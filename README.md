@@ -11,7 +11,7 @@ Un producto de DevGiz Engineering.
 | Carpeta | Qué es |
 |---|---|
 | `motor/` | El motor: referencia catastral, polígonos, ubicación, capas, colindantes y el PDF del certificado |
-| `base/` | La base catastral empacada de cada municipio (no va al repositorio) |
+| `base/` | La base catastral empacada de cada municipio (sin nombres ni cédulas) |
 | `web/` | La plataforma de autoservicio con pago anticipado (Flask) |
 | `plugin/` | Parche y ZIP del plugin de QGIS *Colindante Elite* con el motor nuevo de colindantes |
 | `config/` | Un JSON por municipio (rutas de la base catastral, proyecto de QGIS, plantilla) |

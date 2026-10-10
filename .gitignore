@@ -3,11 +3,11 @@ __pycache__/
 *.pyc
 
 # Datos de clientes y resultados: nunca al repositorio
-base/
 web/datos/
 trabajos/
 tests/datos/
 *.gdb/
+# la base empacada (base/<municipio>/) SI va: no trae nombres ni cedulas
 *.xlsx
 *.dxf
 *.dwg
