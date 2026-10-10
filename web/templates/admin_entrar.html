@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block titulo %}Entrar · {{ CFG.nombre_servicio }}{% endblock %}
+{% block robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+{% block cuerpo %}
+<div class="cont pag" style="max-width:520px">
+  <span class="ceja">Operación</span>
+  <h1 style="margin:16px 0 28px;font-size:clamp(2rem,1.2rem + 3vw,3rem)">Panel de pedidos</h1>
+  {% if deshabilitado %}
+    <div class="aviso ojo">El panel está deshabilitado. Define la variable de entorno <code>PLANOS_ADMIN_CLAVE</code> y reinicia el servidor.</div>
+  {% else %}
+    {% if error %}<div class="aviso mal" role="alert" style="margin-bottom:20px">{{ error }}</div>{% endif %}
+    <form class="panel" method="post">
+      <input type="hidden" name="csrf" value="{{ csrf() }}">
+      <div class="campo" style="margin-top:0">
+        <label for="clave">Clave</label>
+        <input id="clave" type="password" name="clave" required autocomplete="current-password">
+      </div>
+      <div class="pie-form"><span></span><button class="btn btn-p" type="submit">Entrar</button></div>
+    </form>
+  {% endif %}
+</div>
+{% endblock %}

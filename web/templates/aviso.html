@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block titulo %}{{ titulo }} · {{ CFG.nombre_servicio }}{% endblock %}
+{% block robots %}<meta name="robots" content="noindex">{% endblock %}
+{% block cuerpo %}
+<div class="cont pag centrado" style="min-height:52vh;align-content:center">
+  <span class="ceja">{{ codigo }}</span>
+  <h1 style="font-size:clamp(2rem,1.2rem + 3vw,3.4rem)">{{ titulo }}</h1>
+  <p class="bajada">{{ detalle }}</p>
+  <p style="margin-top:16px"><a class="btn btn-p" href="{{ url_for('inicio') }}">Ir al inicio</a></p>
+</div>
+{% endblock %}

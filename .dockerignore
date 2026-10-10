@@ -1,0 +1,11 @@
+.git
+**/__pycache__
+*.pyc
+trabajos
+tests
+plugin
+web/datos
+web/.env.local
+*.bak
+README.md
+planos.bat

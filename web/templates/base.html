@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block titulo %}{{ CFG.nombre_servicio }} · Planos prediales catastrales en minutos{% endblock %}</title>
+<meta name="description" content="{% block descripcion %}Sube tu Excel y tu plano: {{ CFG.nombre_servicio }} ubica cada predio sobre la base catastral, calcula coordenadas, linderos y colindantes y entrega un certificado en PDF por predio. Vista previa gratis.{% endblock %}">
+<meta name="theme-color" content="#060913">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_CO">
+<meta property="og:site_name" content="{{ CFG.nombre_servicio }}">
+<meta property="og:title" content="{{ CFG.nombre_servicio }} · Del levantamiento al plano firmado, en minutos">
+<meta property="og:description" content="Certificados de plano predial catastral con coordenadas, linderos y colindantes. Mira el resultado antes de pagar.">
+{% block robots %}{% endblock %}
+<link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
+<link rel="stylesheet" href="{{ url_for('static', filename='estilo.css', v=VERSION) }}">
+<script src="{{ url_for('static', filename='app.js', v=VERSION) }}" defer></script>
+{% block cabeza %}{% endblock %}
+</head>
+<body>
+<a class="saltar" href="#contenido">Saltar al contenido</a>
+<svg width="0" height="0" class="solo-lector" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="g-marca" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3ba4ff"/><stop offset="1" stop-color="#9066ff"/></linearGradient>
+    <symbol id="i-ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-flecha" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11.5A7 7 0 005 9.500C5 14.800 12 21 12 21z"/><circle cx="12" cy="9.500" r="2.500"/></symbol>
+    <symbol id="i-brujula" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.500 8.500l-2 5-5 2 2-5z"/></symbol>
+    <symbol id="i-lindero" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7l9-3 7 4-2 10-10 2z"/><path d="M13 4v6M20 8l-7 2M8 20l5-10"/></symbol>
+    <symbol id="i-escudo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.500-3.200 7.800-8 9-4.800-1.200-8-4.500-8-9V6z"/><path d="M8.500 12l2.500 2.500 4.500-5"/></symbol>
+    <symbol id="i-regla" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16L16 3l5 5L8 21z"/><path d="M7.500 12.500l1.500 1.500M10.500 9.500l2 2M13.500 6.500l1.500 1.500"/></symbol>
+    <symbol id="i-candado" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.500" width="14" height="10" rx="2.500"/><path d="M8 10.500V8a4 4 0 018 0v2.500"/></symbol>
+  </defs>
+</svg>
+<header class="cab">
+  <div class="cont">
+    <a class="marca" href="{{ url_for('inicio') }}" aria-label="{{ CFG.nombre_servicio }}, inicio">
+      <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M20 3l14.700 8.500v17L20 37 5.300 28.500v-17z" stroke="url(#g-marca)" stroke-width="2.600" stroke-linejoin="round"/><path d="M14 13v14h12" stroke="#edf2fa" stroke-width="2.800" stroke-linecap="round" stroke-linejoin="round"/><circle cx="26" cy="27" r="2.600" fill="#2de2e6"/></svg>
+      <span><b>{{ CFG.nombre_servicio|upper }}</b><small>por {{ CFG.marca }}</small></span>
+    </a>
+    <nav class="nav" aria-label="Principal">{% block nav %}{% endblock %}</nav>
+  </div>
+</header>
+<main id="contenido">{% block cuerpo %}{% endblock %}</main>
+<footer class="pie">
+  <div class="cont">
+    <p><b class="tenue">{{ CFG.nombre_servicio }}</b> es un producto de {{ CFG.marca }}. Los certificados llevan la firma del profesional
+      responsable que indica cada cliente. La base catastral es la publicada por el gestor catastral del municipio.</p>
+    <p class="mono">{{ CFG.municipios.values()|join(' · ') }}</p>
+  </div>
+</footer>
+</body>
+</html>

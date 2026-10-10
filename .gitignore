@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+
+# Datos de clientes y resultados: nunca al repositorio
+base/
+web/datos/
+trabajos/
+tests/datos/
+*.gdb/
+*.xlsx
+*.dxf
+*.dwg
+
+# Secretos y configuración local
+web/.env.local
+.env
+*.key
+
+# Varios
+*.bak
+.claude/

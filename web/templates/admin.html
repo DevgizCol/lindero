@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block titulo %}Operación · {{ CFG.nombre_servicio }}{% endblock %}
+{% block robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+{% block nav %}<form method="post" action="{{ url_for('admin_salir') }}"><input type="hidden" name="csrf" value="{{ csrf() }}">
+  <button class="btn btn-s btn-ch" type="submit">Salir</button></form>{% endblock %}
+{% block cuerpo %}
+<div class="cont pag">
+  <div class="adm-cab">
+    <div><span class="ceja">Operación</span><h1 style="margin-top:16px;font-size:clamp(2rem,1.2rem + 3vw,3.2rem)">Pedidos</h1></div>
+    <div class="chips">
+      <span class="chip">{{ pedidos|length }} en total</span>
+      <span class="chip pend">{{ pedidos|selectattr('estado', 'equalto', 'EN_REVISION')|list|length }} por revisar</span>
+      <span class="chip pend">{{ pedidos|selectattr('estado', 'equalto', 'PREVIA_LISTA')|rejectattr('pagado')|list|length }} esperando pago</span>
+    </div>
+  </div>
+  {% if not pedidos %}<div class="tarjeta centrado"><h2>Aún no hay pedidos</h2><p class="tenue">Aparecerán aquí en cuanto alguien suba sus archivos.</p></div>{% endif %}
+  {% for p in pedidos %}
+  {% set r = p.get('resumen', {}) %}
+  <article class="tarjeta ped">
+    <div class="ped-top">
+      <div>
+        <h2 style="margin:0" class="mono">{{ p.id[:8] }}</h2>
+        <p class="mini">{{ p.creado.replace('T', ' ') }} · {{ p.correo }}</p>
+        <p class="mini">{{ p.firmante.replace('\n', ' · ') }}</p>
+      </div>
+      <div class="chips">
+        <span class="chip {{ 'ok' if p.estado == 'LISTO' else ('err' if p.estado in ('ERROR', 'ERROR_ENTRADA') else ('pend' if p.estado == 'EN_REVISION' else '')) }}">{{ ESTADOS.get(p.estado, p.estado) }}</span>
+        <span class="chip {{ 'ok' if p.pagado else 'pend' }}">{{ 'Pagado' if p.pagado else 'Sin pagar' }}</span>
+        {% if p.get('precio') %}<span class="chip">{{ p.precio|pesos }}</span>{% endif %}
+      </div>
+    </div>
+    {% if r %}
+    <p class="tenue">{{ r.predios }} predios · ubicación {{ r.ubicacion.get('metodo', '-')|replace('_', ' ')|lower }}
+      ({{ r.ubicacion.get('crs_plano', '-') }}, <span class="mono">dx {{ r.ubicacion.get('dx', 0) }} m · dy {{ r.ubicacion.get('dy', 0) }} m</span>)</p>
+    {% if r.por_revisar %}<div class="aviso ojo"><b>Por revisar: {{ r.por_revisar|join(', ') }}</b><span>El detalle de cada lindero está en el informe de revisión.</span></div>{% endif %}
+    {% if r.avisos %}<details class="obs"><summary>Avisos del motor ({{ r.avisos|length }})</summary><ul>{% for a in r.avisos %}<li>{{ a }}</li>{% endfor %}</ul></details>{% endif %}
+    {% endif %}
+    {% if p.get('error') %}<div class="aviso mal">{{ p.error }}</div>{% endif %}
+    <div class="acc">
+      <a class="btn btn-s btn-ch" href="{{ url_for('ver_pedido', pid=p.id) }}">Ver como cliente</a>
+      {% if r %}<a class="btn btn-s btn-ch" href="{{ url_for('admin_archivo', pid=p.id, nombre='vista_previa.png') }}" target="_blank" rel="noopener">Mapa de ubicación</a>
+      <a class="btn btn-s btn-ch" href="{{ url_for('admin_archivo', pid=p.id, nombre='informe_final.xlsx' if p.estado in ('LISTO', 'EN_REVISION') else 'informe_previa.xlsx') }}">Informe de revisión</a>{% endif %}
+      {% if p.estado in ('LISTO', 'EN_REVISION') %}<a class="btn btn-s btn-ch" href="{{ url_for('admin_archivo', pid=p.id, nombre='entrega.zip') }}">ZIP</a>{% endif %}
+      {% if not p.pagado and p.estado == 'PREVIA_LISTA' %}
+        <form method="post" action="{{ url_for('admin_accion', pid=p.id, accion='pagado') }}">
+          <input type="hidden" name="csrf" value="{{ csrf() }}">
+          <input type="text" name="referencia" placeholder="N.º de comprobante" aria-label="Número del comprobante de pago">
+          <button class="btn btn-p btn-ch" type="submit">Confirmar pago</button></form>{% endif %}
+      {% if p.estado == 'EN_REVISION' and p.pagado %}
+        <form method="post" action="{{ url_for('admin_accion', pid=p.id, accion='aprobar') }}">
+          <input type="hidden" name="csrf" value="{{ csrf() }}"><button class="btn btn-p btn-ch" type="submit">Aprobar y liberar la descarga</button></form>{% endif %}
+      {% if p.pagado %}
+        <form method="post" action="{{ url_for('admin_accion', pid=p.id, accion='regenerar') }}">
+          <input type="hidden" name="csrf" value="{{ csrf() }}"><button class="btn btn-s btn-ch" type="submit">Volver a generar</button></form>{% endif %}
+    </div>
+  </article>
+  {% endfor %}
+</div>
+{% endblock %}

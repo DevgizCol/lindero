@@ -1,0 +1,44 @@
+{
+  "nombre_servicio": "Lindero",
+  "marca": "DevGiz Engineering",
+  "municipios": {
+    "malambo": "Malambo (Atlántico)"
+  },
+  "precio_por_predio": 25000,
+  "precio_minimo": 50000,
+  "moneda": "COP",
+  "max_predios": 400,
+  "max_mb_por_archivo": 40,
+  "contacto": "",
+  "pago_manual": "Paga por Nequi o transferencia y envía el comprobante. La descarga se activa cuando se confirma el pago.",
+  "cifras": [
+    {
+      "valor": "147/147",
+      "texto": "linderos con el colindante correcto en la entrega de validación"
+    },
+    {
+      "valor": "38 s",
+      "texto": "para generar 22 planos completos en la prueba de referencia"
+    },
+    {
+      "valor": "6 cm",
+      "texto": "de diferencia frente a la ubicación hecha a mano por un especialista"
+    },
+    {
+      "valor": "99,7 %",
+      "texto": "de acierto en 2.446 linderos de control sobre la base catastral"
+    }
+  ],
+  "cifras_nota": "Pruebas internas con datos reales de Malambo (Atlántico), octubre de 2026.",
+  "limites": {
+    "pedidos_por_hora": 6,
+    "cola_maxima": 25
+  },
+  "wompi": {
+    "activo": false,
+    "llave_publica_env": "WOMPI_LLAVE_PUBLICA",
+    "secreto_integridad_env": "WOMPI_SECRETO_INTEGRIDAD",
+    "secreto_eventos_env": "WOMPI_SECRETO_EVENTOS",
+    "checkout": "https://checkout.wompi.co/p/"
+  }
+}

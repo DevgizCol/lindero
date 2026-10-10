@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+{% block nav %}
+  <a href="#como">Cómo funciona</a>
+  <a href="#entrega">Qué recibes</a>
+  <a href="#precio">Precio</a>
+  <a href="#preguntas">Preguntas</a>
+  <a class="btn btn-p btn-ch" href="#pedido">Empezar</a>
+{% endblock %}
+{% block cuerpo %}
+
+<section class="portada">
+  <div class="cont">
+    <div class="portada-txt">
+      <span class="ceja">Certificados de plano predial · {{ CFG.municipios.values()|list|first }}</span>
+      <h1>Del levantamiento al <span class="degradado">plano firmado</span>, en minutos.</h1>
+      <p class="bajada">Sube el Excel y el plano de tus predios. {{ CFG.nombre_servicio }} los ubica sobre la base catastral oficial,
+        calcula coordenadas, linderos y colindantes, y te muestra el resultado antes de que pagues.</p>
+      <div class="acciones">
+        <a class="btn btn-p btn-xl" href="#pedido">Ver mi vista previa gratis <svg aria-hidden="true"><use href="#i-flecha"/></svg></a>
+        <a class="btn btn-s btn-xl" href="#como">Cómo funciona</a>
+      </div>
+      <ul class="garantias">
+        <li><svg aria-hidden="true"><use href="#i-ok"/></svg>Sin registro</li>
+        <li><svg aria-hidden="true"><use href="#i-ok"/></svg>Vista previa sin costo</li>
+        <li><svg aria-hidden="true"><use href="#i-ok"/></svg>Pagas solo si te sirve</li>
+      </ul>
+    </div>
+
+    <div class="tablero" aria-hidden="true">
+      <div class="tablero-barra"><span><i></i>Predio 0043 · ubicando</span><span>CTM12 · MAGNA-SIRGAS</span></div>
+      <svg viewBox="0 0 560 320" role="presentation">
+        <defs>
+          <linearGradient id="g-lote" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3ba4ff"/><stop offset="1" stop-color="#9066ff"/></linearGradient>
+          <linearGradient id="g-barrido" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2de2e6" stop-opacity="0"/><stop offset=".85" stop-color="#2de2e6" stop-opacity=".16"/><stop offset="1" stop-color="#2de2e6" stop-opacity=".55"/></linearGradient>
+          <pattern id="malla" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M28 0H0V28" fill="none" stroke="rgba(148,170,210,.09)" stroke-width="1"/></pattern>
+          <clipPath id="marco"><rect width="560" height="320" rx="14"/></clipPath>
+        </defs>
+        <g clip-path="url(#marco)">
+          <rect width="560" height="320" fill="url(#malla)"/>
+          <path class="t-predio" d="M60 22l110 11v52.500L60 74zM170 33l130 13v52L170 85.500zM300 46l120 12v51.500L300 98zM420 58l92 9v51l-92-8.500z"/>
+          <path class="t-predio" d="M60 74l74 8v176l-74 6zM134 82l74 7v163l-74 6zM290 97l74 7v135l-74 6zM364 104l74 7v122l-74 6zM438 111l74 7v109l-74 6z"/>
+          <path class="t-via" d="M24 296L540 252"/>
+          <text class="t-rot" x="350" y="285" transform="rotate(-4.900 350 285)">CALLE 12</text>
+          <text class="t-rot" x="84" y="172">0041</text><text class="t-rot" x="158" y="172">0042</text>
+          <text class="t-rot" x="314" y="172">0044</text><text class="t-rot" x="388" y="172">0045</text><text class="t-rot" x="462" y="172">0046</text>
+          <text class="t-rot" x="222" y="66">0019</text><text class="t-rot" x="346" y="80">0020</text>
+          <path class="t-lote" d="M208 89l82 8v148l-82 7z"/>
+          <rect class="t-barrido" x="-140" y="0" width="140" height="320"/>
+          <circle class="t-vert" style="--i:0" cx="208" cy="89" r="5"/><circle class="t-vert" style="--i:1" cx="290" cy="97" r="5"/>
+          <circle class="t-vert" style="--i:2" cx="290" cy="245" r="5"/><circle class="t-vert" style="--i:3" cx="208" cy="252" r="5"/>
+          <text class="t-num" style="--i:0" x="192" y="84">1</text><text class="t-num" style="--i:1" x="299" y="92">2</text>
+          <text class="t-num" style="--i:2" x="299" y="258">3</text><text class="t-num" style="--i:3" x="192" y="266">4</text>
+          <text class="t-cota" x="236" y="84">8.17</text><text class="t-cota" x="232" y="176">201.64 m²</text>
+          <text class="t-cota" x="236" y="270">8.20</text>
+        </g>
+      </svg>
+      <div class="cuadro">
+        <div><span>TRAMO</span><span>DIST.</span><span>COLINDANTE</span></div>
+        <div style="--i:0"><b>1 → 2</b><span>8.17 m</span><em>PREDIO · 0019</em></div>
+        <div style="--i:1"><b>2 → 3</b><span>24.53 m</span><em>PREDIO · 0044</em></div>
+        <div style="--i:2"><b>3 → 4</b><span>8.20 m</span><em>CALLE 12</em></div>
+        <div style="--i:3"><b>4 → 1</b><span>24.61 m</span><em>PREDIO · 0042</em></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cont" aria-labelledby="t-cifras" data-ver>
+  <h2 id="t-cifras" class="solo-lector">Resultados medidos</h2>
+  <div class="cifras">
+    {% for c in CFG.cifras %}<div><b class="degradado">{{ c.valor }}</b><span>{{ c.texto }}</span></div>{% endfor %}
+  </div>
+  <p class="mini" style="margin-top:14px">{{ CFG.cifras_nota }}</p>
+</section>
+
+<section class="sec" id="como">
+  <div class="cont">
+    <div class="sec-cab" data-ver>
+      <span class="ceja">Cómo funciona</span>
+      <h2>Tres pasos. Ninguno te pide confiar a ciegas.</h2>
+    </div>
+    <ol class="pasos">
+      <li data-ver><small>2 minutos</small><h3>Sube tus archivos</h3><p>El Excel con el NODO y la dirección de cada predio, y el plano del levantamiento en DXF.</p></li>
+      <li data-ver style="--d:120ms"><small>Sin costo</small><h3>Mira tus planos antes de pagar</h3><p>Validamos los archivos, ubicamos cada predio y te mostramos dos planos de muestra y el mapa completo.</p></li>
+      <li data-ver style="--d:240ms"><small>Entrega en minutos</small><h3>Paga y descarga</h3><p>Un PDF por predio, nombrado con su NODO, en un ZIP listo para entregar.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="sec fondo-2 borde-sup" id="entrega">
+  <div class="cont dos">
+    <div class="hoja" data-ver aria-hidden="true">
+      <svg viewBox="0 0 700 495" role="presentation" font-family="Arial, sans-serif">
+        <rect width="700" height="495" fill="#fff"/><rect x="5" y="5" width="690" height="485" fill="none" stroke="#111" stroke-width="1.200"/>
+        <text x="350" y="19" text-anchor="middle" font-family="Times New Roman, serif" font-weight="700" font-size="11.500" fill="#111">CERTIFICADO PLANO PREDIAL CATASTRAL</text>
+        <g fill="none" stroke="#111" stroke-width=".800"><rect x="9" y="29" width="394" height="86"/><path d="M9 46h394M9 64h394M9 81h280M9 98h280M67 29v86M289 46v69M333 46v69"/><rect x="416" y="29" width="272" height="86"/><path d="M416 44h272"/><rect x="9" y="127" width="679" height="268"/><rect x="16" y="134" width="662" height="254"/></g>
+        <g fill="#c9ced6"><rect x="74" y="34" width="90" height="6"/><rect x="74" y="52" width="170" height="6"/><rect x="74" y="69" width="120" height="6"/><rect x="74" y="86" width="150" height="6"/><rect x="74" y="103" width="60" height="6"/><rect x="340" y="52" width="46" height="6"/><rect x="340" y="69" width="40" height="6"/><rect x="340" y="94" width="50" height="6"/>
+          <rect x="470" y="54" width="164" height="4"/><rect x="486" y="64" width="132" height="4"/><rect x="500" y="74" width="104" height="4"/><rect x="478" y="84" width="148" height="4"/><rect x="494" y="94" width="116" height="4"/></g>
+        <g fill="#7b8491" font-size="6.500"><text x="14" y="40">Departamento:</text><text x="14" y="58">N° Predial:</text><text x="14" y="75">Dirección:</text><text x="14" y="92">Ocupante:</text><text x="14" y="109">Fecha:</text><text x="293" y="58">Área:</text><text x="293" y="75">Barrio:</text><text x="293" y="100">Zona:</text><text x="552" y="39" text-anchor="middle" fill="#111">Sistema de Referencia</text></g>
+        <g fill="none" stroke="#9aa3ae" stroke-width=".700"><path d="M16 190l190 44M16 162l300 70 362 82M206 234l60-100M316 232l56-98M420 256l52-122M524 280l44-146M620 302l36-168M110 388l40-178M230 388l34-150M420 388l-30-140M560 388l-24-108"/></g>
+        <path d="M16 330L678 372" stroke="#e0457b" stroke-width=".900" fill="none"/>
+        <text x="300" y="344" font-size="8" fill="#555" transform="rotate(3.600 300 344)">CALLE 12</text>
+        <path d="M264 238l126 10-30 100-110-14z" fill="none" stroke="#111" stroke-width="2"/>
+        <g stroke="#e11" stroke-width="1.300"><path d="M260 234l8 8m0-8l-8 8M386 244l8 8m0-8l-8 8M356 344l8 8m0-8l-8 8M246 330l8 8m0-8l-8 8"/></g>
+        <text x="318" y="300" text-anchor="middle" font-weight="700" font-size="9" fill="#e11">A: 201.64 m²</text>
+        <g fill="none" stroke="#111" stroke-width=".800"><rect x="9" y="402" width="292" height="86"/><path d="M9 414h292"/><rect x="312" y="402" width="200" height="40"/><rect x="312" y="448" width="96" height="40"/><rect x="416" y="448" width="96" height="40"/><rect x="524" y="402" width="164" height="86"/><path d="M524 414h164"/></g>
+        <rect x="16" y="420" width="270" height="9" fill="#a8f0d4" stroke="#111" stroke-width=".500"/>
+        <g fill="#e3e6ea"><rect x="16" y="438" width="270" height="8"/><rect x="16" y="456" width="270" height="8"/></g>
+        <g fill="#aeb5bf"><rect x="20" y="431" width="20" height="4"/><rect x="70" y="431" width="44" height="4"/><rect x="124" y="431" width="44" height="4"/><rect x="180" y="431" width="22" height="4"/><rect x="212" y="431" width="68" height="4"/><rect x="20" y="440" width="20" height="4"/><rect x="70" y="440" width="44" height="4"/><rect x="124" y="440" width="44" height="4"/><rect x="180" y="440" width="22" height="4"/><rect x="212" y="440" width="48" height="4"/><rect x="20" y="449" width="20" height="4"/><rect x="70" y="449" width="44" height="4"/><rect x="124" y="449" width="44" height="4"/><rect x="180" y="449" width="22" height="4"/><rect x="212" y="449" width="68" height="4"/><rect x="20" y="458" width="20" height="4"/><rect x="70" y="458" width="44" height="4"/><rect x="124" y="458" width="44" height="4"/><rect x="180" y="458" width="22" height="4"/><rect x="212" y="458" width="68" height="4"/></g>
+        <g font-size="6.500" fill="#111" text-anchor="middle"><text x="155" y="411">Cuadro de Coordenadas y Linderos</text><text x="412" y="411">Convenciones</text><text x="606" y="411">Firma Autorizada</text><text x="360" y="458" fill="#7b8491">Manzana</text><text x="464" y="458" fill="#7b8491">Plano N°</text></g>
+        <g font-size="12" fill="#111" text-anchor="middle"><text x="360" y="478">0231</text><text x="464" y="478">N-12</text></g>
+        <path d="M566 462c8-16 12 10 20-8s8 18 16-4 10 14 22-6" fill="none" stroke="#333" stroke-width="1.100"/><path d="M560 474h92" stroke="#111" stroke-width=".600"/>
+        <rect x="574" y="424" width="64" height="4" fill="#c9ced6"/><rect x="582" y="432" width="48" height="4" fill="#c9ced6"/>
+      </svg>
+    </div>
+    <div data-ver style="--d:120ms">
+      <span class="ceja">Qué recibes</span>
+      <h2 style="margin-top:18px">Un certificado completo por cada predio.</h2>
+      <ul class="lista">
+        <li><svg aria-hidden="true"><use href="#i-ok"/></svg><div><b>Cuadro de coordenadas y linderos</b><span>Norte, este, distancia y colindante de cada tramo, en el orden del plano.</span></div></li>
+        <li><svg aria-hidden="true"><use href="#i-ok"/></svg><div><b>Colindantes identificados lado por lado</b><span>Predio catastral vecino, lote del mismo levantamiento o vía.</span></div></li>
+        <li><svg aria-hidden="true"><use href="#i-ok"/></svg><div><b>Ubicación sobre la base catastral</b><span>Ajustada sobre los predios oficiales del municipio, no a ojo.</span></div></li>
+        <li><svg aria-hidden="true"><use href="#i-ok"/></svg><div><b>La firma de tu profesional</b><span>Nombre, matrícula y firma de quien responde por el plano.</span></div></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="cont">
+    <div class="sec-cab" data-ver>
+      <span class="ceja">Por dentro</span>
+      <h2>Hecho por quien hace estos planos a mano.</h2>
+      <p class="bajada">Cada decisión del motor replica el criterio de un especialista en catastro, y deja marcado lo que no es seguro.</p>
+    </div>
+    <div class="razones" data-ver>
+      <article><svg aria-hidden="true"><use href="#i-pin"/></svg><h3>Referencia catastral sin buscar una por una</h3><p>Cruza cada dirección con las placas domiciliarias y el registro catastral. Lo que no es seguro queda señalado, no inventado.</p></article>
+      <article><svg aria-hidden="true"><use href="#i-brujula"/></svg><h3>Reconoce el sistema de coordenadas</h3><p>Detecta si tu plano viene en CTM12 o en origen Bogotá y lo lleva a su sitio sobre los predios oficiales.</p></article>
+      <article><svg aria-hidden="true"><use href="#i-lindero"/></svg><h3>Mira hacia afuera de cada lindero</h3><p>El colindante se decide por lo que hay al otro lado de cada tramo, no por lo que roza una esquina.</p></article>
+      <article><svg aria-hidden="true"><use href="#i-escudo"/></svg><h3>Nada sale sin revisar</h3><p>Los predios con datos dudosos pasan por un profesional antes de que se libere tu descarga.</p></article>
+      <article><svg aria-hidden="true"><use href="#i-regla"/></svg><h3>Áreas y distancias consistentes</h3><p>Calculadas sobre el elipsoide, con el mismo criterio que la calculadora de campos de QGIS.</p></article>
+      <article><svg aria-hidden="true"><use href="#i-candado"/></svg><h3>Un enlace privado por pedido</h3><p>Cada pedido vive en una dirección única e imposible de adivinar. Solo tú la tienes.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="sec fondo-2 borde-sup" id="precio">
+  <div class="cont">
+    <div class="sec-cab" data-ver>
+      <span class="ceja">Precio</span>
+      <h2>Un precio por predio. Sin mensualidad ni letra pequeña.</h2>
+    </div>
+    <div class="precio-caja" data-ver>
+      <div>
+        <span class="mini mono">POR PREDIO CON PLANO</span>
+        <div class="precio-num">{{ CFG.precio_por_predio|pesos }}<small>{{ CFG.moneda }}</small></div>
+        <ul class="lista">
+          <li><svg aria-hidden="true"><use href="#i-ok"/></svg><div><b>La vista previa es gratis</b><span>Ves dos planos y el mapa de todos tus predios antes de decidir.</span></div></li>
+          <li><svg aria-hidden="true"><use href="#i-ok"/></svg><div><b>Solo se cobran los predios con plano</b><span>Las filas sin figura en el DXF no entran en la cuenta.</span></div></li>
+          <li><svg aria-hidden="true"><use href="#i-ok"/></svg><div><b>Revisión profesional incluida</b><span>Si algo queda dudoso, se revisa sin costo adicional.</span></div></li>
+        </ul>
+      </div>
+      <div class="calc" data-calc data-unidad="{{ CFG.precio_por_predio }}" data-minimo="{{ CFG.precio_minimo }}">
+        <span class="mini mono">CALCULA TU PEDIDO</span>
+        <label for="rango" style="margin-top:22px"><span>Predios</span><output for="rango" data-cuantos>20</output></label>
+        <input id="rango" type="range" min="1" max="200" value="20" step="1">
+        <div class="calc-total"><span class="tenue">Total</span><b data-total>{{ (CFG.precio_por_predio * 20)|pesos }}</b></div>
+        <p class="mini" data-nota style="margin-top:8px">20 × {{ CFG.precio_por_predio|pesos }}</p>
+        <a class="btn btn-p" href="#pedido" style="margin-top:28px;width:100%">Empezar con la vista previa gratis</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="pedido">
+  <div class="cont">
+    <div class="sec-cab" data-ver>
+      <span class="ceja">Tu pedido</span>
+      <h2>Empieza ahora. Tu vista previa llega en un par de minutos.</h2>
+    </div>
+    {% if errores %}<div class="aviso mal" role="alert" style="margin-bottom:24px"><b>Falta corregir esto para continuar</b><ul>{% for e in errores %}<li>{{ e }}</li>{% endfor %}</ul></div>{% endif %}
+    <div class="pedido">
+      <form class="panel" method="post" action="{{ url_for('crear_pedido') }}" enctype="multipart/form-data" data-pasos>
+        <input type="hidden" name="csrf" value="{{ csrf() }}">
+        <ol class="etapas solo-js" aria-label="Pasos del pedido">
+          <li class="actual">1 · Archivos</li><li>2 · Firma</li><li>3 · Contacto</li>
+        </ol>
+
+        <fieldset class="paso-form activo">
+          <legend>Los archivos de tu levantamiento</legend>
+          <p class="tenue">Se validan antes de cobrar nada. Si algo no cuadra, te decimos exactamente qué corregir.</p>
+          <div class="campo">
+            <label for="municipio">Municipio</label>
+            <select id="municipio" name="municipio" required>
+              {% for k, v in CFG.municipios.items() %}<option value="{{ k }}">{{ v }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="campo">
+            <span class="et" id="et-excel">Excel de los predios</span>
+            <label class="soltar"><span class="ico">XLSX</span><span><b>Arrastra tu Excel o haz clic</b><small>Con las columnas NODO y dirección. Puedes subir varios.</small></span><span class="accion">Elegir</span>
+              <input type="file" name="excel" accept=".xlsx,.xlsm" multiple required aria-labelledby="et-excel"></label>
+          </div>
+          <div class="campo">
+            <span class="et" id="et-dxf">Plano del levantamiento</span>
+            <label class="soltar"><span class="ico">DXF</span><span><b>Arrastra tu plano o haz clic</b><small>Cada predio como figura cerrada, con su NODO escrito dentro.</small></span><span class="accion">Elegir</span>
+              <input type="file" name="dxf" accept=".dxf" required aria-labelledby="et-dxf"></label>
+          </div>
+          <div class="campo">
+            <span class="et" id="et-pts">Cartera de campo <span class="opc">opcional</span></span>
+            <label class="soltar"><span class="ico">TXT</span><span><b>Solo si el plano no trae los NODO escritos</b><small>id, norte, este, cota, código</small></span><span class="accion">Elegir</span>
+              <input type="file" name="puntos" accept=".txt,.csv" aria-labelledby="et-pts"></label>
+          </div>
+          <div class="pie-form solo-js"><span class="mini">Paso 1 de 3</span><button class="btn btn-p" type="button" data-ir="sig">Continuar <svg aria-hidden="true"><use href="#i-flecha"/></svg></button></div>
+        </fieldset>
+
+        <fieldset class="paso-form">
+          <legend>Quién firma los planos</legend>
+          <p class="tenue">{{ CFG.nombre_servicio }} no firma por nadie: el certificado sale con los datos del profesional que tú indiques.</p>
+          <div class="campo">
+            <label for="firmante">Nombre y matrícula profesional</label>
+            <textarea id="firmante" name="firmante" required maxlength="180" placeholder="Top. Nombre Apellido&#10;T.P. 00-0000 CPNT">{{ datos.get('firmante', '') }}</textarea>
+            <span class="ayuda">Sale tal como lo escribas, debajo de «Firma autorizada».</span>
+          </div>
+          <div class="campo">
+            <span class="et" id="et-firma">Imagen de la firma <span class="opc">opcional</span></span>
+            <label class="soltar"><span class="ico">PNG</span><span><b>Arrastra la firma o haz clic</b><small>Si no la subes, el plano sale con el espacio para firmar a mano.</small></span><span class="accion">Elegir</span>
+              <input type="file" name="firma" accept=".png,.jpg,.jpeg" aria-labelledby="et-firma"></label>
+          </div>
+          <label class="casilla"><input type="checkbox" name="declaracion" value="1" required>
+            <span>Tengo autorización del profesional indicado para usar su nombre, matrícula y firma en estos planos.</span></label>
+          <div class="pie-form solo-js"><button class="btn btn-s" type="button" data-ir="ant">Atrás</button><button class="btn btn-p" type="button" data-ir="sig">Continuar <svg aria-hidden="true"><use href="#i-flecha"/></svg></button></div>
+        </fieldset>
+
+        <fieldset class="paso-form">
+          <legend>¿A dónde te avisamos?</legend>
+          <p class="tenue">Solo para tu pedido: lo usamos si hace falta contactarte por una revisión.</p>
+          <div class="campo">
+            <label for="correo">Correo electrónico</label>
+            <input id="correo" type="email" name="correo" required autocomplete="email" inputmode="email" placeholder="nombre@empresa.com" value="{{ datos.get('correo', '') }}">
+          </div>
+          <div class="pie-form"><button class="btn btn-s solo-js" type="button" data-ir="ant">Atrás</button><button class="btn btn-p btn-xl" type="submit">Ver mi vista previa gratis</button></div>
+          <p class="mini" style="margin-top:16px">No se cobra nada en este paso. Decides después de ver tus planos.</p>
+        </fieldset>
+      </form>
+
+      <aside class="panel-lat" aria-labelledby="t-req">
+        <h3 id="t-req">Ten esto a la mano</h3>
+        <ul class="requisitos">
+          <li><svg aria-hidden="true"><use href="#i-ok"/></svg><span><b>Excel (.xlsx)</b> con NODO y dirección de cada predio. Si ya trae el código predial, se respeta.</span></li>
+          <li><svg aria-hidden="true"><use href="#i-ok"/></svg><span><b>Plano (.dxf)</b>: desde AutoCAD, <em>Guardar como → DXF 2018</em>. Cada predio cerrado y con su NODO dentro.</span></li>
+          <li><svg aria-hidden="true"><use href="#i-ok"/></svg><span><b>Datos de quien firma</b>: nombre, matrícula y, si quieres, la imagen de la firma.</span></li>
+        </ul>
+        <p class="mini" style="margin-top:22px">Máximo {{ CFG.max_mb_por_archivo }} MB por archivo.</p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<section class="sec fondo-2 borde-sup" id="preguntas">
+  <div class="cont dos" style="align-items:start">
+    <div class="sec-cab" data-ver style="margin:0">
+      <span class="ceja">Preguntas</span>
+      <h2>Lo que se pregunta antes de subir el primer archivo.</h2>
+    </div>
+    <div class="preguntas" data-ver>
+      <details open><summary>¿Puedo ver el resultado antes de pagar?</summary><p>Sí. Recibes dos planos de muestra con marca de agua y el mapa con todos tus predios ya ubicados. Si no te sirve, no pagas nada.</p></details>
+      <details><summary>¿Qué pasa si mi plano no tiene coordenadas reales?</summary><p>Si el Excel trae el código predial de los predios, se ubican con él sobre la base catastral y un profesional revisa el resultado antes de liberar la descarga.</p></details>
+      <details><summary>¿Y si no tengo el código predial?</summary><p>Se busca por la dirección, cruzando las placas domiciliarias y el registro catastral. Cuando el plano tiene coordenadas, se confirma con el predio que queda debajo de cada lote.</p></details>
+      <details><summary>¿Quién firma los planos?</summary><p>El profesional que tú indiques. Declaras tener su autorización, y el certificado sale con su nombre, matrícula y firma.</p></details>
+      <details><summary>¿Qué pasa si un predio queda con datos dudosos?</summary><p>No se entrega sin revisar. El pedido pasa a revisión técnica y la descarga se libera cuando un profesional lo verifica.</p></details>
+      <details><summary>¿Qué municipios cubre?</summary><p>Hoy: {{ CFG.municipios.values()|join(', ') }}. Cada municipio nuevo requiere cargar su base catastral oficial.</p></details>
+      <details><summary>¿Cómo se paga?</summary><p>{% if wompi %}Con Wompi: PSE, Nequi o tarjeta. La entrega se genera en cuanto se confirma el pago.{% else %}{{ CFG.pago_manual }}{% endif %}</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="cont">
+    <div class="cierre" data-ver>
+      <h2>Tus planos pueden estar listos hoy.</h2>
+      <p class="bajada">Sube tus archivos y mira el resultado. Lo demás se decide con los planos en pantalla.</p>
+      <a class="btn btn-p btn-xl" href="#pedido">Ver mi vista previa gratis <svg aria-hidden="true"><use href="#i-flecha"/></svg></a>
+    </div>
+  </div>
+</section>
+{% endblock %}

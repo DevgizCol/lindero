@@ -1,0 +1,38 @@
+{
+  "municipio": "MALAMBO",
+  "departamento": "ATLÁNTICO",
+  "codigo_mun": "08433",
+  "gdb": "C:/Dani/Carto_Malambo/BASE_CATASTRAL_MALAMBO/ANEXOS_MALAMBO_2025013571/2. Información cartográfica/08433_MALAMBO.gdb/08433_MALAMBO.gdb",
+  "capas": {
+    "terreno": "lc_terreno",
+    "vias": "cc_nomeclatura_vial",
+    "placas": "cc_nomeclatura_domiciliaria",
+    "manzanas": "cc_manzana"
+  },
+  "r1": "C:/Dani/Carto_Malambo/BASE_CATASTRAL_MALAMBO/ANEXOS_MALAMBO_2025013571/1. Información alfanumérica/20250331_R1_08433.txt",
+  "proyecto_qgis": "C:/Dani/Carto_Malambo/BASE_CATASTRAL_MALAMBO/BASE_CATASTRAL_MALAMBO.qgz",
+  "layout": "SALIDAS_GRAFICAS",
+  "crs_origen_candidatos": [
+    "EPSG:9377",
+    "EPSG:3116",
+    "EPSG:3115",
+    "EPSG:21897",
+    "EPSG:3117"
+  ],
+  "plantilla": "C:/Dani/Carto_Malambo/BASE_CATASTRAL_MALAMBO/PLANTILLA/SALIDA_CARTOGRAFICA.qpt",
+  "capas_mapa": [
+    "COORDENADAS",
+    "COTAS",
+    "LEVANTAMIENTO_01",
+    "08433_MALAMBO — cc_nomeclatura_vial",
+    "lc_terreno"
+  ],
+  "python_qgis": "",
+  "crs_salida": "ESRI:103599",
+  "medidas": "elipsoidal",
+  "salida": "propia",
+  "base_empacada": "base/malambo",
+  "escala_base": 167,
+  "firmante": "Top. Hector Castañez\nT.P. 01-3864 CNPT Bogota DC.",
+  "firma": "C:/Dani/Carto_Malambo/BASE_CATASTRAL_MALAMBO/firma.png"
+}

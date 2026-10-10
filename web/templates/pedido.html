@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block titulo %}Pedido {{ p.id[:8] }} · {{ CFG.nombre_servicio }}{% endblock %}
+{% block robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+{% block cabeza %}{% if en_curso %}<noscript><meta http-equiv="refresh" content="6"></noscript>{% endif %}{% endblock %}
+{% block nav %}<a class="btn btn-s btn-ch" href="{{ url_for('inicio') }}#pedido">Nuevo pedido</a>{% endblock %}
+{% block cuerpo %}
+{% set r = p.get('resumen', {}) %}
+<div class="cont pag"{% if en_curso %} data-estado-url="{{ url_for('estado_pedido', pid=p.id) }}" data-estado="{{ p.estado }}"{% endif %}>
+  <span class="ceja">Pedido {{ p.id[:8] }} · {{ CFG.municipios.get(p.municipio, p.municipio) }}</span>
+  <h1 style="margin-top:18px;font-size:clamp(2rem,1.2rem + 3vw,3.4rem)">{{ ESTADOS.get(p.estado, p.estado) }}</h1>
+
+  <ol class="ruta" aria-label="Avance del pedido">
+    {% for nombre in ['Archivos', 'Vista previa', 'Pago', 'Generación', 'Entrega'] %}
+    <li class="{{ 'hecha' if loop.index0 < paso else ('actual' if loop.index0 == paso else '') }}"{% if loop.index0 == paso %} aria-current="step"{% endif %}><span>{{ nombre }}</span></li>
+    {% endfor %}
+  </ol>
+
+  {% if en_curso %}
+  <div class="tarjeta centrado" role="status" aria-live="polite">
+    <div class="radar" aria-hidden="true"></div>
+    {% if p.estado in ('PAGADO', 'GENERANDO') %}
+      <h2>Generando tus planos a resolución completa</h2>
+      <p class="tenue" data-frase>Dibujando el plano de cada predio…</p>
+      <p class="tenue" data-frase hidden>Armando el cuadro de coordenadas y linderos…</p>
+      <p class="tenue" data-frase hidden>Empaquetando la entrega…</p>
+    {% else %}
+      <h2>Estamos leyendo tu levantamiento</h2>
+      <p class="tenue" data-frase>Validando el Excel y el plano…</p>
+      <p class="tenue" data-frase hidden>Ubicando cada predio sobre la base catastral…</p>
+      <p class="tenue" data-frase hidden>Identificando los colindantes de cada lindero…</p>
+      <p class="tenue" data-frase hidden>Dibujando tus planos de muestra…</p>
+    {% endif %}
+    <p class="mini">Esta página se actualiza sola. Suele tardar menos de dos minutos.</p>
+  </div>
+  {% endif %}
+
+  {% if p.mensaje and p.estado in ('ERROR_ENTRADA', 'ERROR') %}<div class="aviso mal" role="alert" style="margin-bottom:20px">{{ p.mensaje }}</div>{% endif %}
+
+  {% if p.estado == 'ERROR_ENTRADA' %}
+  <div class="tarjeta">
+    <h2>Qué encontramos en tus archivos</h2>
+    <ul class="tenue" style="margin:0;padding-left:20px;display:grid;gap:8px">
+      {% for a in r.get('avisos', []) %}<li>{{ a }}</li>{% else %}<li>Los archivos no se pudieron leer.</li>{% endfor %}
+    </ul>
+    <p style="margin-top:24px"><a class="btn btn-p" href="{{ url_for('inicio') }}#pedido">Subir los archivos corregidos</a></p>
+    <p class="mini" style="margin-top:12px">No se cobró nada.</p>
+  </div>
+  {% endif %}
+
+  {% if p.estado == 'PREVIA_LISTA' %}
+  <div class="con-lado">
+    <div>
+      <div class="tarjeta">
+        <h2>Tus {{ r.predios }} planos ya están armados</h2>
+        <div class="galeria">
+          {% for img in p.get('previas', []) %}<a href="{{ url_for('ver_previa', pid=p.id, nombre=img) }}" target="_blank" rel="noopener">
+            <img src="{{ url_for('ver_previa', pid=p.id, nombre=img) }}" alt="Vista previa del plano {{ img.rsplit('.', 1)[0] }}" decoding="async"></a>{% endfor %}
+          <a href="{{ url_for('ver_previa', pid=p.id, nombre='vista_general.png') }}" target="_blank" rel="noopener">
+            <img src="{{ url_for('ver_previa', pid=p.id, nombre='vista_general.png') }}" alt="Mapa con todos los predios ubicados sobre la base catastral" decoding="async"></a>
+        </div>
+        <p class="mini" style="margin-top:14px">Muestra en baja resolución con marca de agua. La entrega es en PDF a resolución completa, sin marca.</p>
+      </div>
+      <div class="tarjeta">
+        <h2>Lo que leímos de tus archivos</h2>
+        <div class="datos">
+          <div><b>{{ r.predios }}</b><span>predios con plano</span></div>
+          <div><b>{{ r.filas_excel }}</b><span>filas en el Excel</span></div>
+          <div><b>{{ r.poligonos }}</b><span>figuras en el plano</span></div>
+        </div>
+        {% if r.sin_poligono %}<div class="aviso ojo" style="margin-top:16px">Sin figura en el plano (no se cobran): {{ r.sin_poligono|join(', ') }}</div>{% endif %}
+        {% if r.avisos %}<details class="obs"><summary>Observaciones del análisis ({{ r.avisos|length }})</summary>
+          <ul>{% for a in r.avisos %}<li>{{ a }}</li>{% endfor %}</ul></details>{% endif %}
+      </div>
+    </div>
+    <aside class="cobro" aria-labelledby="t-total">
+      <span class="mini mono" id="t-total">TOTAL DE TU PEDIDO</span>
+      <div class="total">{{ p.precio|pesos }}</div>
+      <p class="mini">{{ r.predios }} predios × {{ CFG.precio_por_predio|pesos }}{% if p.precio > r.predios * CFG.precio_por_predio %} · pedido mínimo {{ CFG.precio_minimo|pesos }}{% endif %}</p>
+      {% if wompi %}
+        <form method="post" action="{{ url_for('pagar', pid=p.id) }}">
+          <input type="hidden" name="csrf" value="{{ csrf() }}">
+          <button class="btn btn-p btn-xl" type="submit">Pagar y descargar mis planos</button>
+        </form>
+        <p class="mini" style="margin-top:12px;text-align:center">Pago seguro con Wompi · PSE, Nequi o tarjeta</p>
+      {% else %}
+        <div class="aviso ojo" style="margin-top:20px">{{ CFG.pago_manual }}{% if CFG.contacto %} Contacto: {{ CFG.contacto }}.{% endif %}
+          <span>Referencia de tu pago: <code>{{ p.id[:8] }}</code></span></div>
+      {% endif %}
+      <ul>
+        <li><svg aria-hidden="true"><use href="#i-ok"/></svg>Entrega en minutos después del pago</li>
+        <li><svg aria-hidden="true"><use href="#i-ok"/></svg>Un PDF por predio, nombrado con su NODO</li>
+        <li><svg aria-hidden="true"><use href="#i-ok"/></svg>Revisión profesional si algún predio lo necesita</li>
+      </ul>
+    </aside>
+  </div>
+  {% endif %}
+
+  {% if p.estado == 'EN_REVISION' %}
+  <div class="tarjeta centrado">
+    <div class="logro" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.200" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.500l4.500 4.500L19 7.500"/></svg></div>
+    <h2>Tu pago está confirmado</h2>
+    <p class="tenue">{{ r.por_revisar|length }} de tus {{ r.predios }} predios necesitan la verificación de un profesional antes de entregarse.</p>
+    <p class="mini">Vuelve a este enlace: la descarga aparece aquí en cuanto se libere. Si hace falta, te contactamos a {{ p.correo }}.</p>
+  </div>
+  {% endif %}
+
+  {% if p.estado == 'LISTO' and p.pagado %}
+  <div class="tarjeta centrado">
+    <div class="logro" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.200" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.500l4.500 4.500L19 7.500"/></svg></div>
+    <h2>{{ r.predios }} planos listos para entregar</h2>
+    <p class="tenue">Un PDF por predio, con su cuadro de coordenadas, linderos y colindantes.</p>
+    <p style="margin-top:14px"><a class="btn btn-p btn-xl" href="{{ url_for('descargar', pid=p.id) }}">Descargar el ZIP</a></p>
+    <p class="mini">Guarda este enlace: puedes volver a descargar cuando quieras.</p>
+  </div>
+  {% endif %}
+
+  {% if not en_curso %}<p class="mini" style="margin-top:28px">Esta dirección es la llave de tu pedido. Guárdala y no la compartas con quien no deba verlo.</p>{% endif %}
+</div>
+{% endblock %}
