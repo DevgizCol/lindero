@@ -35,15 +35,29 @@ plantilla `.qpt` originales (requiere QGIS LTR por OSGeo4W).
 
 ## Llevarlo a un servidor
 
+La imagen (`Dockerfile`) sirve para cualquier proveedor de contenedores. Necesita 1 GB de memoria, un solo proceso
+y una carpeta persistente en `/datos` para los pedidos.
+
+### Google Cloud Run (sin servidor que mantener)
+
+Cloud Run solo da procesador mientras atiende una petición y no tiene disco, por eso:
+
+- `PLANOS_MODO=peticion` (ya viene en la imagen): la página del pedido lanza el trabajo y la petición dura lo que tarde el motor.
+- Los pedidos se guardan en un bucket de Cloud Storage montado como volumen en `/datos`.
+
+Configuración del servicio: región `us-east1`, 1 GiB de memoria, 1 instancia como máximo, tiempo de espera 900 s,
+procesador solo durante las peticiones, acceso sin autenticación, volumen de Cloud Storage en `/datos`, y las
+variables `PLANOS_ADMIN_CLAVE`, `PLANOS_SECRETO` y `PLANOS_HTTPS=1`. Cada pedido puede pesar hasta 30 MB
+(límite de Cloud Run por petición).
+
+### Servidor propio o máquina virtual
+
 ```bat
 docker build -t lindero .
 docker run -p 8080:8080 -v lindero_datos:/datos -e PLANOS_ADMIN_CLAVE=... -e PLANOS_SECRETO=... -e PLANOS_HTTPS=1 lindero
 ```
 
-- Un trabajo de 22 predios usa unos 260 MB de memoria y tarda cerca de 20 s: cabe en una instancia de 512 MB.
-- Los pedidos se guardan en el volumen `/datos`; sin volumen se pierden al reiniciar el contenedor.
-- Un solo proceso web (la cola de pedidos vive en memoria).
-- Sin Docker, en Linux: `gunicorn --bind 0.0.0.0:8080 --workers 1 --threads 8 web.app:app`.
+Un trabajo de 22 predios usa unos 260 MB de memoria y tarda cerca de 20 s.
 
 ## Uso del motor
 

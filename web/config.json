@@ -8,7 +8,7 @@
   "precio_minimo": 50000,
   "moneda": "COP",
   "max_predios": 400,
-  "max_mb_por_archivo": 40,
+  "max_mb_por_archivo": 20,
   "contacto": "",
   "pago_manual": "Paga por Nequi o transferencia y envía el comprobante. La descarga se activa cuando se confirma el pago.",
   "cifras": [
@@ -40,5 +40,6 @@
     "secreto_integridad_env": "WOMPI_SECRETO_INTEGRIDAD",
     "secreto_eventos_env": "WOMPI_SECRETO_EVENTOS",
     "checkout": "https://checkout.wompi.co/p/"
-  }
+  },
+  "max_mb_pedido": 30
 }

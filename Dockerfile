@@ -21,10 +21,12 @@ COPY web ./web
 COPY config ./config
 COPY base ./base
 
-RUN useradd --create-home lindero && mkdir -p /datos && chown -R lindero:lindero /datos /app
-USER lindero
+# Sin usuario propio: el bucket montado en /datos pertenece a root y un usuario distinto no podría escribir en él.
+RUN mkdir -p /datos
 VOLUME /datos
 EXPOSE 8080
 
-# Un solo proceso: la cola de pedidos vive en memoria. Los hilos atienden las páginas mientras el motor trabaja.
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "1", "--threads", "8", "--timeout", "180", "web.app:app"]
+# Un solo proceso. El pedido se procesa dentro de la petición que lanza su página (PLANOS_MODO=peticion),
+# que es lo que necesitan Cloud Run y similares; el tiempo de espera cubre el trabajo más largo.
+ENV PLANOS_MODO=peticion
+CMD exec gunicorn --bind 0.0.0.0:${PORT:-8080} --workers 1 --threads 8 --timeout 900 web.app:app

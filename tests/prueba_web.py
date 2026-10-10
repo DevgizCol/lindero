@@ -10,6 +10,7 @@ import io
 import os
 import re
 import sys
+import threading
 import time
 import zipfile
 
@@ -33,6 +34,13 @@ def csrf(html):
 
 
 def esperar(s, url, estados, tope=600):
+    # como hace la página del pedido: pide procesar lo pendiente (en modo cola no hace nada) y consulta el estado
+    def lanzar():
+        try:
+            s.post(url + "/procesar", data={"csrf": csrf(s.get(BASE + "/").text)}, timeout=tope)
+        except Exception:
+            pass
+    threading.Thread(target=lanzar, daemon=True).start()
     t0 = time.time()
     while time.time() - t0 < tope:
         j = s.get(url + "/estado.json").json()

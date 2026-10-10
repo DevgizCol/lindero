@@ -113,6 +113,12 @@
   var seg = d.querySelector("[data-estado-url]");
   if (seg) {
     var previo = seg.dataset.estado;
+    /* pide al servidor que procese lo pendiente; la respuesta llega cuando el motor termina */
+    if (seg.dataset.procesarUrl) {
+      var cuerpo = new URLSearchParams();
+      cuerpo.set("csrf", seg.dataset.csrf);
+      fetch(seg.dataset.procesarUrl, { method: "POST", body: cuerpo, credentials: "same-origin" }).catch(function () {});
+    }
     var consultar = function () {
       fetch(seg.dataset.estadoUrl, { headers: { Accept: "application/json" }, cache: "no-store" })
         .then(function (r) { return r.ok ? r.json() : null; })

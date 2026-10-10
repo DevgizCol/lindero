@@ -26,8 +26,10 @@ import os
 import queue
 import re
 import secrets
+import shutil
 import subprocess
 import sys
+import tempfile
 import threading
 import urllib.parse
 
@@ -76,7 +78,7 @@ def _secreto():
 app = Flask(__name__)
 app.secret_key = _secreto()
 app.config.update(
-    MAX_CONTENT_LENGTH=int(CFG["max_mb_por_archivo"]) * 5 * 1024 * 1024,
+    MAX_CONTENT_LENGTH=int(CFG.get("max_mb_pedido", CFG["max_mb_por_archivo"] * 5)) * 1024 * 1024,
     SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE="Lax",
     SESSION_COOKIE_SECURE=os.environ.get("PLANOS_HTTPS") == "1",
 )
@@ -136,8 +138,48 @@ def precio(n_predios):
     return max(int(CFG["precio_minimo"]), int(CFG["precio_por_predio"]) * int(n_predios))
 
 
-# ------------------------------------------------------------------ motor en segundo plano (uno a la vez)
+# ------------------------------------------------------------------ ejecución del motor
+# PLANOS_MODO=cola      un hilo en segundo plano procesa los pedidos (servidor propio, siempre encendido)
+# PLANOS_MODO=peticion  el pedido se procesa dentro de una petición que lanza la página del pedido; es lo que
+#                       necesitan Cloud Run y similares, que solo dan procesador mientras atienden una petición
+MODO = os.environ.get("PLANOS_MODO", "cola")
 _cola: queue.Queue = queue.Queue()
+_en_proceso: set = set()
+VENCE_PROCESO_S = 15 * 60
+
+
+def encolar(pid, tipo):
+    """Deja anotado qué le falta al pedido ('previa' o 'final') y, en modo cola, lo pasa al hilo."""
+    actualizar(pid, pendiente=tipo, estado="RECIBIDO" if tipo == "previa" else "PAGADO", mensaje="")
+    if MODO == "cola":
+        _cola.put(pid)
+
+
+def procesar_pendiente(pid):
+    """Ejecuta lo que el pedido tenga pendiente. No hace nada si ya lo está procesando otra petición."""
+    import time
+    with _candado:
+        p = leer(pid)
+        tipo = p.get("pendiente")
+        desde = p.get("proceso_desde", 0)
+        if not tipo or pid in _en_proceso or (p.get("procesando") and time.time() - desde < VENCE_PROCESO_S):
+            return False
+        _en_proceso.add(pid)
+        p.update(procesando=True, proceso_desde=time.time())
+        guardar(p)
+    try:
+        _procesar(pid, tipo)
+    except Exception as e:
+        actualizar(pid, estado="ERROR", mensaje="Error interno al procesar el pedido.", error=str(e)[:500], pendiente=None)
+    finally:
+        with _candado:
+            _en_proceso.discard(pid)
+            p = leer(pid)
+            p["procesando"] = False
+            guardar(p)
+    if leer(pid).get("pendiente"):          # p. ej. el pago llegó mientras se armaba la vista previa
+        return procesar_pendiente(pid)
+    return True
 
 
 def _trabajo_json(p, previa):
@@ -162,18 +204,29 @@ def _correr_motor(pid, previa):
     d = os.path.join(PEDIDOS, pid)
     ruta_job = os.path.join(d, "trabajo_previa.json" if previa else "trabajo_final.json")
     job = _trabajo_json(p, previa)
+    # el motor trabaja en una carpeta temporal local y al final se copia el resultado al almacén de pedidos
+    # (que puede ser un disco o un bucket montado, donde escribir muchos archivos pequeños es lento)
+    destino = job["carpeta"]
+    temporal = tempfile.mkdtemp(prefix="lindero_")
+    job["carpeta"] = os.path.join(temporal, os.path.basename(destino))
     with open(ruta_job, "w", encoding="utf-8") as f:
         json.dump(job, f, ensure_ascii=False, indent=1)
     # solo viajan rutas generadas por el servidor: nada de lo que escribió el cliente llega a la línea de comandos
     proc = subprocess.run([sys.executable, "-m", "motor.cli", "trabajo", ruta_job],
                           capture_output=True, text=True, timeout=3600, cwd=RAIZ)
-    ruta_inf = os.path.join(job["carpeta"], "informe.json")
-    if not os.path.isfile(ruta_inf):
-        with open(os.path.join(d, "error_motor.log"), "w", encoding="utf-8") as f:
-            f.write((proc.stdout or "") + "\n" + (proc.stderr or ""))
-        return None
-    with open(ruta_inf, encoding="utf-8") as f:
-        return json.load(f)
+    try:
+        ruta_inf = os.path.join(job["carpeta"], "informe.json")
+        if not os.path.isfile(ruta_inf):
+            with open(os.path.join(d, "error_motor.log"), "w", encoding="utf-8") as f:
+                f.write((proc.stdout or "") + (proc.stderr or ""))
+            return None
+        with open(ruta_inf, encoding="utf-8") as f:
+            inf = json.load(f)
+        shutil.rmtree(destino, ignore_errors=True)
+        shutil.copytree(job["carpeta"], destino)
+        return inf
+    finally:
+        shutil.rmtree(temporal, ignore_errors=True)
 
 
 def _resumen(inf):
@@ -193,7 +246,7 @@ def _resumen(inf):
 
 def _procesar(pid, tipo):
     previa = tipo == "previa"
-    actualizar(pid, estado="PROCESANDO_PREVIA" if previa else "GENERANDO")
+    actualizar(pid, estado="PROCESANDO_PREVIA" if previa else "GENERANDO", pendiente=None)
     inf = _correr_motor(pid, previa)
     if inf is None:
         actualizar(pid, estado="ERROR", mensaje="El motor no terminó. El equipo técnico ya fue avisado.")
@@ -207,7 +260,7 @@ def _procesar(pid, tipo):
         imgs = [os.path.basename(a) for a in inf.get("archivos", {}).get("vista_previa", [])]
         actualizar(pid, estado="PREVIA_LISTA", resumen=r, previas=imgs, precio=precio(r["predios"]))
         if leer(pid).get("pagado"):
-            _cola.put((pid, "final"))
+            actualizar(pid, pendiente="final", estado="PAGADO")
     else:
         if not r["atlas_ok"]:
             actualizar(pid, estado="EN_REVISION", resumen=r, mensaje="La salida cartográfica necesita revisión manual.")
@@ -220,19 +273,17 @@ def _procesar(pid, tipo):
 
 def _obrero():
     while True:
-        pid, tipo = _cola.get()
+        pid = _cola.get()
         try:
-            _procesar(pid, tipo)
-        except Exception as e:      # un pedido que falla no detiene la cola
-            try:
-                actualizar(pid, estado="ERROR", mensaje="Error interno al procesar el pedido.", error=str(e)[:500])
-            except Exception:
-                pass
+            procesar_pendiente(pid)
+        except Exception:      # un pedido que falla no detiene la cola
+            pass
         finally:
             _cola.task_done()
 
 
-threading.Thread(target=_obrero, daemon=True).start()
+if MODO == "cola":
+    threading.Thread(target=_obrero, daemon=True).start()
 
 
 # ------------------------------------------------------------------ límites de uso (en memoria)
@@ -325,7 +376,7 @@ def inicio():
 def crear_pedido():
     _exigir_csrf()
     lim = CFG.get("limites", {})
-    if _cola.qsize() >= int(lim.get("cola_maxima", 25)):
+    if _cola.qsize() + len(_en_proceso) >= int(lim.get("cola_maxima", 25)):
         return render_template("inicio.html", errores=["Hay muchos pedidos en proceso. Intenta de nuevo en unos minutos."], datos=request.form), 503
     if _excede(("pedido", _ip()), int(lim.get("pedidos_por_hora", 6)), 3600):
         return render_template("inicio.html", errores=["Llegaste al límite de pedidos por hora. Intenta más tarde."], datos=request.form), 429
@@ -373,7 +424,7 @@ def crear_pedido():
          "municipio": municipio, "correo": correo, "firmante": firmante, "archivos": arch, "pagado": False,
          "historial": [], "mensaje": ""}
     guardar(p)
-    _cola.put((pid, "previa"))
+    encolar(pid, "previa")
     return redirect(url_for("ver_pedido", pid=pid), code=303)
 
 
@@ -381,6 +432,15 @@ def crear_pedido():
 def ver_pedido(pid):
     p = leer(pid)
     return render_template("pedido.html", p=p, en_curso=p["estado"] in EN_CURSO, paso=PASO.get(p["estado"], 0))
+
+
+@app.post("/pedidos/<pid>/procesar")
+def procesar_pedido(pid):
+    """La página del pedido llama aquí mientras hay trabajo pendiente; la petición dura lo que tarde el motor."""
+    _exigir_csrf()
+    leer(pid)
+    hizo = procesar_pendiente(pid)
+    return {"procesado": bool(hizo), "estado": leer(pid)["estado"]}
 
 
 @app.get("/pedidos/<pid>/estado.json")
@@ -430,10 +490,10 @@ def marcar_pagado(pid, origen, referencia=""):
         return p
     p = actualizar(pid, pagado=True, pago={"origen": origen, "referencia": referencia,
                                          "cuando": datetime.datetime.now().isoformat(timespec="seconds")},
-                   estado="PAGADO" if p["estado"] == "PREVIA_LISTA" else p["estado"])
-    if p["estado"] == "PAGADO":
-        _cola.put((pid, "final"))
-    return p
+                   estado=p["estado"])
+    if p["estado"] == "PREVIA_LISTA":
+        encolar(pid, "final")
+    return leer(pid)
 
 
 @app.post("/pedidos/<pid>/pagar")
@@ -535,9 +595,9 @@ def admin_accion(pid, accion):
     elif accion == "aprobar" and p["estado"] == "EN_REVISION" and p.get("pagado"):
         actualizar(pid, estado="LISTO", mensaje="")
     elif accion == "regenerar" and p.get("pagado"):
-        _cola.put((pid, "final"))
+        encolar(pid, "final")
     elif accion == "previa":
-        _cola.put((pid, "previa"))
+        encolar(pid, "previa")
     else:
         abort(400)
     return redirect(url_for("admin"), code=303)

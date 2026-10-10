@@ -5,7 +5,7 @@
 {% block nav %}<a class="btn btn-s btn-ch" href="{{ url_for('inicio') }}#pedido">Nuevo pedido</a>{% endblock %}
 {% block cuerpo %}
 {% set r = p.get('resumen', {}) %}
-<div class="cont pag"{% if en_curso %} data-estado-url="{{ url_for('estado_pedido', pid=p.id) }}" data-estado="{{ p.estado }}"{% endif %}>
+<div class="cont pag"{% if en_curso %} data-estado-url="{{ url_for('estado_pedido', pid=p.id) }}" data-estado="{{ p.estado }}" data-procesar-url="{{ url_for('procesar_pedido', pid=p.id) }}" data-csrf="{{ csrf() }}"{% endif %}>
   <span class="ceja">Pedido {{ p.id[:8] }} · {{ CFG.municipios.get(p.municipio, p.municipio) }}</span>
   <h1 style="margin-top:18px;font-size:clamp(2rem,1.2rem + 3vw,3.4rem)">{{ ESTADOS.get(p.estado, p.estado) }}</h1>
 
