@@ -35,8 +35,25 @@ class Dibujo:
     sueltas: float = 0.0                               # metros de línea que no cerraron polígono
 
 
+def limpiar_texto_autocad(t: str) -> str:
+    """Limpia secuencias de escape comunes en MTEXT de AutoCAD como '\\A1;', '{\\fArial;', '\\P'."""
+    s = str(t or "").strip()
+    s = re.sub(r"\\A[0-9];", "", s)
+    s = re.sub(r"\{?\\f[^;]*;?", "", s)
+    s = re.sub(r"[\{\}]", "", s)
+    s = re.sub(r"\\P", " ", s)  # saltos de párrafo en AutoCAD
+    return re.sub(r"\s+", " ", s).strip()
+
+
 def norm_nodo(t) -> str:
-    return re.sub(r"[^0-9A-Z]", "", str(t or "").upper())
+    s = limpiar_texto_autocad(t)
+    return re.sub(r"[^0-9A-Z]", "", s.upper())
+
+
+def extraer_num_nodo(t) -> str:
+    """Extrae el número entero de un identificador para rescate: 'T-01' -> '1', 'Lote 12' -> '12'."""
+    nums = re.findall(r"\d+", str(t or ""))
+    return str(int(nums[-1])) if nums else ""
 
 
 def leer_dxf(ruta) -> gpd.GeoDataFrame:

@@ -90,7 +90,12 @@ app.config.update(
 @app.after_request
 def _cabeceras(resp):
     resp.headers.setdefault("X-Content-Type-Options", "nosniff")
-    resp.headers.setdefault("Referrer-Policy", "same-origin")
+    resp.headers.setdefault("X-XSS-Protection", "1; mode=block")
+    resp.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    resp.headers.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=(self 'https://checkout.wompi.co')")
+    
+    if os.environ.get("PLANOS_HTTPS") == "1" or not os.environ.get("FLASK_DEBUG"):
+        resp.headers.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
     
     # CSP: Permite Google Fonts, Leaflet (unpkg), teselas satelitales de Esri y checkout Wompi
     csp = (
@@ -112,8 +117,24 @@ def _cabeceras(resp):
     resp.headers["Content-Security-Policy"] = csp
     
     if request.path.startswith(("/pedidos/", "/admin")):
-        resp.headers["Cache-Control"] = "no-store"
+        resp.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
     return resp
+
+
+# ------------------------------------------------------------------ telemetría y salud para Render y Cloud
+@app.get("/salud")
+@app.get("/healthz")
+def salud():
+    return {
+        "status": "ok",
+        "servicio": CFG.get("nombre_servicio", "Lindero PRO"),
+        "version": "2.4.0",
+        "motor": "Spatial Engine MAGNA-SIRGAS CTM12",
+        "municipios_activos": list(CFG.get("municipios", {}).keys()),
+        "cola": _cola.qsize(),
+        "en_proceso": len(_en_proceso),
+        "timestamp": datetime.datetime.now().isoformat(timespec="seconds")
+    }, 200
 
 
 # ------------------------------------------------------------------ pedidos en disco
@@ -366,17 +387,42 @@ def _pesos(v):
 
 
 def _guardar_subida(archivo, tipo, carpeta, nombre):
-    ext = os.path.splitext(archivo.filename or "")[1].lower()
+    nombre_orig = archivo.filename or ""
+    ext = os.path.splitext(nombre_orig)[1].lower()
     if ext not in EXT[tipo]:
-        return None, f"El archivo de {tipo} debe ser {', '.join(sorted(EXT[tipo]))}."
+        return None, f"El archivo de {tipo} ('{nombre_orig}') debe ser {', '.join(sorted(EXT[tipo]))}."
     destino = os.path.join(carpeta, nombre + ext)       # el nombre lo pone el servidor, no el cliente
     archivo.save(destino)
-    if os.path.getsize(destino) > int(CFG["max_mb_por_archivo"]) * 1024 * 1024:
+    tam = os.path.getsize(destino)
+    if tam > int(CFG["max_mb_por_archivo"]) * 1024 * 1024:
         os.remove(destino)
         return None, f"El archivo de {tipo} supera {CFG['max_mb_por_archivo']} MB."
-    if os.path.getsize(destino) == 0:
+    if tam == 0:
         os.remove(destino)
-        return None, f"El archivo de {tipo} está vacío."
+        return None, f"El archivo de {tipo} ('{nombre_orig}') está vacío."
+
+    # Validación de integridad de bytes mágicos
+    try:
+        with open(destino, "rb") as f_chk:
+            cabecera = f_chk.read(2048)
+        if tipo == "excel":
+            # xlsx/xlsm son zips (PK\x03\x04); xls es OLE2 (\xd0\xcf\x11\xe0)
+            if not (cabecera.startswith(b"PK\x03\x04") or cabecera.startswith(b"\xd0\xcf\x11\xe0")):
+                os.remove(destino)
+                return None, f"El archivo '{nombre_orig}' no parece un Excel válido o está protegido contra lectura."
+        elif tipo == "dxf":
+            cab_txt = cabecera.decode("latin-1", errors="ignore").upper()
+            if not any(token in cab_txt for token in ("SECTION", "HEADER", "ENTITIES", "BLOCKS", "0\n", "0\r\n")):
+                os.remove(destino)
+                return None, f"El archivo '{nombre_orig}' no parece un plano DXF válido de AutoCAD."
+        elif tipo == "firma":
+            if not (cabecera.startswith(b"\x89PNG") or cabecera.startswith(b"\xff\xd8\xff")):
+                os.remove(destino)
+                return None, f"La imagen de la firma ('{nombre_orig}') debe ser una imagen PNG o JPG válida."
+    except Exception as err:
+        os.remove(destino)
+        return None, f"No se pudo validar el archivo '{nombre_orig}': {err}"
+
     return nombre + ext, None
 
 

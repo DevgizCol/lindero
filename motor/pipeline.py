@@ -27,7 +27,7 @@ from . import capas as capas_mod
 from .base import RAIZ, cargar_base
 from .colindantes import VIA
 from .excel import leer_excel
-from .poligonos import Dibujo, desde_poligonos, extraer, norm_nodo
+from .poligonos import Dibujo, desde_poligonos, extraer, norm_nodo, extraer_num_nodo
 from .refcat import Geocodificador
 from .ubicacion import ubicar
 
@@ -122,15 +122,41 @@ def ejecutar(t: Trabajo, registrar=print) -> dict:
     inf["avisos"] += dib.avisos
     pares = []          # (nodo normalizado, polígono)
     vistos = set()
+    polys_sin_emparejar = []
     for p, n in zip(dib.poligonos, dib.nodos):
         k = norm_nodo(n)
         if k and k in por_nodo and k not in vistos:
             pares.append((k, p))
             vistos.add(k)
-    sin_fila = [n for n in dib.nodos if n and norm_nodo(n) not in por_nodo]
+        else:
+            polys_sin_emparejar.append((p, n))
+
+    # Rescate inteligente difuso: si hay polígonos sin emparejar y filas del Excel pendientes,
+    # emparejar por número cardinal ('T1' con 'Lote 1', 'T-02' con '2', etc.)
+    filas_pendientes = {k: f for k, f in por_nodo.items() if k not in vistos}
+    if polys_sin_emparejar and filas_pendientes:
+        mapa_num_excel = {}
+        for k_ex, f_ex in filas_pendientes.items():
+            num = extraer_num_nodo(f_ex.get("NODO", ""))
+            if num:
+                mapa_num_excel.setdefault(num, []).append(k_ex)
+
+        for p, n in polys_sin_emparejar:
+            num_poly = extraer_num_nodo(n)
+            if num_poly and num_poly in mapa_num_excel:
+                candidatos = mapa_num_excel[num_poly]
+                if len(candidatos) == 1 and candidatos[0] not in vistos:
+                    k_elegido = candidatos[0]
+                    pares.append((k_elegido, p))
+                    vistos.add(k_elegido)
+                    inf["avisos"].append(
+                        f"Emparejamiento inteligente: Polígono '{n}' asociado con éxito a fila '{por_nodo[k_elegido].get('NODO')}' por correspondencia de número #{num_poly}."
+                    )
+
+    sin_fila = [n for _, n in polys_sin_emparejar if not n or norm_nodo(n) not in vistos]
     sin_poly = [f.get("NODO") for k, f in por_nodo.items() if k not in vistos]
     if sin_fila:
-        inf["avisos"].append(f"Polígonos cuyo NODO no está en el Excel: {', '.join(map(str, sin_fila[:15]))}")
+        inf["avisos"].append(f"Polígonos cuyo NODO no está en el Excel: {', '.join(map(str, [x for x in sin_fila if x][:15]))}")
     if sin_poly:
         inf["avisos"].append(f"Filas del Excel sin polígono en el plano: {', '.join(map(str, sin_poly[:15]))}")
     inf["etapas"]["poligonos"] = {"en_plano": len(dib.poligonos), "con_nodo": sum(1 for n in dib.nodos if n),
@@ -138,7 +164,7 @@ def ejecutar(t: Trabajo, registrar=print) -> dict:
     registrar(f"Polígonos: {len(dib.poligonos)} en el plano, {len(pares)} emparejados con el Excel")
     if not pares:
         inf["requiere_revision"] = True
-        inf["avisos"].append("No hay ningún polígono emparejado con el Excel: no se generan planos.")
+        inf["avisos"].append("No hay ningún polígono emparejado con el Excel: verifica que los nombres de NODO coincidan o lleven la misma numeración.")
         return _cerrar(t, inf)
 
     # 4. Ubicación

@@ -8,13 +8,16 @@ app_port: 7860
 pinned: false
 ---
 
-# Lindero
+# Lindero PRO · Spatial Engine
 
-Certificados de plano predial catastral en minutos. A partir del Excel de los predios y el plano del
-levantamiento (DXF), Lindero encuentra la referencia catastral, ubica cada lote sobre la base oficial,
-calcula coordenadas, linderos y colindantes, y genera un PDF por predio. No depende de QGIS.
+[![CI & Keep-Alive de Producción](https://github.com/DevgizCol/lindero/actions/workflows/ci.yml/badge.svg)](https://github.com/DevgizCol/lindero/actions/workflows/ci.yml)
+[![Render Status](https://img.shields.io/badge/Render-Live%20Deploy-00f0ff?logo=render)](https://lindero.onrender.com/)
+[![IGAC CTM12](https://img.shields.io/badge/IGAC-MAGNA--SIRGAS%20CTM12-0066ff)](https://lindero.onrender.com/)
+[![Habeas Data](https://img.shields.io/badge/Seguridad-Ley%201581%20Habeas%20Data-10b981)](#)
 
-Un producto de DevGiz Engineering.
+Plataforma empresarial de inteligencia espacial y automatización cartográfica. A partir del Excel de campo y el plano DXF, **Lindero PRO** proyecta cada predio sobre la base catastral oficial del IGAC en CTM12 (EPSG:9377), calcula cuadros de coordenadas elipsoidales, rumbos y colindantes oficiales, y emite certificados en PDF, Shapefiles con 25 campos estandarizados e informes de revisión en segundos.
+
+Un desarrollo de **DevGiz Engineering** ([https://devgiz.vercel.app/](https://devgiz.vercel.app/)).
 
 ## Qué hay aquí
 

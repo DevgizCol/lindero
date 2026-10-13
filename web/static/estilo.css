@@ -2,14 +2,14 @@
    Identidad: Obsidian Deep (#070a13) con contrastes en Cyan Neón (#00f0ff) y Azul Eléctrico (#0066ff). */
 
 :root {
-  --bg: #070a13;
-  --bg-2: #0c1222;
-  --sup: #11182c;
-  --sup-2: #16223d;
-  --linea: rgba(0, 240, 255, 0.12);
-  --linea-2: rgba(0, 240, 255, 0.25);
-  --linea-glow: rgba(0, 240, 255, 0.4);
-  --txt: #f1f5f9;
+  --bg: #060913;
+  --bg-2: #0a0f1d;
+  --sup: #0e1526;
+  --sup-2: #141d33;
+  --linea: rgba(0, 240, 255, 0.14);
+  --linea-2: rgba(0, 240, 255, 0.28);
+  --linea-glow: rgba(0, 240, 255, 0.45);
+  --txt: #f8fafc;
   --txt-2: #94a3b8;
   --txt-3: #64748b;
   --azul: #0066ff;
@@ -25,8 +25,8 @@
   --ancho: 1220px;
   --r: 20px;
   --r-s: 12px;
-  --sombra: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px var(--linea);
-  --sombra-glow: 0 0 40px -10px rgba(0, 240, 255, 0.25);
+  --sombra: 0 25px 50px -12px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 0 0 1px var(--linea);
+  --sombra-glow: 0 0 45px -10px rgba(0, 240, 255, 0.22);
   color-scheme: dark;
 }
 
@@ -34,14 +34,32 @@
 html { scroll-behavior: smooth; scroll-padding-top: 90px; }
 body {
   margin: 0;
-  background: var(--bg);
+  background-color: var(--bg);
   color: var(--txt);
   font: 400 1rem/1.65 var(--f);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  /* Fondo Cartográfico de Alta Precisión: Cuadrícula milimétrica + Retícula geodésica + Halo atmosférico */
   background-image: 
-    radial-gradient(circle at 50% 0%, rgba(0, 102, 255, 0.12) 0%, transparent 60%),
-    radial-gradient(circle at 90% 20%, rgba(0, 240, 255, 0.06) 0%, transparent 40%);
+    /* Halos lumínicos atmosféricos profundos */
+    radial-gradient(ellipse 90% 60% at 50% -10%, rgba(0, 102, 255, 0.16), transparent 70%),
+    radial-gradient(circle 700px at 90% 18%, rgba(0, 240, 255, 0.05), transparent 60%),
+    radial-gradient(circle 800px at 10% 45%, rgba(0, 102, 255, 0.06), transparent 60%),
+    /* Retícula Geodésica CTM12 Mayor (cada 120px) */
+    linear-gradient(to right, rgba(0, 240, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 240, 255, 0.035) 1px, transparent 1px),
+    /* Malla Milimétrica Menor (cada 24px) */
+    linear-gradient(to right, rgba(255, 255, 255, 0.012) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.012) 1px, transparent 1px);
+  background-size: 
+    100% 100%,
+    100% 100%,
+    100% 100%,
+    120px 120px,
+    120px 120px,
+    24px 24px,
+    24px 24px;
+  background-position: center top;
 }
 
 img, svg { display: block; max-width: 100%; }

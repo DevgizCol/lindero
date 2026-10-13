@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: lindero
+    runtime: docker
+    plan: free
+    region: oregon
+    branch: main
+    healthCheckPath: /salud
+    autoDeploy: true
+    envVars:
+      - key: PORT
+        value: 5080
+      - key: PLANOS_MODO
+        value: peticion
+      - key: PERMITIR_IFRAME
+        value: "0"

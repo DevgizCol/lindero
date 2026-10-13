@@ -1,0 +1,47 @@
+name: CI & Keep-Alive de Producción
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Ping cada 14 minutos para evitar spin-down de 50 segundos en Render Free tier
+    - cron: '*/14 * * * *'
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Verificación Cartográfica y Seguridad
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Compilación sintáctica
+        run: |
+          python -m py_compile web/app.py motor/pipeline.py motor/excel.py motor/poligonos.py
+
+      - name: Ejecutar pruebas del motor cartográfico
+        run: |
+          python tests/prueba_sin_qgis.py
+
+  keep-alive:
+    name: Keep-Alive Render 24/7
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Health Ping a Render Producción
+        run: |
+          curl -s -f https://lindero.onrender.com/salud || echo "Servicio reactivándose..."
