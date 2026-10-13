@@ -6,7 +6,7 @@
     "malambo": "Malambo (Atlántico)"
   },
   "precio_por_predio": 4000,
-  "precio_minimo": 16000,
+  "precio_minimo": 4000,
   "moneda": "COP",
   "max_predios": 500,
   "max_mb_por_archivo": 25,
