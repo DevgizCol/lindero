@@ -372,7 +372,7 @@ app.jinja_env.globals.update(csrf=_csrf, CFG=CFG, ESTADOS=ESTADOS, VERSION=_vers
 
 @app.context_processor
 def _contexto():
-    return {"wompi": _wompi_activo()}
+    return {"wompi": _wompi_activo(), "wompi_ambiente": _wompi_ambiente()}
 
 
 # en qué tramo de la ruta (Archivos, Vista previa, Pago, Generación, Entrega) está cada estado
@@ -488,6 +488,7 @@ def crear_pedido():
     p = {"id": pid, "creado": datetime.datetime.now().isoformat(timespec="seconds"), "estado": "RECIBIDO",
          "municipio": municipio, "correo": correo, "firmante": firmante, "archivos": arch, "pagado": False,
          "historial": [], "mensaje": ""}
+    p["referencia"] = obtener_referencia(p)
     guardar(p)
     encolar(pid, "previa")
     return redirect(url_for("ver_pedido", pid=pid), code=303)
@@ -496,6 +497,25 @@ def crear_pedido():
 @app.get("/pedidos/<pid>")
 def ver_pedido(pid):
     p = leer(pid)
+    # Soporte para retorno de Wompi ?id=<tx_id>&env=<test|prod>
+    tx_id = request.args.get("id")
+    if tx_id and not p.get("pagado") and _wompi_activo():
+        env_arg = request.args.get("env") or _wompi_ambiente()
+        tx_info = _verificar_transaccion_wompi(tx_id, env_arg)
+        if tx_info and tx_info.get("status") == "APPROVED":
+            ref_com = tx_info.get("reference", "")
+            if ref_com in (obtener_referencia(p), pid):
+                marcar_pagado(
+                    pid=pid,
+                    origen="wompi",
+                    referencia_tx=str(tx_info.get("id", tx_id)),
+                    referencia_comercial=ref_com,
+                    ambiente=env_arg,
+                    metodo=tx_info.get("payment_method_type", "WOMPI"),
+                    monto_cop=int(tx_info.get("amount_in_cents", 0)) // 100
+                )
+                p = leer(pid)
+    p["referencia"] = obtener_referencia(p)
     return render_template("pedido.html", p=p, en_curso=p["estado"] in EN_CURSO, paso=PASO.get(p["estado"], 0))
 
 
@@ -545,18 +565,126 @@ def descargar(pid):
 
 # ------------------------------------------------------------------ pagos
 def _wompi_activo():
-    w = CFG["wompi"]
-    return bool(w.get("activo") and os.environ.get(w["llave_publica_env"]) and os.environ.get(w["secreto_integridad_env"])
-                and os.environ.get(w["secreto_eventos_env"]))
+    w = CFG.get("wompi", {})
+    return bool(w.get("activo") and os.environ.get(w.get("llave_publica_env", "")) and os.environ.get(w.get("secreto_integridad_env", ""))
+                and os.environ.get(w.get("secreto_eventos_env", "")))
 
 
-def marcar_pagado(pid, origen, referencia=""):
+def _wompi_ambiente():
+    """Retorna 'test' o 'prod' según la llave pública configurada o variable de entorno."""
+    w = CFG.get("wompi", {})
+    llave = os.environ.get(w.get("llave_publica_env", ""), "").strip()
+    if llave.startswith("pub_test_"):
+        return "test"
+    if llave.startswith("pub_prod_"):
+        return "prod"
+    return os.environ.get("WOMPI_AMBIENTE", w.get("ambiente_defecto", "prod")).lower()
+
+
+def obtener_referencia(p):
+    """Devuelve la referencia comercial oficial y parametrizada: LND-YYYYMMDD-XXXXXX."""
+    if p.get("referencia"):
+        return p["referencia"]
+    prefijo = CFG.get("wompi", {}).get("prefijo_referencia", "LND")
+    creado = p.get("creado", "")
+    try:
+        fecha_str = datetime.datetime.fromisoformat(creado).strftime("%Y%m%d") if creado else datetime.datetime.now().strftime("%Y%m%d")
+    except Exception:
+        fecha_str = datetime.datetime.now().strftime("%Y%m%d")
+    clean_id = re.sub(r"[^A-Za-z0-9]", "", p.get("id", ""))[:8].upper()
+    ref = f"{prefijo}-{fecha_str}-{clean_id}"
+    p["referencia"] = ref
+    return ref
+
+
+def buscar_por_referencia(ref_o_id):
+    """Busca el pid de un pedido por su referencia comercial (ej. LND-20261013-1PQH6L) o id directo."""
+    if not ref_o_id:
+        return None
+    val = str(ref_o_id).strip()
+    if RE_ID.match(val) and os.path.isdir(os.path.join(PEDIDOS, val)):
+        return val
+    val_upper = val.upper()
+    try:
+        for pid in os.listdir(PEDIDOS):
+            if not RE_ID.match(pid):
+                continue
+            ruta_p = os.path.join(PEDIDOS, pid, "pedido.json")
+            if os.path.isfile(ruta_p):
+                try:
+                    with open(ruta_p, "r", encoding="utf-8") as f:
+                        p_data = json.load(f)
+                    ref_p = p_data.get("referencia") or obtener_referencia(p_data)
+                    if ref_p.upper() == val_upper:
+                        return pid
+                    if "-" in val_upper and val_upper.rsplit("-", 1)[-1] == re.sub(r"[^A-Za-z0-9]", "", pid)[:8].upper():
+                        return pid
+                except Exception:
+                    continue
+    except Exception:
+        pass
+    return None
+
+
+def _registrar_venta(pid, p, pago):
+    """Registra la venta en web/datos/ventas.jsonl para auditoría y contabilidad."""
+    try:
+        ruta_ventas = os.path.join(DATOS, "ventas.jsonl")
+        registro = {
+            "fecha": pago.get("cuando"),
+            "referencia_comercial": pago.get("referencia_comercial"),
+            "id_pedido": pid,
+            "id_transaccion": pago.get("referencia"),
+            "origen": pago.get("origen"),
+            "ambiente": pago.get("ambiente"),
+            "metodo": pago.get("metodo"),
+            "monto_cop": pago.get("monto_cop"),
+            "predios": p.get("resumen", {}).get("predios", 1),
+            "municipio": p.get("municipio", ""),
+            "correo": p.get("correo", ""),
+            "firmante": p.get("firmante", "")
+        }
+        with _candado, open(ruta_ventas, "a", encoding="utf-8") as f:
+            f.write(json.dumps(registro, ensure_ascii=False) + "\n")
+    except Exception as e:
+        print(f"[VENTAS] Error registrando venta: {e}")
+
+
+def _verificar_transaccion_wompi(tx_id, ambiente="prod"):
+    """Consulta la API de Wompi para verificar el estado de una transacción."""
+    base_url = "https://sandbox.wompi.co/v1" if ambiente == "test" else "https://production.wompi.co/v1"
+    url = f"{base_url}/transactions/{tx_id}"
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "Lindero-Backend/2.4"})
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            if resp.status == 200:
+                datos = json.loads(resp.read().decode())
+                return datos.get("data")
+    except Exception:
+        pass
+    return None
+
+
+def marcar_pagado(pid, origen, referencia_tx="", referencia_comercial="", ambiente=None, metodo="MANUAL", monto_cop=None):
     p = leer(pid)
     if p.get("pagado"):
         return p
-    p = actualizar(pid, pagado=True, pago={"origen": origen, "referencia": referencia,
-                                         "cuando": datetime.datetime.now().isoformat(timespec="seconds")},
-                   estado=p["estado"])
+    ref_com = referencia_comercial or obtener_referencia(p)
+    amb = ambiente or _wompi_ambiente()
+    monto = monto_cop if monto_cop is not None else int(p.get("precio", 0))
+    ahora = datetime.datetime.now().isoformat(timespec="seconds")
+
+    registro_pago = {
+        "origen": origen,
+        "referencia": referencia_tx,
+        "referencia_comercial": ref_com,
+        "ambiente": amb,
+        "metodo": metodo,
+        "monto_cop": monto,
+        "cuando": ahora,
+    }
+    p = actualizar(pid, pagado=True, pago=registro_pago, referencia=ref_com, estado=p["estado"])
+    _registrar_venta(pid, p, registro_pago)
     if p["estado"] == "PREVIA_LISTA":
         encolar(pid, "final")
     return leer(pid)
@@ -570,10 +698,11 @@ def pagar(pid):
         return redirect(url_for("ver_pedido", pid=pid), code=303)
     w = CFG["wompi"]
     centavos = int(p["precio"]) * 100
-    integridad = hashlib.sha256(f"{pid}{centavos}COP{os.environ[w['secreto_integridad_env']]}".encode()).hexdigest()
+    ref_comercial = obtener_referencia(p)
+    integridad = hashlib.sha256(f"{ref_comercial}{centavos}COP{os.environ[w['secreto_integridad_env']]}".encode()).hexdigest()
     q = urllib.parse.urlencode({
         "public-key": os.environ[w["llave_publica_env"]], "currency": "COP", "amount-in-cents": centavos,
-        "reference": pid, "signature:integrity": integridad, "redirect-url": url_for("ver_pedido", pid=pid, _external=True),
+        "reference": ref_comercial, "signature:integrity": integridad, "redirect-url": url_for("ver_pedido", pid=pid, _external=True),
     })
     return redirect(w["checkout"] + "?" + q, code=303)
 
@@ -597,14 +726,25 @@ def evento_wompi():
         if not hmac.compare_digest(hashlib.sha256(base.encode()).hexdigest().lower(), str(firma["checksum"]).lower()):
             abort(400)
         tx = ev["data"]["transaction"]
-        pid = str(tx["reference"])
+        ref_recibida = str(tx["reference"])
     except (KeyError, TypeError):
         abort(400)
-    if not RE_ID.match(pid) or not os.path.isdir(os.path.join(PEDIDOS, pid)):
+    pid = buscar_por_referencia(ref_recibida)
+    if not pid or not os.path.isdir(os.path.join(PEDIDOS, pid)):
         return {"ok": True}
     p = leer(pid)
     if tx.get("status") == "APPROVED" and tx.get("currency") == "COP" and int(tx.get("amount_in_cents", 0)) == int(p.get("precio", -1)) * 100:
-        marcar_pagado(pid, "wompi", str(tx.get("id", "")))
+        ambiente_tx = ev.get("environment") or tx.get("environment") or _wompi_ambiente()
+        metodo = tx.get("payment_method_type", "WOMPI")
+        marcar_pagado(
+            pid=pid,
+            origen="wompi",
+            referencia_tx=str(tx.get("id", "")),
+            referencia_comercial=ref_recibida,
+            ambiente=ambiente_tx,
+            metodo=metodo,
+            monto_cop=int(tx.get("amount_in_cents", 0)) // 100
+        )
     return {"ok": True}
 
 
@@ -643,14 +783,18 @@ def admin():
     pedidos = []
     for pid in os.listdir(PEDIDOS):
         try:
-            pedidos.append(leer(pid))
+            p_item = leer(pid)
+            p_item["referencia"] = obtener_referencia(p_item)
+            pedidos.append(p_item)
         except Exception:
             continue
     pedidos.sort(key=lambda p: p.get("creado", ""), reverse=True)
-    recaudado = sum(int(p.get("precio", 0)) for p in pedidos if p.get("pagado"))
+    recaudado_prod = sum(int(p.get("precio", 0)) for p in pedidos if p.get("pagado") and p.get("pago", {}).get("ambiente") != "test")
+    recaudado_test = sum(int(p.get("precio", 0)) for p in pedidos if p.get("pagado") and p.get("pago", {}).get("ambiente") == "test")
     stats = {
         "total": len(pedidos),
-        "recaudado": recaudado,
+        "recaudado": recaudado_prod,
+        "recaudado_test": recaudado_test,
         "en_revision": sum(1 for p in pedidos if p.get("estado") == "EN_REVISION"),
         "esperando_pago": sum(1 for p in pedidos if p.get("estado") == "PREVIA_LISTA" and not p.get("pagado")),
         "listos": sum(1 for p in pedidos if p.get("estado") == "LISTO"),
@@ -665,7 +809,8 @@ def admin_accion(pid, accion):
     _exigir_csrf()
     p = leer(pid)
     if accion == "pagado":
-        marcar_pagado(pid, "manual", request.form.get("referencia", "")[:80])
+        ref_man = request.form.get("referencia", "")[:80]
+        marcar_pagado(pid, "manual", referencia_tx=ref_man, metodo="MANUAL")
     elif accion == "aprobar" and p["estado"] == "EN_REVISION" and p.get("pagado"):
         ruta_zip = os.path.join(_dir(pid), "final", "PLANOS_" + pid[:8] + ".zip")
         if not os.path.isfile(ruta_zip):

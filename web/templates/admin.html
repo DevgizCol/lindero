@@ -20,6 +20,11 @@
     <div class="adm-status-live">
       <span class="punto-radar"></span>
       <span>Servidor Activo · Render Nube</span>
+      {% if wompi_ambiente == 'test' %}
+        <span class="badge-modo-test">🟡 Wompi Sandbox</span>
+      {% else %}
+        <span class="badge-modo-prod">🟢 Wompi Producción</span>
+      {% endif %}
     </div>
   </header>
 
@@ -28,9 +33,9 @@
     <div class="kpi-card kpi-recaudo">
       <div class="kpi-icon">💰</div>
       <div class="kpi-datos">
-        <span class="kpi-label">Recaudo Confirmado</span>
+        <span class="kpi-label">Recaudo Real</span>
         <strong class="kpi-valor">{{ stats.recaudado|pesos }}</strong>
-        <span class="kpi-sub">Pasarela Wompi y manual</span>
+        <span class="kpi-sub">{% if stats.recaudado_test %}+ {{ stats.recaudado_test|pesos }} en Sandbox{% else %}Ventas reales en producción{% endif %}</span>
       </div>
     </div>
     <div class="kpi-card">
@@ -98,16 +103,18 @@
     {% set pago = p.get('pago', {}) %}
     <article class="tarjeta ped-card"
              data-id="{{ p.id }}"
+             data-referencia="{{ p.referencia }}"
              data-estado="{{ p.estado }}"
              data-pagado="{{ '1' if p.pagado else '0' }}"
-             data-busqueda="{{ p.id }} {{ p.correo }} {{ p.firmante }} {{ p.municipio }} {{ pago.get('referencia', '') }}">
+             data-busqueda="{{ p.referencia }} {{ p.id }} {{ p.correo }} {{ p.firmante }} {{ p.municipio }} {{ pago.get('referencia', '') }} {{ pago.get('referencia_comercial', '') }}">
 
       <!-- Header del pedido -->
       <div class="ped-card-head">
         <div class="ped-id-wrap">
           <span class="ped-ref mono">
-            Pedido <strong>{{ p.id[:8] }}</strong>
-            <button type="button" class="btn-copiar" title="Copiar ID completo" onclick="copiarTexto('{{ p.id }}', this)">
+            <strong class="ref-tag">{{ p.referencia }}</strong>
+            <small class="ped-id-sub" style="color:var(--txt-3);margin-left:4px">({{ p.id[:8] }})</small>
+            <button type="button" class="btn-copiar" title="Copiar Referencia Comercial" onclick="copiarTexto('{{ p.referencia }}', this)">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             </button>
           </span>
@@ -131,9 +138,15 @@
           <!-- Badge de Pago -->
           {% if p.pagado %}
             {% if pago.get('origen') == 'wompi' %}
-              <span class="chip ok chip-pago" title="ID Wompi: {{ pago.get('referencia') }}">
-                💳 Wompi #{{ pago.get('referencia')[:14] }}
-              </span>
+              {% if pago.get('ambiente') == 'test' %}
+                <span class="chip pend chip-pago" title="ID Wompi: {{ pago.get('referencia') }} · Método: {{ pago.get('metodo', 'Wompi') }}">
+                  🟡 Wompi (Test) #{{ pago.get('referencia')[:12] if pago.get('referencia') else '-' }}
+                </span>
+              {% else %}
+                <span class="chip ok chip-pago" title="ID Wompi: {{ pago.get('referencia') }} · Método: {{ pago.get('metodo', 'Wompi') }}">
+                  💳 Wompi #{{ pago.get('referencia')[:12] if pago.get('referencia') else '-' }}
+                </span>
+              {% endif %}
             {% else %}
               <span class="chip ok chip-pago">✓ Pago Manual #{{ pago.get('referencia', '-') }}</span>
             {% endif %}

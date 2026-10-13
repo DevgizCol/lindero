@@ -37,6 +37,8 @@
   },
   "wompi": {
     "activo": true,
+    "prefijo_referencia": "LND",
+    "ambiente_defecto": "prod",
     "llave_publica_env": "WOMPI_LLAVE_PUBLICA",
     "secreto_integridad_env": "WOMPI_SECRETO_INTEGRIDAD",
     "secreto_eventos_env": "WOMPI_SECRETO_EVENTOS",

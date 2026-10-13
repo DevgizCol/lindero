@@ -1519,3 +1519,149 @@ code { font-family: var(--f-mono); background: rgba(255, 255, 255, 0.08); paddin
 }
 .btn-toggle-pass:hover { color: var(--cian); }
 .btn-toggle-pass svg { width: 20px; height: 20px; }
+
+/* ── Parametrización de Referencias y Modo Sandbox ── */
+.ref-pago-box {
+  background: rgba(0, 240, 255, 0.04);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin: 16px 0 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  text-align: left;
+}
+.ref-pago-col {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.ref-label {
+  font: 600 0.68rem/1 var(--f-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--txt-3);
+}
+.ref-valor {
+  font: 700 1.05rem/1.2 var(--f-mono);
+  color: #fff;
+  letter-spacing: 0.05em;
+}
+.btn-copiar-mini {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  color: var(--txt-2);
+  font: 600 0.72rem/1 var(--f-cuerpo);
+  padding: 7px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.btn-copiar-mini:hover {
+  background: rgba(0, 240, 255, 0.15);
+  border-color: var(--cian);
+  color: #fff;
+}
+
+/* Banner de modo pruebas */
+.banner-test-mode {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin: 12px 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+.tag-test-mode {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  font: 700 0.68rem/1 var(--f-mono);
+  letter-spacing: 0.06em;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+.banner-test-mode p {
+  font-size: 0.8rem;
+  color: #fef3c7;
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Comprobante de pago */
+.comprobante-pago {
+  background: rgba(16, 185, 129, 0.04);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin: 20px auto 0;
+  max-width: 520px;
+  text-align: left;
+}
+.comprobante-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.comprobante-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  font-size: 0.84rem;
+}
+.comprobante-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.comprobante-rotulo {
+  font-size: 0.72rem;
+  color: var(--txt-3);
+  text-transform: uppercase;
+  font-family: var(--f-mono);
+}
+.comprobante-valor {
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Badges del Admin */
+.badge-modo-test {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #fbbf24;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font: 600 0.72rem/1 var(--f-mono);
+}
+.badge-modo-prod {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #34d399;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font: 600 0.72rem/1 var(--f-mono);
+}
+.ref-tag {
+  color: var(--cian);
+  font-weight: 700;
+}
