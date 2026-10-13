@@ -309,6 +309,36 @@ def _procesar(pid, tipo):
                        mensaje="Un profesional está verificando los predios marcados antes de liberar la descarga.")
         else:
             actualizar(pid, estado="LISTO", resumen=r, mensaje="")
+            if leer(pid).get("pagado"):
+                _notificar_entrega_correo(pid)
+
+
+def _notificar_entrega_correo(pid):
+    """Lanza el envío del correo de entrega y comprobante digital en segundo plano."""
+    def _tarea():
+        try:
+            from motor.correo import enviar_correo_entrega
+            p = leer(pid)
+            if not p.get("pagado") or p.get("correo_notificado"):
+                return
+            pago = p.get("pago", {})
+            datos_correo = {
+                "correo": p.get("correo"),
+                "referencia": p.get("referencia") or obtener_referencia(p),
+                "id_transaccion": pago.get("referencia", "-"),
+                "monto_formateado": _pesos(pago.get("monto_cop") or p.get("precio", 4000)),
+                "predios": p.get("resumen", {}).get("predios", 1),
+                "municipio": CFG.get("municipios", {}).get(p.get("municipio", ""), p.get("municipio", "")).capitalize(),
+                "firmante": p.get("firmante", "Profesional Topógrafo"),
+                "metodo": pago.get("metodo", "Pasarela de Pago"),
+                "url_descarga": f"https://lindero.onrender.com/pedidos/{pid}/descargar",
+                "url_pedido": f"https://lindero.onrender.com/pedidos/{pid}",
+            }
+            if enviar_correo_entrega(datos_correo):
+                actualizar(pid, correo_notificado=True)
+        except Exception as e:
+            print(f"[CORREO] Error al despachar notificación: {e}")
+    threading.Thread(target=_tarea, daemon=True).start()
 
 
 def _obrero():
@@ -687,6 +717,8 @@ def marcar_pagado(pid, origen, referencia_tx="", referencia_comercial="", ambien
     _registrar_venta(pid, p, registro_pago)
     if p["estado"] == "PREVIA_LISTA":
         encolar(pid, "final")
+    elif p["estado"] == "LISTO":
+        _notificar_entrega_correo(pid)
     return leer(pid)
 
 
@@ -817,6 +849,7 @@ def admin_accion(pid, accion):
             encolar(pid, "final")
         else:
             actualizar(pid, estado="LISTO", mensaje="")
+            _notificar_entrega_correo(pid)
     elif accion == "regenerar" and p.get("pagado"):
         encolar(pid, "final")
     elif accion == "previa":

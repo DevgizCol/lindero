@@ -1665,3 +1665,196 @@ code { font-family: var(--f-mono); background: rgba(255, 255, 255, 0.08); paddin
   color: var(--cian);
   font-weight: 700;
 }
+
+/* ── Visor Topográfico Profesional y Control de Capas ── */
+.mapa-satelital {
+  height: 380px;
+  min-height: 320px;
+  width: 100%;
+  background: #020617;
+  position: relative;
+  z-index: 10;
+}
+@media (max-width: 768px) {
+  .mapa-satelital { height: 280px; }
+}
+
+.visor-controles-topografo {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.btn-visor-modo {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--txt-2);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font: 600 0.72rem/1 var(--f-mono);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-visor-modo:hover {
+  background: rgba(0, 240, 255, 0.12);
+  color: #fff;
+  border-color: var(--cian);
+}
+.btn-visor-modo.activo {
+  background: rgba(0, 240, 255, 0.2);
+  border-color: var(--cian);
+  color: var(--cian);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.25);
+}
+
+.visor-capas-subbar {
+  background: #090e1c;
+  border-bottom: 1px solid var(--linea);
+  padding: 8px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.visor-capas-toggles {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.toggle-capa {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font: 500 0.72rem/1 var(--f-mono);
+  color: var(--txt-2);
+  cursor: pointer;
+  user-select: none;
+}
+.toggle-capa input {
+  accent-color: var(--cian);
+  cursor: pointer;
+}
+.toggle-capa:hover span { color: #fff; }
+.visor-meta-municipio {
+  font: 600 0.7rem/1 var(--f-mono);
+  color: var(--cian);
+}
+
+/* Cuadro de Construcción Topográfico */
+.visor-cuadro-construccion {
+  background: #090e1c;
+  border-top: 1px solid var(--linea);
+}
+.visor-cuadro-construccion summary {
+  padding: 10px 14px;
+  font: 600 0.75rem/1.2 var(--f-mono);
+  color: var(--txt-2);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.02);
+  user-select: none;
+}
+.visor-cuadro-construccion summary:hover {
+  color: var(--cian);
+  background: rgba(0, 240, 255, 0.04);
+}
+.cuadro-badge-mini {
+  background: rgba(0, 240, 255, 0.12);
+  color: var(--cian);
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-size: 0.65rem;
+}
+.tabla-construccion-wrap {
+  max-height: 180px;
+  overflow-y: auto;
+  padding: 4px 10px 10px;
+}
+.tabla-construccion {
+  width: 100%;
+  border-collapse: collapse;
+  font: 400 0.7rem/1.3 var(--f-mono);
+  color: var(--txt-2);
+}
+.tabla-construccion th {
+  background: #0f172a;
+  color: #94a3b8;
+  padding: 5px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--linea-2);
+  position: sticky;
+  top: 0;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+}
+.tabla-construccion td {
+  padding: 4px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  white-space: nowrap;
+}
+.tabla-construccion tr:hover td {
+  background: rgba(0, 240, 255, 0.06);
+  color: #fff;
+}
+
+/* Etiquetas y Marcadores en Leaflet */
+.marcador-vertice-div {
+  display: grid;
+  place-items: center;
+}
+.vertice-icono {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #00f0ff;
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.9);
+  display: grid;
+  place-items: center;
+  font: 800 9px/1 monospace;
+  color: #0f172a;
+}
+.vertice-icono.verde {
+  border-color: #10b981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.9);
+}
+.cota-label {
+  background: rgba(15, 23, 42, 0.88);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  color: #00f0ff;
+  font: 700 9px/1 var(--f-mono);
+  padding: 2px 5px;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.cota-label.verde {
+  border-color: rgba(16, 185, 129, 0.5);
+  color: #34d399;
+}
+.cota-label.dorado {
+  border-color: rgba(245, 158, 11, 0.6);
+  color: #fbbf24;
+  background: rgba(30, 20, 10, 0.9);
+}
+.etiqueta-lote-div {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  padding: 4px 8px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+  pointer-events: none;
+}
+.etiqueta-lote-div b {
+  display: block;
+  font: 800 11px/1.2 var(--f-mono);
+  color: #fff;
+}
+.etiqueta-lote-div span {
+  font: 600 9.5px/1.1 var(--f-mono);
+  color: var(--cian);
+}
