@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 {% block nav %}
+<a href="#demo-audiovisual">Demo 38s</a>
+<a href="#soluciones">Sectores</a>
 <a href="#como">Cómo funciona</a>
 <a href="#entrega">Qué recibes</a>
-<a href="#por-dentro">Garantía técnica</a>
-<a href="#precio">Precios</a>
-<a href="#preguntas">Preguntas</a>
+<a href="#precio">Precios & Packs</a>
+<a href="#radar-nacional">Cobertura Colombia</a>
 <a class="btn btn-p btn-ch" href="#pedido">Empezar gratis</a>
 {% endblock %}
 {% block cuerpo %}
@@ -135,6 +136,192 @@
     </div>
   </div>
   <p class="mini" style="margin-top:14px;text-align:center;">{{ CFG.cifras_nota }}</p>
+</section>
+
+<!-- ── DEMO AUDIOVISUAL INTERACTIVA (38 SEGUNDOS EN VIVO) ── -->
+<section class="sec fondo-2 borde-sup" id="demo-audiovisual">
+  <div class="cont">
+    <div class="sec-cab text-center" data-ver>
+      <span class="ceja">Producción Audiovisual · Showcase Interactivo</span>
+      <h2>Mira a Lindero PRO en acción: Del campo al plano certificado en 38 segundos.</h2>
+      <p class="bajada">Simulación interactiva paso a paso con los estándares de la cartografía colombiana. Cero teoría: comprueba cómo procesa cada capa en tiempo real.</p>
+    </div>
+
+    <div class="player-audiovisual-card" data-ver id="player-audiovisual">
+      <!-- Barra superior de la consola de grabación / simulación -->
+      <div class="player-topbar">
+        <div class="player-badge-rec">
+          <span class="punto-rec"></span>
+          <span class="txt-rec">SIMULACIÓN EN VIVO · 38s</span>
+          <span class="chip-calidad">4K UHD · CTM12 (EPSG:9377)</span>
+        </div>
+        <div class="player-waveform-box" title="Locución técnica sincronizada">
+          <span class="waveform-label">NARRACIÓN SINCRONIZADA</span>
+          <div class="waveform-bars" id="audiovisual-bars">
+            <span class="w-bar"></span><span class="w-bar"></span><span class="w-bar"></span><span class="w-bar"></span><span class="w-bar"></span><span class="w-bar"></span><span class="w-bar"></span><span class="w-bar"></span>
+          </div>
+        </div>
+        <div class="player-velocidad-wrap">
+          <button type="button" class="btn-player-velocidad" id="btn-player-speed" title="Cambiar velocidad de reproducción">1.0x</button>
+        </div>
+      </div>
+
+      <!-- Pantalla de Proyección Cinemática -->
+      <div class="player-screen">
+        <div class="player-backdrop" style="background-image: url('{{ url_for('static', filename='lindero_hero_audiovisual.jpg') }}');"></div>
+        <div class="player-grid-overlay"></div>
+
+        <!-- Escenas dinámicas superpuestas -->
+        <div class="player-stage">
+          <!-- ESCENA 1: INGESTA DE CAMPO -->
+          <div class="player-scene activa" id="scene-1" data-escena="1">
+            <div class="scene-badge">FASE 01 · 00:00 - 00:08s</div>
+            <div class="scene-content">
+              <div class="scene-visual-box">
+                <div class="scene-pipeline">
+                  <div class="pipe-node active">
+                    <span class="p-ico">📡</span>
+                    <span class="p-tit">Estación / GPS RTK</span>
+                    <small>Puntos TXT / CSV</small>
+                  </div>
+                  <div class="pipe-arrow">➔</div>
+                  <div class="pipe-node active">
+                    <span class="p-ico">📐</span>
+                    <span class="p-tit">Plano DXF 2018</span>
+                    <small>AutoCAD en bruto</small>
+                  </div>
+                  <div class="pipe-arrow">➔</div>
+                  <div class="pipe-node glow">
+                    <span class="p-ico">⚡</span>
+                    <span class="p-tit">Nube Lindero PRO</span>
+                    <small>Ingesta y parseo en 2s</small>
+                  </div>
+                </div>
+              </div>
+              <div class="scene-text-overlay">
+                <h3>1. Ingesta Automática de Datos de Campo</h3>
+                <p>Arrastras tu cartera de campo y tu plano en bruto. El sistema reconoce polígonos, detecta nodos y valida que no existan polilíneas abiertas ni geometrías corruptas.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ESCENA 2: PROYECCIÓN CTM12 Y CRUCE CATASTRAL -->
+          <div class="player-scene" id="scene-2" data-escena="2">
+            <div class="scene-badge">FASE 02 · 00:09 - 00:18s</div>
+            <div class="scene-content">
+              <div class="scene-visual-box">
+                <div class="scene-radar-grid">
+                  <div class="radar-scan-line"></div>
+                  <div class="radar-hud-tag n">NORTE: 1'643.210 m CTM12</div>
+                  <div class="radar-hud-tag e">ESTE: 4'821.390 m CTM12</div>
+                  <div class="radar-hud-tag crs">DATUM: MAGNA-SIRGAS (EPSG:9377)</div>
+                  <div class="radar-mz-highlight">CRUCE OFICIAL: MANZANA 0231 · BASE IGAC</div>
+                </div>
+              </div>
+              <div class="scene-text-overlay">
+                <h3>2. Reproyección CTM12 y Cruce con la Base Oficial</h3>
+                <p>Conversión instantánea de coordenadas locales o Bogotá Este al Origen Nacional CTM12. Se superpone la ortofoto de alta resolución y se identifican las placas domiciliarias del municipio.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ESCENA 3: CÁLCULO DE LINDEROS, COTAS Y COLINDANTES -->
+          <div class="player-scene" id="scene-3" data-escena="3">
+            <div class="scene-badge">FASE 03 · 00:19 - 00:28s</div>
+            <div class="scene-content">
+              <div class="scene-visual-box">
+                <div class="scene-cad-table-sim">
+                  <div class="cad-sim-header">
+                    <span>VÉRTICE</span><span>LADO</span><span>RUMBO / ACIMUT</span><span>DISTANCIA</span><span>COLINDANCIA DETECTADA</span>
+                  </div>
+                  <div class="cad-sim-row"><span>P1 - P2</span><span>N-O</span><span>N 12° 45' 10" W</span><span>14.85 m</span><b class="text-cian">Calle 12 (Vía Pública Oficial)</b></div>
+                  <div class="cad-sim-row"><span>P2 - P3</span><span>N-E</span><span>N 78° 12' 33" E</span><span>22.10 m</span><b class="text-verde">Predio 0231-0012 (Lote Vecino)</b></div>
+                  <div class="cad-sim-row"><span>P3 - P4</span><span>S-E</span><span>S 11° 50' 18" E</span><span>15.02 m</span><b class="text-ambar">Lote T2 (Mismo Levantamiento)</b></div>
+                  <div class="cad-sim-row"><span>P4 - P1</span><span>S-O</span><span>S 78° 35' 02" W</span><span>22.35 m</span><b class="text-cian">Predio 0231-0010 (Oficial)</b></div>
+                </div>
+              </div>
+              <div class="scene-text-overlay">
+                <h3>3. Geometría Elipsoidal y Colindancias Reales</h3>
+                <p>Cálculo de distancias y rumbos cerrados sobre el elipsoide GRS80. El algoritmo asocia automáticamente quién colinda por el Norte, Sur, Oriente y Occidente, eliminando el error humano.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ESCENA 4: ENTREGA CERTIFICADA ZIP -->
+          <div class="player-scene" id="scene-4" data-escena="4">
+            <div class="scene-badge">FASE 04 · 00:29 - 00:38s</div>
+            <div class="scene-content">
+              <div class="scene-visual-box">
+                <div class="scene-zip-pack">
+                  <div class="zip-item">
+                    <span class="zip-ico">📄</span>
+                    <div><b>01.PDF_VECTORIAL/</b><small>Planos individuales con cuadro técnico y firma</small></div>
+                  </div>
+                  <div class="zip-item">
+                    <span class="zip-ico">🗺️</span>
+                    <div><b>02.SHAPEFILE_IGAC/</b><small>25 atributos LEVANTAMIENTO_01 en CTM12</small></div>
+                  </div>
+                  <div class="zip-item">
+                    <span class="zip-ico">📐</span>
+                    <div><b>03.AUTOCAD_DXF/</b><small>Polígonos, cotas y vértices en capas limpias</small></div>
+                  </div>
+                  <div class="zip-status-stamp">✓ 100% LISTO PARA RADICACIÓN NOTARIAL Y CURADURÍA</div>
+                </div>
+              </div>
+              <div class="scene-text-overlay">
+                <h3>4. Paquete Certificado Listo para Radicar</h3>
+                <p>En solo 38 segundos obtienes los entregables completos que exige la normativa colombiana. Sin contratar cadistas adicionales y ahorrando más de 6 horas de dibujo manual.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subtítulos de locución dinámica -->
+        <div class="player-subtitles" id="player-subtitles">
+          <span class="sub-icon">🎙️</span>
+          <p id="subtitles-text">«Paso 1: Exportas tus datos de estación total o GPS. No necesitas limpiar líneas ni hacer cálculos preliminares...»</p>
+        </div>
+      </div>
+
+      <!-- Barra de Transporte y Controles -->
+      <div class="player-controls">
+        <button type="button" class="btn-play-pause" id="btn-play-pause" aria-label="Reproducir o pausar video">
+          <span class="ico-play" id="ico-play">▶</span>
+        </button>
+
+        <div class="player-time-box">
+          <span id="player-cur-time" class="mono">00:00</span>
+          <span class="sep">/</span>
+          <span class="mono">00:38</span>
+        </div>
+
+        <div class="player-timeline-wrap" id="player-timeline-wrap">
+          <div class="player-timeline-bar" id="player-timeline-bar"></div>
+          <!-- Marcadores de fase en la línea de tiempo -->
+          <div class="timeline-marker m1" style="left:0%" title="Fase 1: Ingesta"></div>
+          <div class="timeline-marker m2" style="left:23.7%" title="Fase 2: CTM12 IGAC"></div>
+          <div class="timeline-marker m3" style="left:50%" title="Fase 3: Linderos CAD"></div>
+          <div class="timeline-marker m4" style="left:76.3%" title="Fase 4: Entrega ZIP"></div>
+        </div>
+
+        <div class="player-steps-nav">
+          <button type="button" class="btn-scene-jump activo" data-jump="1">1. Ingesta</button>
+          <button type="button" class="btn-scene-jump" data-jump="2">2. CTM12</button>
+          <button type="button" class="btn-scene-jump" data-jump="3">3. Linderos</button>
+          <button type="button" class="btn-scene-jump" data-jump="4">4. Entrega</button>
+        </div>
+      </div>
+
+      <!-- Llamado a la acción directo del video -->
+      <div class="player-cta-bar">
+        <div class="player-cta-txt">
+          <b>¿Quieres probar este mismo flujo con tu levantamiento?</b>
+          <span>Sube tu archivo y visualiza tus lotes en el mapa interactivo 100% gratis.</span>
+        </div>
+        <a class="btn btn-p" href="#pedido">Probar gratis ahora <svg aria-hidden="true"><use href="#i-flecha"/></svg></a>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- ── CÓMO FUNCIONA: 3 PASOS DE CERO FRICCIÓN Y CONFIANZA ── -->
@@ -381,15 +568,375 @@
   </div>
 </section>
 
+<!-- ── SOLUCIONES POR SECTOR EN COLOMBIA (5 PERFILES COMERCIALES) ── -->
+<section class="sec fondo-2 borde-sup" id="soluciones">
+  <div class="cont">
+    <div class="sec-cab text-center" data-ver>
+      <span class="ceja">Soluciones Especializadas · Territorio Colombia</span>
+      <h2>Diseñado para los 5 grandes actores del sector inmobiliario y catastral.</h2>
+      <p class="bajada">Resolvemos el cuello de botella técnico según tus trámites específicos, eliminando devoluciones en Curadurías, Notarías y Catastro.</p>
+    </div>
+
+    <!-- Navegación por pestañas de industria -->
+    <div class="tabs-soluciones-nav" data-ver>
+      <button type="button" class="tab-sol-btn activa" data-tab="sol-topografos">
+        <span class="tab-ico">👷‍♂️</span>
+        <span class="tab-txt">Topógrafos CPNT</span>
+      </button>
+      <button type="button" class="tab-sol-btn" data-tab="sol-empresas">
+        <span class="tab-ico">🏢</span>
+        <span class="tab-txt">Firmas de Ingeniería</span>
+      </button>
+      <button type="button" class="tab-sol-btn" data-tab="sol-parceladores">
+        <span class="tab-ico">🏡</span>
+        <span class="tab-txt">Parceladores Campestres</span>
+      </button>
+      <button type="button" class="tab-sol-btn" data-tab="sol-abogados">
+        <span class="tab-ico">⚖️</span>
+        <span class="tab-txt">Abogados Inmobiliarios</span>
+      </button>
+      <button type="button" class="tab-sol-btn" data-tab="sol-gestores">
+        <span class="tab-ico">🗺️</span>
+        <span class="tab-txt">Gestores Catastrales</span>
+      </button>
+    </div>
+
+    <!-- Contenedor de Paneles de Solución -->
+    <div class="tabs-soluciones-content" data-ver>
+      <!-- PANEL 1: TOPÓGRAFOS INDEPENDIENTES -->
+      <article class="tab-sol-panel activo" id="sol-topografos">
+        <div class="sol-panel-grid">
+          <div class="sol-panel-info">
+            <span class="sol-tag-badge">TOPÓGRAFOS Y AGRIMENSORES INDEPENDIENTES</span>
+            <h3>Tu cadista inteligente en la nube: entrega sin trasnochar.</h3>
+            <p class="sol-bajada">¿Llegaste exhausto de campo tras una jornada de medición? No pases la noche dibujando polígonos, cuadrando cuadros de rumbos elipsoidales ni pegando cajetines en AutoCAD.</p>
+            
+            <div class="sol-contrastes">
+              <div class="sol-item contra">
+                <span class="s-ico">❌</span>
+                <div>
+                  <b>Flujo Tradicional</b>
+                  <p>4 a 6 horas dibujando en AutoCAD por cada levantamiento. Riesgo de rechazo por coordenadas en Bogotá Este o tablas manuales descuadradas.</p>
+                </div>
+              </div>
+              <div class="sol-item pro">
+                <span class="s-ico">⚡</span>
+                <div>
+                  <b>Con Lindero PRO</b>
+                  <p>Subes tu archivo de puntos o DXF y en 38 segundos tienes el PDF oficial con tu matrícula profesional CPNT, el DXF editable por capas y el Shapefile listo.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="sol-entregables-mini">
+              <span><b>Entregables para este perfil:</b> PDF individual por predio · DXF en CTM12 (EPSG:9377) · Shapefile oficial · Matrícula profesional en cajetín.</span>
+            </div>
+
+            <div class="sol-acciones">
+              <a class="btn btn-p" href="#pedido">Probar mi primer predio gratis</a>
+              <a class="btn btn-s btn-wpp" href="https://wa.me/573106514707?text=Hola%20Lindero%20PRO,%20soy%20top%C3%B3grafo%20independiente%20y%20quiero%20probar%20el%20procesamiento%20de%20mi%20primer%20predio%20gratis" target="_blank" rel="noopener">
+                💬 Hablar con Soporte de Campo
+              </a>
+            </div>
+          </div>
+          <div class="sol-panel-card-lateral">
+            <div class="card-metrica-header">
+              <span class="mini mono">CASO DE USO FRECUENTE</span>
+              <span class="card-status-dot">Activo</span>
+            </div>
+            <h4>Desenglobes Rurales y Sucesiones Familiares</h4>
+            <p>Trámites comunes ante Notaría donde se exige el plano del lote matriz y las hijuelas individuales con cuadro de áreas y linderos periciales.</p>
+            <div class="metricas-resumen">
+              <div class="m-dato"><b>38 seg</b><span>Tiempo de entrega</span></div>
+              <div class="m-dato"><b>$4.000 COP</b><span>Costo por predio</span></div>
+              <div class="m-dato"><b>0 %</b><span>Reprocesos CAD</span></div>
+            </div>
+            <div class="cita-testimonio">
+              «Antes me tomaba 2 días armar los planos para Curaduría en Rionegro. Ahora los proceso en el carro con el portátil antes de regresar a la oficina.»
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- PANEL 2: FIRMAS DE INGENIERÍA -->
+      <article class="tab-sol-panel" id="sol-empresas">
+        <div class="sol-panel-grid">
+          <div class="sol-panel-info">
+            <span class="sol-tag-badge">FIRMAS DE CONSULTORÍA E INGENIERÍA CIVIL</span>
+            <h3>Estandarización 100% IGAC y cero glosas de interventoría.</h3>
+            <p class="sol-bajada">Elimina los cuellos de botella en la entrega de proyectos viales, de infraestructura o consultoría territorial pública. Cumplimiento estricto de la Resolución 471 y 529.</p>
+            
+            <div class="sol-contrastes">
+              <div class="sol-item contra">
+                <span class="s-ico">❌</span>
+                <div>
+                  <b>Flujo Tradicional</b>
+                  <p>Altos costos de nómina en dibujantes CAD, inconsistencias entre diferentes cadistas y demoras de semanas subsanando observaciones de interventoría.</p>
+                </div>
+              </div>
+              <div class="sol-item pro">
+                <span class="s-ico">⚡</span>
+                <div>
+                  <b>Con Lindero PRO</b>
+                  <p>Mismo formato uniforme garantizado para toda tu empresa. Generación masiva del esquema LEVANTAMIENTO_01 con sus 25 atributos oficiales verificados.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="sol-entregables-mini">
+              <span><b>Entregables para este perfil:</b> Geodatabase/Shapefile IGAC · Informe de verificación en Excel (.xlsx) · Membrete corporativo unificado.</span>
+            </div>
+
+            <div class="sol-acciones">
+              <a class="btn btn-p" href="#precio">Ver Paquetes Profesionales</a>
+              <a class="btn btn-s btn-wpp" href="https://wa.me/573106514707?text=Hola%20Lindero%20PRO,%20somos%20una%20firma%20de%20ingenier%C3%ADa%20y%20queremos%20cotizar%20un%20paquete%20para%20contratos" target="_blank" rel="noopener">
+                💬 Cotizar Cuenta Corporativa
+              </a>
+            </div>
+          </div>
+          <div class="sol-panel-card-lateral">
+            <div class="card-metrica-header">
+              <span class="mini mono">CASO DE USO FRECUENTE</span>
+              <span class="card-status-dot">Activo</span>
+            </div>
+            <h4>Fajas Prediales para Vías y Servidumbres</h4>
+            <p>Identificación de polígonos afectados y generación de anexos cartográficos para adquisición predial y avalúos corporativos.</p>
+            <div class="metricas-resumen">
+              <div class="m-dato"><b>25</b><span>Atributos IGAC</span></div>
+              <div class="m-dato"><b>$2.250 COP</b><span>Tarifa en paquete</span></div>
+              <div class="m-dato"><b>100 %</b><span>Conforme CTM12</span></div>
+            </div>
+            <div class="cita-testimonio">
+              «Estandarizamos las entregas de 120 predios de una concesión vial en Cundinamarca en una sola tarde sin contratar personal temporal.»
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- PANEL 3: PARCELADORES CAMPESTRES -->
+      <article class="tab-sol-panel" id="sol-parceladores">
+        <div class="sol-panel-grid">
+          <div class="sol-panel-info">
+            <span class="sol-tag-badge">DESARROLLADORES Y PARCELADORES INMOBILIARIOS</span>
+            <h3>Seguridad jurídica total entre lotes continuos contiguos.</h3>
+            <p class="sol-bajada">Vende con tranquilidad. Cada comprador recibe un plano individualizado con sus linderos periciales calculados sin traslapes ni vacíos entre vecinos.</p>
+            
+            <div class="sol-contrastes">
+              <div class="sol-item contra">
+                <span class="s-ico">❌</span>
+                <div>
+                  <b>Flujo Tradicional</b>
+                  <p>Disputas de linderos entre compradores contiguos por errores de cotas en AutoCAD. Demoras de hasta 6 meses para radicar licencias de parcelación.</p>
+                </div>
+              </div>
+              <div class="sol-item pro">
+                <span class="s-ico">⚡</span>
+                <div>
+                  <b>Con Lindero PRO</b>
+                  <p>El motor calcula el deslinde exacto entre lotes contiguos (como T1 y T2 en nuestro visor). Cada parcela tiene su cuadro independiente listo para escriturar.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="sol-entregables-mini">
+              <span><b>Entregables para este perfil:</b> Planos individuales de venta · Cuadro general de áreas y vías de acceso · Anexos de colindancia para promesa de compraventa.</span>
+            </div>
+
+            <div class="sol-acciones">
+              <a class="btn btn-p" href="#pedido">Procesar Condominio o Loteo</a>
+              <a class="btn btn-s btn-wpp" href="https://wa.me/573106514707?text=Hola%20Lindero%20PRO,%20tenemos%20un%20proyecto%20de%20parcelaci%C3%B3n%20campestre%20y%20requerimos%20planos%20individuales" target="_blank" rel="noopener">
+                💬 Asesoría para Parcelaciones
+              </a>
+            </div>
+          </div>
+          <div class="sol-panel-card-lateral">
+            <div class="card-metrica-header">
+              <span class="mini mono">CASO DE USO FRECUENTE</span>
+              <span class="card-status-dot">Activo</span>
+            </div>
+            <h4>Condominios Campestres y Parcelaciones Rurales</h4>
+            <p>Proyectos en el Oriente Antioqueño, Sabana de Bogotá, Anapoima y Eje Cafetero con decenas de lotes independientes.</p>
+            <div class="metricas-resumen">
+              <div class="m-dato"><b>0 mm</b><span>Traslapes entre lotes</span></div>
+              <div class="m-dato"><b>24h</b><span>Listos para notaría</span></div>
+              <div class="m-dato"><b>100%</b><span>Georreferenciado</span></div>
+            </div>
+            <div class="cita-testimonio">
+              «Pudimos radicar los 48 planos de nuestra parcelación en Curaduría sin una sola observación sobre los linderos comunes.»
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- PANEL 4: ABOGADOS INMOBILIARIOS -->
+      <article class="tab-sol-panel" id="sol-abogados">
+        <div class="sol-panel-grid">
+          <div class="sol-panel-info">
+            <span class="sol-tag-badge">DERECHO INMOBILIARIO, NOTARÍAS Y CURADURÍAS</span>
+            <h3>El anexo técnico que los jueces y registradores admiten sin peros.</h3>
+            <p class="sol-bajada">Evita que tus demandas de pertenencia o trámites de rectificación de área queden estancados por objeciones de la Oficina de Registro (ORIP).</p>
+            
+            <div class="sol-contrastes">
+              <div class="sol-item contra">
+                <span class="s-ico">❌</span>
+                <div>
+                  <b>Flujo Tradicional</b>
+                  <p>Planos en sistemas de coordenadas obsoletos que la SNR o los juzgados civiles inadmiten por falta de georreferenciación oficial en CTM12.</p>
+                </div>
+              </div>
+              <div class="sol-item pro">
+                <span class="s-ico">⚡</span>
+                <div>
+                  <b>Con Lindero PRO</b>
+                  <p>Certificado con identificación de linderos sobre el elipsoide GRS80, identificación de vías públicas oficiales y predios catastrales vecinos registrados.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="sol-entregables-mini">
+              <span><b>Entregables para este perfil:</b> Certificado PDF con sellos oficiales · Cuadro pericial de rumbos y distancias · Archivo digital para la ORIP.</span>
+            </div>
+
+            <div class="sol-acciones">
+              <a class="btn btn-p" href="#pedido">Generar Anexo Técnico</a>
+              <a class="btn btn-s btn-wpp" href="https://wa.me/573106514707?text=Hola%20Lindero%20PRO,%20somos%20firma%20jur%C3%ADdica%20inmobiliaria%20y%20necesitamos%20anexos%20t%C3%A9cnicos%20para%20procesos" target="_blank" rel="noopener">
+                💬 Consulta Jurídico-Técnica
+              </a>
+            </div>
+          </div>
+          <div class="sol-panel-card-lateral">
+            <div class="card-metrica-header">
+              <span class="mini mono">CASO DE USO FRECUENTE</span>
+              <span class="card-status-dot">Activo</span>
+            </div>
+            <h4>Juicios de Pertenencia y Deslindes Judiciales</h4>
+            <p>Procesos civiles donde el dictamen pericial requiere precisión milimétrica y concordancia con la base catastral municipal.</p>
+            <div class="metricas-resumen">
+              <div class="m-dato"><b>EPSG:9377</b><span>Válido SNR</span></div>
+              <div class="m-dato"><b>± 0.05 m</b><span>Cierre elipsoidal</span></div>
+              <div class="m-dato"><b>100 %</b><span>Admisibilidad</span></div>
+            </div>
+            <div class="cita-testimonio">
+              «Los jueces exigen el anexo en CTM12. Lindero PRO nos permite presentar la prueba técnica de linderos sin dilatar el proceso.»
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- PANEL 5: GESTORES CATASTRALES -->
+      <article class="tab-sol-panel" id="sol-gestores">
+        <div class="sol-panel-grid">
+          <div class="sol-panel-info">
+            <span class="sol-tag-badge">OPERADORES Y GESTORES DE CATASTRO MULTIPROPÓSITO</span>
+            <h3>Velocidad masiva para barridos prediales y actualización masiva.</h3>
+            <p class="sol-bajada">Cumple los cronogramas exigidos por las alcaldías y el IGAC. Procesa lotes completos de miles de predios sin fricción de software.</p>
+            
+            <div class="sol-contrastes">
+              <div class="sol-item contra">
+                <span class="s-ico">❌</span>
+                <div>
+                  <b>Flujo Tradicional</b>
+                  <p>Incompatibilidad de esquemas alfanuméricos, errores topológicos y semanas enteras quemando horas para ensamblar carpetas de entrega.</p>
+                </div>
+              </div>
+              <div class="sol-item pro">
+                <span class="s-ico">⚡</span>
+                <div>
+                  <b>Con Lindero PRO</b>
+                  <p>Validación geométrica y ensamblaje automático de carpetas 01.SHP, 02.PDF y 03.DXF por manzana o vereda con trazabilidad completa.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="sol-entregables-mini">
+              <span><b>Entregables para este perfil:</b> Lote completo de Shapefiles LEVANTAMIENTO_01 · Validación topológica · API disponible para integración masiva.</span>
+            </div>
+
+            <div class="sol-acciones">
+              <a class="btn btn-p" href="#precio">Consultar Convenio Gestores</a>
+              <a class="btn btn-s btn-wpp" href="https://wa.me/573106514707?text=Hola%20Lindero%20PRO,%20somos%20gestores/operadores%20catastrales%20y%20requerimos%20procesamiento%20masivo" target="_blank" rel="noopener">
+                💬 Contactar Equipo de Desarrollo
+              </a>
+            </div>
+          </div>
+          <div class="sol-panel-card-lateral">
+            <div class="card-metrica-header">
+              <span class="mini mono">CASO DE USO FRECUENTE</span>
+              <span class="card-status-dot">Activo</span>
+            </div>
+            <h4>Actualización Catastral Urbana y Rural</h4>
+            <p>Operaciones masivas en municipios en proceso de actualización o descentralización catastral bajo la Ley 1955.</p>
+            <div class="metricas-resumen">
+              <div class="m-dato"><b>2.000+</b><span>Predios / lote</span></div>
+              <div class="m-dato"><b>Directo</b><span>Soporte API</span></div>
+              <div class="m-dato"><b>RUT</b><span>Facturación electrónica</span></div>
+            </div>
+            <div class="cita-testimonio">
+              «Procesamos una manzana catastral entera de 56 predios en minutos, garantizando la congruencia con las placas domiciliarias.»
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
 <!-- ── PRECIOS CON ANCLAJE DE VALOR Y CALCULADORA INTELIGENTE ── -->
 <section class="sec fondo-2 borde-sup" id="precio">
   <div class="cont">
-    <div class="sec-cab" data-ver>
-      <span class="ceja">Inversión Transparente</span>
-      <h2>$4.000 COP por predio. Menos que una gaseosa, cero suscripciones.</h2>
-      <p class="bajada">Un cadista cobra entre $45.000 y $80.000 COP por plano y tarda 2 días. Con Lindero PRO pagas
-        solo $4.000 COP y lo tienes en 38 segundos.</p>
+    <div class="sec-cab text-center" data-ver>
+      <span class="ceja">Inversión Transparente · Planes Comerciales</span>
+      <h2>Tarifas claras para profesionales independientes y firmas de ingeniería.</h2>
+      <p class="bajada">Un cadista cobra entre $45.000 y $80.000 COP por plano y tarda 2 días. Con Lindero PRO pagas desde $2.250 COP y lo tienes en 38 segundos.</p>
     </div>
+
+    <!-- Grid de Paquetes Comerciales B2B -->
+    <div class="paquetes-b2b-grid" data-ver id="paquetes-b2b">
+      <!-- Tarjeta 1: Al Vuelo -->
+      <div class="paquete-card">
+        <div class="paquete-tag">INDIVIDUAL / AL VUELO</div>
+        <div class="paquete-precio">$ 4.000<small>COP / predio</small></div>
+        <p class="paquete-desc">Para topógrafos independientes con pedidos ocasionales. Sin compromisos ni recargas mínimas.</p>
+        <ul class="paquete-items">
+          <li><span class="p-check">✓</span> Pago por predio procesado</li>
+          <li><span class="p-check">✓</span> Vista previa satelital 100% gratis</li>
+          <li><span class="p-check">✓</span> PDF oficial CTM12 + DXF + SHP</li>
+          <li><span class="p-check">✓</span> Pago inmediato vía Wompi (PSE, Nequi, Tarjeta)</li>
+        </ul>
+        <a class="btn btn-s btn-block" href="#pedido">Procesar al Vuelo</a>
+      </div>
+
+      <!-- Tarjeta 2: Pack Profesional (Destacado) -->
+      <div class="paquete-card destacado">
+        <div class="paquete-badge-destacado">MÁS POPULAR · AHORRA 25%</div>
+        <div class="paquete-tag">PACK PROFESIONAL (50 PREDIOS)</div>
+        <div class="paquete-precio">$ 150.000<small>COP total ($3.000 / predio)</small></div>
+        <p class="paquete-desc">Ideal para estudios de topografía y consultores con flujo mensual constante.</p>
+        <ul class="paquete-items">
+          <li><span class="p-check">✓</span> Saldo de 50 predios <b>sin vencimiento</b></li>
+          <li><span class="p-check">✓</span> <b>Personalización de membrete:</b> tu logo y firma fija</li>
+          <li><span class="p-check">✓</span> Soporte técnico prioritario por WhatsApp</li>
+          <li><span class="p-check">✓</span> Descarga inmediata sin pasar por pasarela cada vez</li>
+        </ul>
+        <a class="btn btn-p btn-block" href="https://wa.me/573106514707?text=Hola%20Lindero%20PRO,%20quiero%20adquirir%20el%20Pack%20Profesional%20de%2050%20predios%20por%20$150.000%20COP" target="_blank" rel="noopener">Activar Pack Profesional</a>
+      </div>
+
+      <!-- Tarjeta 3: Pack Corporativo -->
+      <div class="paquete-card">
+        <div class="paquete-tag">PACK EMPRESARIAL (200 PREDIOS)</div>
+        <div class="paquete-precio">$ 450.000<small>COP total ($2.250 / predio)</small></div>
+        <p class="paquete-desc">Para promotores de parcelaciones, contratistas de obras viales y gestores catastrales.</p>
+        <ul class="paquete-items">
+          <li><span class="p-check">✓</span> Tarifa mayorista: <b>$2.250 COP / predio (Ahorro 44%)</b></li>
+          <li><span class="p-check">✓</span> Factura electrónica colombiana con RUT</li>
+          <li><span class="p-check">✓</span> Procesamiento prioritario de alta capacidad</li>
+          <li><span class="p-check">✓</span> Acceso a API y asistencia personalizada de ingenieros</li>
+        </ul>
+        <a class="btn btn-s btn-block" href="https://wa.me/573106514707?text=Hola%20Lindero%20PRO,%20quiero%20cotizar%20el%20Pack%20Empresarial%20de%20200%20predios%20con%20factura%20electr%C3%B3nica" target="_blank" rel="noopener">Solicitar Pack Empresarial</a>
+      </div>
+    </div>
+
+    <!-- Calculadora Dinámica -->
     <div class="precio-caja" data-ver>
       <div class="precio-info">
         <div class="precio-pill">TARIFA PLANA CERTIFICADA</div>
@@ -427,6 +974,123 @@
           ⚡ <b>Ahorras aprox. $ 820.000 COP</b> y <b>14 horas</b> de dibujo manual en CAD
         </div>
         <a class="btn btn-p" href="#pedido" style="margin-top:20px;width:100%">Empezar con mi vista previa gratis</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── RADAR DE COBERTURA Y PROSPECCIÓN NACIONAL (COLOMBIA) ── -->
+<section class="sec" id="radar-nacional">
+  <div class="cont">
+    <div class="sec-cab text-center" data-ver>
+      <span class="ceja">Ecosistema Territorial · Cobertura 100% Colombia</span>
+      <h2>Compatible con las Curadurías, Notarías y Catastro de todo el país.</h2>
+      <p class="bajada">El marco MAGNA-SIRGAS Origen Nacional (CTM12) unificó la cartografía colombiana. Lindero PRO garantiza cumplimiento normativo en cualquier municipio.</p>
+    </div>
+
+    <div class="radar-regiones-grid" data-ver>
+      <!-- Región 1 -->
+      <div class="region-card">
+        <div class="region-cab">
+          <span class="reg-ico">⛰️</span>
+          <div>
+            <h4>Antioquia & Oriente Campestre</h4>
+            <span class="reg-foco">Rionegro · El Retiro · Marinilla · Medellín</span>
+          </div>
+        </div>
+        <p>Principal polo de parcelaciones campestres de Colombia. Alta demanda en desenglobes notariales de fincas familiares y licencias de parcelación.</p>
+        <div class="reg-tags">
+          <span>Condominios</span><span>Desenglobes</span><span>Curadurías Medellín</span>
+        </div>
+      </div>
+
+      <!-- Región 2 -->
+      <div class="region-card">
+        <div class="region-cab">
+          <span class="reg-ico">🏙️</span>
+          <div>
+            <h4>Cundinamarca & Sabana de Bogotá</h4>
+            <span class="reg-foco">Chía · Cajicá · Cota · Anapoima · Bogotá D.C.</span>
+          </div>
+        </div>
+        <p>Máxima exigencia técnica en las 5 Curadurías Urbanas de Bogotá y municipios de conurbación. Anexos cartográficos para licencias y pertenencias.</p>
+        <div class="reg-tags">
+          <span>Curadurías 1-5</span><span>Sabana Norte</span><span>Juicios Civiles</span>
+        </div>
+      </div>
+
+      <!-- Región 3 -->
+      <div class="region-card">
+        <div class="region-cab">
+          <span class="reg-ico">🌴</span>
+          <div>
+            <h4>Valle del Cauca & Sur</h4>
+            <span class="reg-foco">Cali · Jamundí · Rozo · Dapa · Palmira</span>
+          </div>
+        </div>
+        <p>Desarrollo acelerado en corredores suburbanos (Jamundí y Dapa). Proyectos de loteo, servidumbres y rectificación de cabida y linderos ante la ORIP.</p>
+        <div class="reg-tags">
+          <span>Curadurías Cali</span><span>Loteos Planos</span><span>ORIP Cali</span>
+        </div>
+      </div>
+
+      <!-- Región 4 -->
+      <div class="region-card">
+        <div class="region-cab">
+          <span class="reg-ico">☕</span>
+          <div>
+            <h4>Eje Cafetero</h4>
+            <span class="reg-foco">Pereira · Armenia · Manizales · Dosquebradas</span>
+          </div>
+        </div>
+        <p>Auge de subdivisiones para turismo rural, fincas de descanso y condominios cerrados con topografía quebrada y alta precisión requerida.</p>
+        <div class="reg-tags">
+          <span>Agroturismo</span><span>Reloteos</span><span>SCT Seccional</span>
+        </div>
+      </div>
+
+      <!-- Región 5 -->
+      <div class="region-card">
+        <div class="region-cab">
+          <span class="reg-ico">🌊</span>
+          <div>
+            <h4>Costa Caribe</h4>
+            <span class="reg-foco">Barranquilla · Malambo · Cartagena · Santa Marta</span>
+          </div>
+        </div>
+        <p>Pioneros en Catastro Multipropósito y expansión logística industrial. Compatibilidad nativa con las bases catastrales municipales del Atlántico.</p>
+        <div class="reg-tags">
+          <span>Catastro Malambo</span><span>Zonas Francas</span><span>Base Oficial IGAC</span>
+        </div>
+      </div>
+
+      <!-- Región 6 -->
+      <div class="region-card">
+        <div class="region-cab">
+          <span class="reg-ico">🏭</span>
+          <div>
+            <h4>Santanderes</h4>
+            <span class="reg-foco">Bucaramanga · Floridablanca · Piedecuesta · Girón</span>
+          </div>
+        </div>
+        <p>Complejidad topográfica y alta densidad de peritajes judiciales en deslindes y amojonamiento en zonas de ladera y expansión metropolitana.</p>
+        <div class="reg-tags">
+          <span>Topografía Ladera</span><span>AMB</span><span>Deslindes</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Banner de Dossier Comercial & Alianzas Estratégicas -->
+    <div class="dossier-callout" data-ver>
+      <div class="dossier-txt">
+        <div class="dossier-badge">KIT COMERCIAL Y MANUAL TÉCNICO DEVGIz</div>
+        <h3>¿Representas a una asociación de topógrafos, lonja o curaduría?</h3>
+        <p>Disponemos de convenios institucionales para agremiaciones, tarifas corporativas por volumen y jornadas de capacitación técnica en CTM12 para tu equipo.</p>
+      </div>
+      <div class="dossier-acciones">
+        <a class="btn btn-p" href="https://wa.me/573106514707?text=Hola%20Lindero%20PRO,%20quiero%20conocer%20los%20convenios%20institucionales%20y%20el%20dossier%20comercial" target="_blank" rel="noopener">
+          💬 Solicitar Alianza Institucional
+        </a>
       </div>
     </div>
   </div>

@@ -675,6 +675,149 @@
   }
 
 
+  /* ==========================================================================
+     PRODUCCIÓN AUDIOVISUAL · CONTROLADOR DE LA DEMO INTERACTIVA 38s
+     ========================================================================== */
+  var playerCard = d.getElementById("player-audiovisual");
+  if (playerCard) {
+    var btnPlayPause = d.getElementById("btn-play-pause");
+    var icoPlay = d.getElementById("ico-play");
+    var curTimeEl = d.getElementById("player-cur-time");
+    var timelineBar = d.getElementById("player-timeline-bar");
+    var timelineWrap = d.getElementById("player-timeline-wrap");
+    var subtitlesText = d.getElementById("subtitles-text");
+    var btnSpeed = d.getElementById("btn-player-speed");
+    var jumpBtns = playerCard.querySelectorAll("[data-jump]");
+    var scenes = playerCard.querySelectorAll(".player-scene");
+
+    var duration = 38;
+    var currentTime = 0;
+    var isPlaying = false;
+    var speed = 1.0;
+    var playInterval = null;
+
+    var subtitulos = [
+      { min: 0, max: 8, escena: 1, texto: "«Paso 1: Exportas tus datos de estación total o GPS. No necesitas limpiar líneas ni hacer cálculos preliminares...»" },
+      { min: 9, max: 18, escena: 2, texto: "«Paso 2: El motor espacial proyecta al origen único nacional CTM12 y cruza automáticamente la base oficial del municipio...»" },
+      { min: 19, max: 28, escena: 3, texto: "«Paso 3: Calcula linderos, colindantes oficiales y el cuadro de construcción técnico con rigor legal para Curaduría...»" },
+      { min: 29, max: 38, escena: 4, texto: "«Paso 4: Descargas tu archivo ZIP completo. Ahorraste 6 horas de dibujo y tus planos están listos para firma y radicación.»" }
+    ];
+
+    var formatTime = function (sec) {
+      var s = Math.floor(sec);
+      return "00:" + (s < 10 ? "0" + s : s);
+    };
+
+    var setScene = function (numEscena) {
+      scenes.forEach(function (s) {
+        s.classList.toggle("activa", s.dataset.escena === String(numEscena));
+      });
+      jumpBtns.forEach(function (b) {
+        b.classList.toggle("activo", b.dataset.jump === String(numEscena));
+      });
+    };
+
+    var updateUI = function () {
+      if (curTimeEl) curTimeEl.textContent = formatTime(currentTime);
+      var pct = (currentTime / duration) * 100;
+      if (timelineBar) timelineBar.style.width = Math.min(100, pct) + "%";
+
+      for (var i = 0; i < subtitulos.length; i++) {
+        var sub = subtitulos[i];
+        if (currentTime >= sub.min && currentTime <= sub.max) {
+          if (subtitlesText) subtitlesText.textContent = sub.texto;
+          setScene(sub.escena);
+          break;
+        }
+      }
+    };
+
+    var pause = function () {
+      isPlaying = false;
+      playerCard.classList.remove("reproduciendo");
+      if (icoPlay) icoPlay.textContent = "▶";
+      if (playInterval) {
+        clearInterval(playInterval);
+        playInterval = null;
+      }
+    };
+
+    var play = function () {
+      if (currentTime >= duration) {
+        currentTime = 0;
+      }
+      isPlaying = true;
+      playerCard.classList.add("reproduciendo");
+      if (icoPlay) icoPlay.textContent = "❚❚";
+      var stepMs = 100;
+      playInterval = setInterval(function () {
+        currentTime += (stepMs / 1000) * speed;
+        if (currentTime >= duration) {
+          currentTime = duration;
+          updateUI();
+          pause();
+        } else {
+          updateUI();
+        }
+      }, stepMs);
+    };
+
+    if (btnPlayPause) {
+      btnPlayPause.addEventListener("click", function () {
+        if (isPlaying) pause();
+        else play();
+      });
+    }
+
+    if (timelineWrap) {
+      timelineWrap.addEventListener("click", function (e) {
+        var rect = timelineWrap.getBoundingClientRect();
+        var clickX = e.clientX - rect.left;
+        var ratio = Math.max(0, Math.min(1, clickX / rect.width));
+        currentTime = ratio * duration;
+        updateUI();
+      });
+    }
+
+    jumpBtns.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var jumpTo = parseInt(this.dataset.jump, 10);
+        var targetSec = jumpTo === 1 ? 0 : (jumpTo === 2 ? 9 : (jumpTo === 3 ? 19 : 29));
+        currentTime = targetSec;
+        updateUI();
+      });
+    });
+
+    if (btnSpeed) {
+      btnSpeed.addEventListener("click", function () {
+        if (speed === 1.0) speed = 1.5;
+        else if (speed === 1.5) speed = 2.0;
+        else speed = 1.0;
+        btnSpeed.textContent = speed.toFixed(1) + "x";
+      });
+    }
+
+    updateUI();
+  }
+
+  /* ==========================================================================
+     SOLUCIONES POR SECTOR · CONTROLADOR DE PESTAÑAS (TABS)
+     ========================================================================== */
+  var tabsBtns = d.querySelectorAll(".tab-sol-btn");
+  var tabsPanels = d.querySelectorAll(".tab-sol-panel");
+  if (tabsBtns.length && tabsPanels.length) {
+    tabsBtns.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var targetId = this.dataset.tab;
+        tabsBtns.forEach(function (b) { b.classList.remove("activa"); });
+        tabsPanels.forEach(function (p) { p.classList.remove("activo"); });
+        this.classList.add("activa");
+        var targetPanel = d.getElementById(targetId);
+        if (targetPanel) targetPanel.classList.add("activo");
+      });
+    });
+  }
+
   /* ── Tooltips Interactivos y Ayudas Visuales ── */
   d.querySelectorAll("[data-tooltip]").forEach(function (el) {
     el.setAttribute("title", el.dataset.tooltip);
