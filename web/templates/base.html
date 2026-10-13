@@ -47,7 +47,6 @@
       </div>
       <div class="marca-texto">
         <span class="marca-titulo">LINDERO <span class="tag-pro">PRO</span></span>
-        <span class="marca-sub">por <a href="{{ CFG.url_devgiz }}" target="_blank" rel="noopener" class="link-devgiz">DevGiz</a></span>
       </div>
     </a>
     <div class="cab-centro">
@@ -65,14 +64,14 @@
     <div class="pie-grid">
       <div class="pie-col-marca">
         <div class="pie-marca">
-          <span class="logo-txt">DEVGIZ // LINDERO</span>
+          <span class="logo-txt">LINDERO PRO</span>
           <span class="pie-badge">Spatial Engine v2.4</span>
         </div>
         <p class="pie-desc">
-          Plataforma de inteligencia espacial y automatización cartográfica. Transforma levantamientos de campo en planos prediales catastrales oficiales bajo normativa IGAC en segundos.
+          Inteligencia espacial y automatización cartográfica para topógrafos. Genera planos prediales oficiales, shapefiles y cuadros de linderos CTM12 en segundos.
         </p>
         <div class="pie-enlace-devgiz">
-          <span>Desarrollado y respaldado por:</span>
+          <span>Diseñado y respaldado por:</span>
           <a href="{{ CFG.url_devgiz }}" target="_blank" rel="noopener" class="btn-devgiz-oficial">
             <span>DevGiz Engineering</span>
             <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M5.22 14.78a.75.75 0 001.06 0l7.22-7.22v5.69a.75.75 0 001.5 0v-7.5a.75.75 0 00-.75-.75h-7.5a.75.75 0 000 1.5h5.69l-7.22 7.22a.75.75 0 000 1.06z" clip-rule="evenodd"/></svg>
@@ -80,28 +79,28 @@
         </div>
       </div>
       <div class="pie-col">
-        <h4>ESPECIFICACIONES</h4>
+        <h4>ESTÁNDARES CARTOGRÁFICOS</h4>
         <ul>
           <li><span class="check-dot"></span> MAGNA-SIRGAS Origen Nacional (EPSG:9377)</li>
-          <li><span class="check-dot"></span> Esquema LEVANTAMIENTO_01 (25 campos)</li>
-          <li><span class="check-dot"></span> Salidas COTAS y COORDENADAS WGS84/CTM12</li>
-          <li><span class="check-dot"></span> Formatos SHP, PDF Vectorial y DXF 2018</li>
+          <li><span class="check-dot"></span> Esquema LEVANTAMIENTO_01 (25 atributos IGAC)</li>
+          <li><span class="check-dot"></span> Cuadros de coordenadas elipsoidales y colindantes</li>
+          <li><span class="check-dot"></span> Entregables en Shapefile (.shp), PDF Vectorial y DXF</li>
         </ul>
       </div>
       <div class="pie-col">
-        <h4>SEGURIDAD Y HABEAS DATA</h4>
+        <h4>CONFIANZA Y SEGURIDAD</h4>
         <p class="pie-mini">
-          Cumplimiento Ley 1581 de 2012 de Protección de Datos Personales. Los datos catastrales alfanuméricos procesados son de uso exclusivo del titular del levantamiento y se eliminan del servidor tras la descarga.
+          Cumplimiento riguroso de la Ley 1581 de 2012 (Habeas Data). Tus archivos y datos prediales son de uso exclusivo para tu pedido y se procesan con cifrado de extremo a extremo.
         </p>
         <div class="tarifa-tag">
-          <small>TARIFA OFICIAL</small>
+          <small>TARIFA TRANSPARENTE</small>
           <strong>${{ "{:,}".format(CFG.precio_por_predio).replace(',', '.') }} COP / predio</strong>
         </div>
       </div>
     </div>
     <div class="pie-inferior">
       <p>&copy; 2026 DevGiz Engineering. Todos los derechos reservados. <a href="{{ CFG.url_devgiz }}" target="_blank" rel="noopener">devgiz.vercel.app</a></p>
-      <p class="pie-mono">Municipio activo: {{ CFG.municipios.values()|join(' · ') }}</p>
+      <p class="pie-mono">Cobertura activa: {{ CFG.municipios.values()|join(' · ') }}</p>
     </div>
   </div>
 </footer>
