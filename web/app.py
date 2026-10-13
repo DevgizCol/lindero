@@ -92,19 +92,25 @@ def _cabeceras(resp):
     resp.headers.setdefault("X-Content-Type-Options", "nosniff")
     resp.headers.setdefault("Referrer-Policy", "same-origin")
     
-    # Hugging Face Spaces o modo embebido
+    # CSP: Permite Google Fonts, Leaflet (unpkg), teselas satelitales de Esri y checkout Wompi
+    csp = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' https://unpkg.com https://checkout.wompi.co; "
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; "
+        "font-src 'self' data: https://fonts.gstatic.com; "
+        "img-src 'self' data: https: blob:; "
+        "connect-src 'self' https:; "
+        "form-action 'self' https://checkout.wompi.co; "
+    )
+    
     if os.environ.get("SPACE_ID") or os.environ.get("PERMITIR_IFRAME") == "1":
-        resp.headers["Content-Security-Policy"] = (
-            "default-src 'self' 'unsafe-inline' https://huggingface.co https://*.hf.space; "
-            "style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; "
-            "form-action 'self' https://checkout.wompi.co; "
-            "frame-ancestors 'self' https://huggingface.co https://*.hf.space"
-        )
+        csp += "frame-ancestors 'self' https://huggingface.co https://*.hf.space;"
     else:
-        resp.headers.setdefault("X-Frame-Options", "DENY")
-        resp.headers.setdefault("Content-Security-Policy",
-                                "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; "
-                                "form-action 'self' https://checkout.wompi.co; frame-ancestors 'none'")
+        resp.headers.setdefault("X-Frame-Options", "SAMEORIGIN")
+        csp += "frame-ancestors 'self';"
+        
+    resp.headers["Content-Security-Policy"] = csp
+    
     if request.path.startswith(("/pedidos/", "/admin")):
         resp.headers["Cache-Control"] = "no-store"
     return resp
