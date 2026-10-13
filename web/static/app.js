@@ -263,19 +263,19 @@
     }
   }
 
-  /* ── Visor Topográfico y Catastral de Alta Precisión (Leaflet + Topo CAD) ── */
+  /* ── Visor Topográfico y Catastral CAD de Alta Precisión (Leaflet + Manzana 231) ── */
   var elMapa = d.getElementById("mapa-hero");
   if (elMapa && typeof L !== "undefined") {
     try {
       var mapaHero = L.map("mapa-hero", {
         center: [10.84772, -74.77172],
-        zoom: 19.5,
+        zoom: 19,
         zoomControl: true,
         scrollWheelZoom: false,
         attributionControl: false
       });
 
-      // Capas base: Ortofoto Satelital Esri HD y Fondo Plano CAD Técnico
+      // Capas base: Ortofoto Satelital Esri HD y Modo CAD Oscuro
       var capaSatelite = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
         maxZoom: 20
       }).addTo(mapaHero);
@@ -285,17 +285,21 @@
         subdomains: "abcd"
       });
 
-      // Escala gráfica topográfica métrica oficial
+      // Escala gráfica métrica oficial
       L.control.scale({ metric: true, imperial: false, position: "bottomleft" }).addTo(mapaHero);
 
-      // Grupos de capas vectoriales para encendido/apagado independiente
+      // Grupos de capas vectoriales independientes
+      var grupoManzana = L.featureGroup().addTo(mapaHero);
+      var grupoTerrenos = L.featureGroup().addTo(mapaHero);
+      var grupoVias = L.featureGroup().addTo(mapaHero);
+      var grupoPlacas = L.featureGroup().addTo(mapaHero);
       var grupoPoligonos = L.featureGroup().addTo(mapaHero);
-      var grupoVertices = L.featureGroup().addTo(mapaHero);
-      var grupoCotas = L.featureGroup().addTo(mapaHero);
       var grupoDeslinde = L.featureGroup().addTo(mapaHero);
+      var grupoCotas = L.featureGroup().addTo(mapaHero);
+      var grupoVertices = L.featureGroup().addTo(mapaHero);
       var grupoEtiquetas = L.featureGroup().addTo(mapaHero);
 
-      // Fórmulas geodésicas y de coordenadas CTM12
+      // Geodesia y transformación a CTM12
       var distMetros = function (c1, c2) {
         var R = 6371000;
         var dLat = (c2[0] - c1[0]) * Math.PI / 180;
@@ -322,21 +326,129 @@
         };
       };
 
-      // Definición geométrica oficial de los 2 Predios Continuos (T1 y T2)
+      // ── CARGAR CAPAS OFICIALES DE LA BASE CATASTRAL (MANZANA 231) ──
+      fetch("/static/base_manzana_231.json")
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (base) {
+          if (!base) return;
+
+          // 1. Manzana Catastral
+          if (base.manzana && base.manzana.features) {
+            L.geoJSON(base.manzana, {
+              style: {
+                color: "#38bdf8",
+                weight: 1.4,
+                dashArray: "5, 4",
+                fillColor: "#0284c7",
+                fillOpacity: 0.04
+              }
+            }).addTo(grupoManzana);
+          }
+
+          // 2. Terrenos Catastrales Vecinos con Etiquetas Sutiles
+          if (base.terrenos && base.terrenos.features) {
+            base.terrenos.features.forEach(function (feat) {
+              var poly = L.geoJSON(feat, {
+                style: {
+                  color: "#64748b",
+                  weight: 0.85,
+                  opacity: 0.65,
+                  fillColor: "#1e293b",
+                  fillOpacity: 0.18
+                }
+              });
+
+              var loteNum = feat.properties.lote_num || "";
+              poly.bindTooltip("<b>Predio Oficial IGAC " + loteNum + "</b><br>Código: " + feat.properties.codigo, { sticky: true });
+              grupoTerrenos.addLayer(poly);
+
+              // Etiqueta sutil de 4 dígitos (como en el plano de certificación)
+              if (loteNum && feat.geometry && feat.geometry.coordinates) {
+                var coords = feat.geometry.coordinates[0];
+                if (coords && coords.length) {
+                  var cX = 0, cY = 0, total = coords.length;
+                  coords.forEach(function (pt) { cX += pt[0]; cY += pt[1]; });
+                  var centro = [cY / total, cX / total];
+                  // Omitir etiqueta sobre T1/T2 para no superponer
+                  if (!(centro[0] > 10.8474 && centro[0] < 10.8479 && centro[1] > -74.7719 && centro[1] < -74.7715)) {
+                    var loteIcon = L.divIcon({
+                      className: "lote-cad-label",
+                      html: "<span>" + loteNum + "</span>",
+                      iconSize: [26, 12],
+                      iconAnchor: [13, 6]
+                    });
+                    grupoTerrenos.addLayer(L.marker(centro, { icon: loteIcon }));
+                  }
+                }
+              }
+            });
+          }
+
+          // 3. Vías y Calles Adyacentes (Ejes Viales Oficiales)
+          if (base.vias && base.vias.features) {
+            base.vias.features.forEach(function (feat) {
+              var viaLine = L.geoJSON(feat, {
+                style: {
+                  color: "#f43f5e",
+                  weight: 1.6,
+                  opacity: 0.72,
+                  dashArray: "3, 3"
+                }
+              });
+              viaLine.bindTooltip("<b>Vía Oficial:</b> " + (feat.properties.texto || "Vía Pública"), { sticky: true });
+              grupoVias.addLayer(viaLine);
+
+              var txt = feat.properties.texto;
+              if (txt && feat.geometry && feat.geometry.coordinates) {
+                var coordsLine = feat.geometry.coordinates;
+                if (coordsLine.length >= 2) {
+                  var midIdx = Math.floor(coordsLine.length / 2);
+                  var midPt = [coordsLine[midIdx][1], coordsLine[midIdx][0]];
+                  var viaIcon = L.divIcon({
+                    className: "via-cad-label",
+                    html: "<span>" + txt + "</span>",
+                    iconSize: [70, 14],
+                    iconAnchor: [35, 7]
+                  });
+                  grupoVias.addLayer(L.marker(midPt, { icon: viaIcon }));
+                }
+              }
+            });
+          }
+
+          // 4. Placas Domiciliarias
+          if (base.placas && base.placas.features) {
+            base.placas.features.forEach(function (feat) {
+              var txt = feat.properties.texto;
+              if (txt && feat.geometry && feat.geometry.coordinates) {
+                var pt = feat.geometry.coordinates;
+                var latLng = Array.isArray(pt[0]) ? [pt[0][1], pt[0][0]] : [pt[1], pt[0]];
+                var placaIcon = L.divIcon({
+                  className: "placa-cad-label",
+                  html: "<span>" + txt + "</span>",
+                  iconSize: [28, 12],
+                  iconAnchor: [14, 6]
+                });
+                grupoPlacas.addLayer(L.marker(latLng, { icon: placaIcon }));
+              }
+            });
+          }
+        })
+        .catch(function (e) { console.warn("base_manzana_231:", e); });
+
+      // ── PREDIOS CONTINUOS T1 Y T2 DEL LEVANTAMIENTO TOPOGRÁFICO ──
       var predioT1 = {
         nodo: "T1",
         color: "#00f0ff",
-        fillColor: "#0066ff",
+        fillColor: "#00f0ff",
         area: "334.18 m²",
         perimetro: "102.40 m",
         direccion: "K 1C SUR 4 94 CASA 1",
         manzana: "08433010000000231",
-        codigo: "084330100000002310053000000000",
-        // Vértices ordenados en sentido horario
         puntos: [
-          { id: "P1", coords: [10.847861, -74.771648], colindante: "Frente Vía / Calle 1C Sur" },
-          { id: "P2", coords: [10.847841, -74.771591], colindante: "Costado Este / Predio T3" },
-          { id: "P3", coords: [10.847707, -74.771644], colindante: "Costado Este / Predio T4" },
+          { id: "P1", coords: [10.847861, -74.771648], colindante: "Frente Vía / Carrera 1C Sur" },
+          { id: "P2", coords: [10.847841, -74.771591], colindante: "Costado Este / Predio T3 (0053)" },
+          { id: "P3", coords: [10.847707, -74.771644], colindante: "Costado Este / Predio T4 (0053)" },
           { id: "P4", coords: [10.847463, -74.771737], colindante: "Fondo Sur / Límite Manzana" },
           { id: "P5", coords: [10.847489, -74.771807], colindante: "Fondo Sur / Límite Manzana" },
           { id: "P6", coords: [10.847695, -74.771722], colindante: "Lindero Común Divisorio Lote T2" }
@@ -346,254 +458,198 @@
       var predioT2 = {
         nodo: "T2",
         color: "#10b981",
-        fillColor: "#059669",
+        fillColor: "#10b981",
         area: "227.52 m²",
         perimetro: "88.75 m",
         direccion: "K 1C SUR 4 94 CASA 1-A",
         manzana: "08433010000000231",
-        codigo: "084330100000002310053000000000",
         puntos: [
-          { id: "P7", coords: [10.847868, -74.771692], colindante: "Frente Vía / Calle 1C Sur" },
+          { id: "P7", coords: [10.847868, -74.771692], colindante: "Frente Vía / Carrera 1C Sur" },
           { id: "P1", coords: [10.847861, -74.771648], colindante: "Lindero Común Divisorio Lote T1" },
           { id: "P6", coords: [10.847695, -74.771722], colindante: "Lindero Común Divisorio Lote T1" },
           { id: "P5", coords: [10.847489, -74.771807], colindante: "Fondo Sur / Límite Manzana" },
-          { id: "P8", coords: [10.847508, -74.771849], colindante: "Costado Oeste / Predio T5" },
-          { id: "P9", coords: [10.847716, -74.771767], colindante: "Costado Oeste / Predio T5" }
+          { id: "P8", coords: [10.847508, -74.771849], colindante: "Costado Oeste / Predio T5 (0053)" },
+          { id: "P9", coords: [10.847716, -74.771767], colindante: "Costado Oeste / Predio T5 (0053)" }
         ]
       };
 
-      // Función para limpiar capas
-      var limpiarCapas = function () {
-        grupoPoligonos.clearLayers();
-        grupoVertices.clearLayers();
-        grupoCotas.clearLayers();
-        grupoDeslinde.clearLayers();
-        grupoEtiquetas.clearLayers();
-      };
+      var predios = [predioT1, predioT2];
+      var verticesRegistrados = {};
+      var filasTabla = [];
 
-      // ── MODO 1: 2 PREDIOS CONTINUOS Y ACOTADOS (Topografía de Precisión) ──
-      var renderizar2PrediosContinuos = function () {
-        limpiarCapas();
+      predios.forEach(function (pred) {
+        var coordsPoli = pred.puntos.map(function (p) { return p.coords; });
+        coordsPoli.push(pred.puntos[0].coords);
 
-        var predios = [predioT1, predioT2];
-        var verticesRegistrados = {};
-        var filasTabla = [];
+        // 1. Polígono del Predio
+        var pol = L.polygon(coordsPoli, {
+          color: pred.color,
+          weight: 2.6,
+          fillColor: pred.fillColor,
+          fillOpacity: 0.22
+        });
 
-        predios.forEach(function (pred) {
-          var coordsPoli = pred.puntos.map(function (p) { return p.coords; });
-          coordsPoli.push(pred.puntos[0].coords); // Cerrar polígono
+        pol.bindPopup(
+          "<div style='font-family:sans-serif;color:#0b0f19;padding:6px;min-width:220px;line-height:1.4;'>" +
+            "<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;'>" +
+              "<span style='font-size:10px;font-weight:800;color:#0066ff;background:rgba(0,102,255,0.1);padding:2px 6px;border-radius:4px;'>IGAC · CTM12</span>" +
+              "<span style='font-size:10px;color:#10b981;font-weight:700;'>✓ CONTINUO CERTIFICADO</span>" +
+            "</div>" +
+            "<div style='font-size:17px;font-weight:800;color:#0f172a;'>LOTE " + pred.nodo + "</div>" +
+            "<div style='font-size:12px;color:#475569;margin-bottom:6px;'>📍 " + pred.direccion + "</div>" +
+            "<div style='background:#f8fafc;padding:8px;border-radius:6px;border:1px solid #e2e8f0;font-size:11.5px;'>" +
+              "<div><b>Área de Terreno:</b> <span style='color:#0f172a;font-weight:700;'>" + pred.area + "</span></div>" +
+              "<div><b>Perímetro:</b> " + pred.perimetro + "</div>" +
+              "<div><b>Manzana:</b> " + pred.manzana + "</div>" +
+            "</div>" +
+          "</div>"
+        );
 
-          // 1. Dibujar Polígono del Predio
-          var pol = L.polygon(coordsPoli, {
-            color: pred.color,
-            weight: 2.8,
-            fillColor: pred.fillColor,
-            fillOpacity: 0.32,
-            dashArray: "6, 4"
-          });
+        pol.on("mouseover", function () { this.setStyle({ fillOpacity: 0.45, weight: 3.2 }); });
+        pol.on("mouseout", function () { this.setStyle({ fillOpacity: 0.22, weight: 2.6 }); });
+        grupoPoligonos.addLayer(pol);
 
-          pol.bindPopup(
-            "<div style='font-family:sans-serif;color:#0b0f19;padding:6px;min-width:220px;line-height:1.4;'>" +
-              "<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;'>" +
-                "<span style='font-size:10px;font-weight:800;color:#0066ff;background:rgba(0,102,255,0.1);padding:2px 6px;border-radius:4px;'>IGAC · CTM12</span>" +
-                "<span style='font-size:10px;color:#10b981;font-weight:700;'>✓ CONTINUO ACOTADO</span>" +
-              "</div>" +
-              "<div style='font-size:18px;font-weight:800;color:#0f172a;'>LOTE " + pred.nodo + "</div>" +
-              "<div style='font-size:12px;color:#475569;margin-bottom:6px;'>📍 " + pred.direccion + "</div>" +
-              "<div style='background:#f8fafc;padding:8px;border-radius:6px;border:1px solid #e2e8f0;font-size:11.5px;'>" +
-                "<div><b>Área de Terreno:</b> <span style='color:#0f172a;font-weight:700;'>" + pred.area + "</span></div>" +
-                "<div><b>Perímetro:</b> " + pred.perimetro + "</div>" +
-                "<div><b>Manzana:</b> " + pred.manzana + "</div>" +
-              "</div>" +
-            "</div>"
-          );
+        // 2. Cotas Métricas Sutiles
+        for (var i = 0; i < pred.puntos.length; i++) {
+          var pActual = pred.puntos[i];
+          var pSig = pred.puntos[(i + 1) % pred.puntos.length];
+          var dM = distMetros(pActual.coords, pSig.coords);
+          var mPoint = centroPunto(pActual.coords, pSig.coords);
 
-          pol.on("mouseover", function () { this.setStyle({ fillOpacity: 0.65, weight: 3.5 }); });
-          pol.on("mouseout", function () { this.setStyle({ fillOpacity: 0.32, weight: 2.8 }); });
-          grupoPoligonos.addLayer(pol);
+          var tramoId = [pActual.id, pSig.id].sort().join("-");
+          var esComun = tramoId === "P1-P6" || tramoId === "P5-P6";
 
-          // 2. Cotas Métricas (Distancia de cada tramo)
-          for (var i = 0; i < pred.puntos.length; i++) {
-            var pActual = pred.puntos[i];
-            var pSig = pred.puntos[(i + 1) % pred.puntos.length];
-            var dM = distMetros(pActual.coords, pSig.coords);
-            var mPoint = centroPunto(pActual.coords, pSig.coords);
-
-            // Evitar duplicar cota del deslinde común
-            var tramoId = [pActual.id, pSig.id].sort().join("-");
-            var esComun = tramoId === "P1-P6" || tramoId === "P5-P6";
-
-            if (!verticesRegistrados["cota_" + tramoId]) {
-              verticesRegistrados["cota_" + tramoId] = true;
-              var claseCota = esComun ? "cota-label dorado" : (pred.nodo === "T1" ? "cota-label" : "cota-label verde");
-              var cotaIcon = L.divIcon({
-                className: "marcador-cota-div",
-                html: "<span class='" + claseCota + "'>" + dM + " m</span>",
-                iconSize: [44, 16],
-                iconAnchor: [22, 8]
-              });
-              grupoCotas.addLayer(L.marker(mPoint, { icon: cotaIcon }));
-            }
-
-            // Datos para Cuadro de Construcción
-            filasTabla.push({
-              vertice: pActual.id,
-              tramo: pActual.id + " → " + pSig.id,
-              distancia: dM + " m",
-              coords: aCTM12(pActual.coords[0], pActual.coords[1]),
-              colindancia: pActual.colindante,
-              lote: pred.nodo
+          if (!verticesRegistrados["cota_" + tramoId]) {
+            verticesRegistrados["cota_" + tramoId] = true;
+            var claseCota = esComun ? "cota-label dorado" : (pred.nodo === "T1" ? "cota-label" : "cota-label verde");
+            var cotaIcon = L.divIcon({
+              className: "marcador-cota-div",
+              html: "<span class='" + claseCota + "'>" + dM + " m</span>",
+              iconSize: [40, 14],
+              iconAnchor: [20, 7]
             });
+            grupoCotas.addLayer(L.marker(mPoint, { icon: cotaIcon }));
           }
 
-          // 3. Vértices Topográficos
-          pred.puntos.forEach(function (pt) {
-            if (!verticesRegistrados["v_" + pt.id]) {
-              verticesRegistrados["v_" + pt.id] = true;
-              var ctm = aCTM12(pt.coords[0], pt.coords[1]);
-              var vIcon = L.divIcon({
-                className: "marcador-vertice-div",
-                html: "<div class='vertice-icono' title='Vértice " + pt.id + "'>" + pt.id.replace("P", "") + "</div>",
-                iconSize: [18, 18],
-                iconAnchor: [9, 9]
-              });
-              var markerV = L.marker(pt.coords, { icon: vIcon });
-              markerV.bindTooltip(
-                "<b>Vértice " + pt.id + " (CTM12)</b><br>Norte: " + ctm.norte + " m<br>Este: " + ctm.este + " m",
-                { direction: "top", offset: [0, -10] }
-              );
-              grupoVertices.addLayer(markerV);
-            }
+          filasTabla.push({
+            vertice: pActual.id,
+            tramo: pActual.id + " → " + pSig.id,
+            distancia: dM + " m",
+            coords: aCTM12(pActual.coords[0], pActual.coords[1]),
+            colindancia: pActual.colindante,
+            lote: pred.nodo
           });
-
-          // 4. Etiqueta Central del Lote
-          var cLat = coordsPoli.reduce(function (s, c) { return s + c[0]; }, 0) / coordsPoli.length;
-          var cLon = coordsPoli.reduce(function (s, c) { return s + c[1]; }, 0) / coordsPoli.length;
-          var etiquetaIcon = L.divIcon({
-            className: "marcador-etiqueta-div",
-            html: "<div class='etiqueta-lote-div'><b>LOTE " + pred.nodo + "</b><span>" + pred.area + "</span></div>",
-            iconSize: [90, 34],
-            iconAnchor: [45, 17]
-          });
-          grupoEtiquetas.addLayer(L.marker([cLat, cLon], { icon: etiquetaIcon }));
-        });
-
-        // 5. Línea de Deslinde Común (Colindancia T1 - T2)
-        var coordsDeslinde = [
-          [10.847861, -74.771648], // P1
-          [10.847695, -74.771722], // P6
-          [10.847489, -74.771807]  // P5
-        ];
-        var d1 = parseFloat(distMetros(coordsDeslinde[0], coordsDeslinde[1]));
-        var d2 = parseFloat(distMetros(coordsDeslinde[1], coordsDeslinde[2]));
-        var totalDeslinde = (d1 + d2).toFixed(2);
-
-        var lineaDeslinde = L.polyline(coordsDeslinde, {
-          color: "#f59e0b",
-          weight: 4.5,
-          dashArray: "8, 6",
-          opacity: 0.95
-        });
-        lineaDeslinde.bindTooltip(
-          "<b>📐 Deslinde Común T1 ↔ T2</b><br>Longitud divisoria: " + totalDeslinde + " m",
-          { sticky: true }
-        );
-        grupoDeslinde.addLayer(lineaDeslinde);
-
-        // 6. Rellenar Tabla del Cuadro de Construcción
-        var tablaBody = d.getElementById("tabla-construccion-body");
-        if (tablaBody) {
-          var htmlTabla = "";
-          filasTabla.forEach(function (f) {
-            htmlTabla += "<tr>" +
-              "<td><strong style='color:#00f0ff;'>" + f.vertice + "</strong> <span style='font-size:0.6rem;color:#64748b;'>(" + f.lote + ")</span></td>" +
-              "<td>" + f.tramo + "</td>" +
-              "<td><strong>" + f.distancia + "</strong></td>" +
-              "<td>" + f.coords.norte + "</td>" +
-              "<td>" + f.coords.este + "</td>" +
-              "<td style='color:#94a3b8;font-size:0.65rem;'>" + f.colindancia + "</td>" +
-            "</tr>";
-          });
-          tablaBody.innerHTML = htmlTabla;
         }
 
-        // Ajustar zoom a los 2 predios con padding elegante
-        mapaHero.fitBounds(grupoPoligonos.getBounds(), { padding: [35, 35] });
-
-        var pieTxt = d.getElementById("pie-levantamiento-txt");
-        if (pieTxt) pieTxt.textContent = "Lotes Continuos T1 + T2 (561.70 m²)";
-      };
-
-      // ── MODO 2: TODOS LOS PREDIOS (Levantamiento Completo de 23 Lotes) ──
-      var renderizarTodosPredios = function () {
-        limpiarCapas();
-
-        fetch("/static/predios_reales_hero.json")
-          .then(function (r) { return r.ok ? r.json() : null; })
-          .then(function (lista) {
-            if (!lista) return;
-            var tablaBody = d.getElementById("tabla-construccion-body");
-            if (tablaBody) {
-              tablaBody.innerHTML = "<tr><td colspan='6' style='text-align:center;padding:12px;color:#94a3b8;'>Mostrando polígonos del levantamiento general. Selecciona '2 Predios Continuos' para ver el cuadro detallado con rumbos y cotas individuales.</td></tr>";
-            }
-
-            lista.forEach(function (p) {
-              var pol = L.polygon(p.coords, {
-                color: "#00f0ff",
-                weight: 2.2,
-                fillColor: "#0066ff",
-                fillOpacity: 0.36,
-                dashArray: "4, 4"
-              });
-
-              pol.bindPopup(
-                "<div style='font-family:sans-serif;color:#0b0f19;padding:6px;min-width:210px;'>" +
-                  "<div style='font-size:10px;font-weight:800;color:#0066ff;'>IGAC · CTM12</div>" +
-                  "<div style='font-size:17px;font-weight:800;color:#0f172a;'>PREDIO NODO " + p.nodo + "</div>" +
-                  "<div style='font-size:12px;color:#475569;'>📍 " + (p.direccion || "El Tesoro, Malambo") + "</div>" +
-                  "<div style='font-size:11.5px;margin-top:4px;'><b>Área:</b> " + p.area + "</div>" +
-                "</div>"
-              );
-
-              pol.on("mouseover", function () { this.setStyle({ fillOpacity: 0.7, weight: 3 }); });
-              pol.on("mouseout", function () { this.setStyle({ fillOpacity: 0.36, weight: 2.2 }); });
-              grupoPoligonos.addLayer(pol);
+        // 3. Vértices Topográficos P1..P9
+        pred.puntos.forEach(function (pt) {
+          if (!verticesRegistrados["v_" + pt.id]) {
+            verticesRegistrados["v_" + pt.id] = true;
+            var ctm = aCTM12(pt.coords[0], pt.coords[1]);
+            var vIcon = L.divIcon({
+              className: "marcador-vertice-div",
+              html: "<div class='vertice-icono' title='Vértice " + pt.id + "'>" + pt.id.replace("P", "") + "</div>",
+              iconSize: [14, 14],
+              iconAnchor: [7, 7]
             });
-
-            mapaHero.fitBounds(grupoPoligonos.getBounds(), { padding: [25, 25] });
-
-            var pieTxt = d.getElementById("pie-levantamiento-txt");
-            if (pieTxt) pieTxt.textContent = "El Tesoro Completo (23 predios - 5.840 m²)";
-          });
-      };
-
-      // Iniciar en Modo 2 Predios Continuos por defecto
-      renderizar2PrediosContinuos();
-
-      // Botones de Selector de Modo
-      var btn2Predios = d.getElementById("btn-modo-2predios");
-      var btnTodos = d.getElementById("btn-modo-todos");
-
-      if (btn2Predios && btnTodos) {
-        btn2Predios.addEventListener("click", function () {
-          btn2Predios.classList.add("activo");
-          btnTodos.classList.remove("activo");
-          renderizar2PrediosContinuos();
+            var markerV = L.marker(pt.coords, { icon: vIcon });
+            markerV.bindTooltip(
+              "<b>Vértice " + pt.id + " (CTM12)</b><br>Norte: " + ctm.norte + " m<br>Este: " + ctm.este + " m",
+              { direction: "top", offset: [0, -8] }
+            );
+            grupoVertices.addLayer(markerV);
+          }
         });
 
-        btnTodos.addEventListener("click", function () {
-          btnTodos.classList.add("activo");
-          btn2Predios.classList.remove("activo");
-          renderizarTodosPredios();
+        // 4. Etiqueta Sutil del Lote
+        var cLat = coordsPoli.reduce(function (s, c) { return s + c[0]; }, 0) / coordsPoli.length;
+        var cLon = coordsPoli.reduce(function (s, c) { return s + c[1]; }, 0) / coordsPoli.length;
+        var etiquetaIcon = L.divIcon({
+          className: "marcador-etiqueta-div",
+          html: "<div class='etiqueta-lote-div" + (pred.nodo === "T2" ? " verde" : "") + "'><b>LOTE " + pred.nodo + "</b><span>" + pred.area + "</span></div>",
+          iconSize: [78, 28],
+          iconAnchor: [39, 14]
+        });
+        grupoEtiquetas.addLayer(L.marker([cLat, cLon], { icon: etiquetaIcon }));
+      });
+
+      // 5. Línea de Deslinde Común (Colindancia T1 - T2)
+      var coordsDeslinde = [
+        [10.847861, -74.771648], // P1
+        [10.847695, -74.771722], // P6
+        [10.847489, -74.771807]  // P5
+      ];
+      var d1 = parseFloat(distMetros(coordsDeslinde[0], coordsDeslinde[1]));
+      var d2 = parseFloat(distMetros(coordsDeslinde[1], coordsDeslinde[2]));
+      var totalDeslinde = (d1 + d2).toFixed(2);
+
+      var lineaDeslinde = L.polyline(coordsDeslinde, {
+        color: "#f59e0b",
+        weight: 3.5,
+        dashArray: "7, 5",
+        opacity: 0.95
+      });
+      lineaDeslinde.bindTooltip(
+        "<b>📐 Deslinde Común T1 ↔ T2</b><br>Longitud divisoria: " + totalDeslinde + " m",
+        { sticky: true }
+      );
+      grupoDeslinde.addLayer(lineaDeslinde);
+
+      // 6. Rellenar Tabla del Cuadro de Construcción
+      var tablaBody = d.getElementById("tabla-construccion-body");
+      if (tablaBody) {
+        var htmlTabla = "";
+        filasTabla.forEach(function (f) {
+          htmlTabla += "<tr>" +
+            "<td><strong style='color:#00f0ff;'>" + f.vertice + "</strong> <span style='font-size:0.6rem;color:#64748b;'>(" + f.lote + ")</span></td>" +
+            "<td>" + f.tramo + "</td>" +
+            "<td><strong>" + f.distancia + "</strong></td>" +
+            "<td>" + f.coords.norte + "</td>" +
+            "<td>" + f.coords.este + "</td>" +
+            "<td style='color:#94a3b8;font-size:0.62rem;'>" + f.colindancia + "</td>" +
+          "</tr>";
+        });
+        tablaBody.innerHTML = htmlTabla;
+      }
+
+      // 7. Encuadre Óptimo de Zoom en los Predios T1 y T2
+      var boundsLotes = grupoPoligonos.getBounds();
+      mapaHero.fitBounds(boundsLotes, { padding: [35, 35], maxZoom: 19 });
+
+      // Botones de Enfoque de Zoom
+      var btnEnfocarLotes = d.getElementById("btn-enfocar-lotes");
+      var btnEnfocarManzana = d.getElementById("btn-enfocar-manzana");
+
+      if (btnEnfocarLotes) {
+        btnEnfocarLotes.addEventListener("click", function () {
+          btnEnfocarLotes.classList.add("activo");
+          if (btnEnfocarManzana) btnEnfocarManzana.classList.remove("activo");
+          mapaHero.fitBounds(boundsLotes, { padding: [35, 35], maxZoom: 19 });
         });
       }
 
-      // Checkboxes de Control de Capas
-      var chkSat = d.getElementById("chk-capa-satelite");
-      var chkVert = d.getElementById("chk-capa-vertices");
-      var chkCotas = d.getElementById("chk-capa-cotas");
-      var chkDesl = d.getElementById("chk-capa-deslinde");
+      if (btnEnfocarManzana) {
+        btnEnfocarManzana.addEventListener("click", function () {
+          btnEnfocarManzana.classList.add("activo");
+          if (btnEnfocarLotes) btnEnfocarLotes.classList.remove("activo");
+          var bMz = grupoManzana.getBounds();
+          if (bMz.isValid()) mapaHero.fitBounds(bMz, { padding: [20, 20] });
+          else mapaHero.setView([10.84772, -74.77172], 18);
+        });
+      }
 
+      // Control de Capas Independiente
+      var bindToggle = function (id, capa) {
+        var el = d.getElementById(id);
+        if (el) {
+          el.addEventListener("change", function () {
+            if (this.checked) mapaHero.addLayer(capa);
+            else mapaHero.removeLayer(capa);
+          });
+        }
+      };
+
+      var chkSat = d.getElementById("chk-capa-satelite");
       if (chkSat) {
         chkSat.addEventListener("change", function () {
           if (this.checked) {
@@ -605,24 +661,13 @@
           }
         });
       }
-      if (chkVert) {
-        chkVert.addEventListener("change", function () {
-          if (this.checked) mapaHero.addLayer(grupoVertices);
-          else mapaHero.removeLayer(grupoVertices);
-        });
-      }
-      if (chkCotas) {
-        chkCotas.addEventListener("change", function () {
-          if (this.checked) mapaHero.addLayer(grupoCotas);
-          else mapaHero.removeLayer(grupoCotas);
-        });
-      }
-      if (chkDesl) {
-        chkDesl.addEventListener("change", function () {
-          if (this.checked) mapaHero.addLayer(grupoDeslinde);
-          else mapaHero.removeLayer(grupoDeslinde);
-        });
-      }
+
+      bindToggle("chk-capa-terrenos", grupoTerrenos);
+      bindToggle("chk-capa-vias", grupoVias);
+      bindToggle("chk-capa-placas", grupoPlacas);
+      bindToggle("chk-capa-cotas", grupoCotas);
+      bindToggle("chk-capa-vertices", grupoVertices);
+      bindToggle("chk-capa-deslinde", grupoDeslinde);
 
     } catch (err) {
       console.warn("Leaflet visor-topografico:", err);

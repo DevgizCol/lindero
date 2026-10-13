@@ -27,35 +27,38 @@
       </ul>
     </div>
 
-    <!-- Visor Topográfico y Catastral Certificado con Polígonos de Campo -->
+    <!-- Visor Topográfico y Catastral Certificado con Capas Oficiales IGAC -->
     <div class="visor-satelital-card" data-ver>
       <div class="visor-barra">
         <div class="visor-estado">
           <span class="punto-radar"></span>
-          <strong>Visor Topográfico y Catastral</strong>
+          <strong>Visor Topográfico CAD</strong>
           <span class="chip-ctm12">MAGNA-SIRGAS · CTM12</span>
         </div>
         <div class="visor-controles-topografo">
-          <button type="button" class="btn-visor-modo activo" id="btn-modo-2predios" title="Ver 2 Predios Continuos (T1 y T2) con Cotas, Vértices y Colindancia Común">📐 2 Predios Continuos</button>
-          <button type="button" class="btn-visor-modo" id="btn-modo-todos" title="Ver Todo el Levantamiento (23 Predios)">🗺️ Todos los Predios</button>
+          <button type="button" class="btn-visor-modo activo" id="btn-enfocar-lotes" title="Enfocar directamente en los Lotes Continuos T1 y T2">🎯 Enfocar Lotes T1-T2</button>
+          <button type="button" class="btn-visor-modo" id="btn-enfocar-manzana" title="Ver la Manzana Catastral 231 completa con sus vías y linderos">📐 Manzana 231</button>
         </div>
       </div>
 
-      <!-- Barra de conmutación de capas topográficas -->
+      <!-- Barra de conmutación de capas topográficas y base catastral -->
       <div class="visor-capas-subbar">
         <div class="visor-capas-toggles">
           <label class="toggle-capa"><input type="checkbox" id="chk-capa-satelite" checked> <span>🛰️ Ortofoto HD</span></label>
-          <label class="toggle-capa"><input type="checkbox" id="chk-capa-vertices" checked> <span>📍 Vértices (P1..Pn)</span></label>
-          <label class="toggle-capa"><input type="checkbox" id="chk-capa-cotas" checked> <span>📏 Cotas Métricas</span></label>
-          <label class="toggle-capa"><input type="checkbox" id="chk-capa-deslinde" checked> <span>📐 Deslinde Común</span></label>
+          <label class="toggle-capa"><input type="checkbox" id="chk-capa-terrenos" checked> <span>🏠 Lotes Catastrales</span></label>
+          <label class="toggle-capa"><input type="checkbox" id="chk-capa-vias" checked> <span>🛣️ Vías</span></label>
+          <label class="toggle-capa"><input type="checkbox" id="chk-capa-placas" checked> <span>🏷️ Placas</span></label>
+          <label class="toggle-capa"><input type="checkbox" id="chk-capa-cotas" checked> <span>📏 Cotas</span></label>
+          <label class="toggle-capa"><input type="checkbox" id="chk-capa-vertices" checked> <span>📍 Vértices</span></label>
+          <label class="toggle-capa"><input type="checkbox" id="chk-capa-deslinde" checked> <span>📐 Deslinde</span></label>
         </div>
-        <div class="visor-meta-municipio">Malambo, Atlántico</div>
+        <div class="visor-meta-municipio">Mz 231 · Malambo (Atlántico)</div>
       </div>
 
       <div id="mapa-hero" class="mapa-satelital" aria-label="Visor topográfico interactivo de planos en Malambo"></div>
 
       <!-- Cuadro de Construcción Topográfico interactivo (CTM12) -->
-      <details class="visor-cuadro-construccion" id="cuadro-topo-details" open>
+      <details class="visor-cuadro-construccion" id="cuadro-topo-details">
         <summary>
           <span>📐 Cuadro de Construcción y Vértices CTM12 (Lotes Continuos T1 y T2)</span>
           <span class="cuadro-badge-mini">Origen Nacional EPSG:9377</span>
@@ -80,9 +83,9 @@
       </details>
 
       <div class="visor-pie-datos">
-        <div class="item-tramo"><span>Levantamiento:</span> <b id="pie-levantamiento-txt">Lotes Continuos T1 + T2 (561.70 m²)</b></div>
+        <div class="item-tramo"><span>Levantamiento:</span> <b id="pie-levantamiento-txt">Lotes Continuos T1 + T2 (561.70 m²) · Mz 231</b></div>
         <div class="item-tramo"><span>Precisión:</span> <b class="text-cyan">± 0.05 m (CTM12)</b></div>
-        <div class="item-tramo"><span>Estado:</span> <b class="text-verde">Georreferenciado Oficial</b></div>
+        <div class="item-tramo"><span>Base Oficial:</span> <b class="text-verde">IGAC Catastro Malambo</b></div>
       </div>
     </div>
   </div>

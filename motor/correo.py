@@ -1,10 +1,9 @@
 """motor/correo.py: Módulo de notificaciones transaccionales y entrega automática.
 
 Soporta:
-1. Resend API (HTTPS REST https://api.resend.com/emails)
-2. SendGrid API (HTTPS REST https://api.sendgrid.com/v3/mail/send)
-3. SMTP Estándar (smtplib TLS/SSL)
-4. Fallback simulado en logs si no hay credenciales configuradas
+1. Resend API Oficial (HTTPS REST https://api.resend.com/emails)
+2. SMTP Estándar de respaldo (smtplib TLS/SSL)
+3. Fallback simulado en logs si no hay credenciales configuradas
 """
 
 import json
@@ -127,10 +126,9 @@ def enviar_correo_entrega(datos: dict) -> bool:
     """Envía el correo de confirmación de pago y descarga de planos.
     
     Busca credenciales en:
-    1. RESEND_API_KEY
-    2. SENDGRID_API_KEY
-    3. SMTP_HOST, SMTP_USER, SMTP_PASS
-    4. Fallback a log local si no hay proveedor configurado.
+    1. RESEND_API_KEY (Proveedor oficial exclusivo de correos)
+    2. SMTP_HOST, SMTP_USER, SMTP_PASS (Respaldo secundario)
+    3. Fallback a log local si no hay proveedor configurado.
     """
     destinatario = (datos.get("correo") or "").strip()
     if not destinatario or "@" not in destinatario:
@@ -142,7 +140,7 @@ def enviar_correo_entrega(datos: dict) -> bool:
     cuerpo_html = _plantilla_correo(datos)
     remitente = os.environ.get("CORREO_REMITENTE", "Lindero PRO <soporte@devgiz.com>")
 
-    # 1. Probar Resend API
+    # 1. Envío exclusivo vía Resend API
     resend_key = os.environ.get("RESEND_API_KEY", "").strip()
     if resend_key:
         try:
@@ -178,33 +176,7 @@ def enviar_correo_entrega(datos: dict) -> bool:
         except Exception as e:
             logger.error("Error enviando por Resend: %s", e)
 
-    # 2. Probar SendGrid API
-    sendgrid_key = os.environ.get("SENDGRID_API_KEY", "").strip()
-    if sendgrid_key:
-        try:
-            payload = json.dumps({
-                "personalizations": [{"to": [{"email": destinatario}]}],
-                "from": {"email": os.environ.get("SENDGRID_FROM", "soporte@devgiz.com"), "name": "Lindero PRO"},
-                "subject": asunto,
-                "content": [{"type": "text/html", "value": cuerpo_html}]
-            }).encode("utf-8")
-            req = urllib.request.Request(
-                "https://api.sendgrid.com/v3/mail/send",
-                data=payload,
-                headers={
-                    "Authorization": f"Bearer {sendgrid_key}",
-                    "Content-Type": "application/json",
-                    "User-Agent": "Lindero-Mailer/2.4"
-                }
-            )
-            with urllib.request.urlopen(req, timeout=10) as resp:
-                if resp.status in (200, 202):
-                    logger.info("Correo enviado exitosamente vía SendGrid a %s", destinatario)
-                    return True
-        except Exception as e:
-            logger.error("Error enviando por SendGrid: %s", e)
-
-    # 3. Probar SMTP Estándar
+    # 2. Probar SMTP Estándar
     smtp_host = os.environ.get("SMTP_HOST", "").strip()
     if smtp_host:
         try:
