@@ -87,9 +87,10 @@
           <span>Referencia de tu pago: <code>{{ p.id[:8] }}</code></span></div>
       {% endif %}
       <ul>
-        <li><svg aria-hidden="true"><use href="#i-ok"/></svg>Entrega en minutos después del pago</li>
-        <li><svg aria-hidden="true"><use href="#i-ok"/></svg>Un PDF por predio, nombrado con su NODO</li>
-        <li><svg aria-hidden="true"><use href="#i-ok"/></svg>Revisión profesional si algún predio lo necesita</li>
+        <li><svg aria-hidden="true"><use href="#i-ok"/></svg>Entrega inmediata tras confirmación de pago</li>
+        <li><svg aria-hidden="true"><use href="#i-ok"/></svg>Shapefiles oficiales (25 campos LEVANTAMIENTO_01, COTAS, COORDENADAS)</li>
+        <li><svg aria-hidden="true"><use href="#i-ok"/></svg>Certificados en PDF a alta resolución con tu firma profesional</li>
+        <li><svg aria-hidden="true"><use href="#i-ok"/></svg>Informe técnico en Excel con cuadro de coordenadas y colindantes</li>
       </ul>
     </aside>
   </div>
@@ -107,10 +108,10 @@
   {% if p.estado == 'LISTO' and p.pagado %}
   <div class="tarjeta centrado">
     <div class="logro" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.200" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.500l4.500 4.500L19 7.500"/></svg></div>
-    <h2>{{ r.predios }} planos listos para entregar</h2>
-    <p class="tenue">Un PDF por predio, con su cuadro de coordenadas, linderos y colindantes.</p>
-    <p style="margin-top:14px"><a class="btn btn-p btn-xl" href="{{ url_for('descargar', pid=p.id) }}">Descargar el ZIP</a></p>
-    <p class="mini">Guarda este enlace: puedes volver a descargar cuando quieras.</p>
+    <h2>{{ r.predios }} planos y cartografía listos para radicar</h2>
+    <p class="tenue">Paquete oficial completado: Shapefiles MAGNA-SIRGAS, PDFs vectoriales e informe de coordenadas.</p>
+    <p style="margin-top:14px"><a class="btn btn-p btn-xl" href="{{ url_for('descargar', pid=p.id) }}">Descargar Paquete Completo (ZIP)</a></p>
+    <p class="mini">Guarda este enlace: puedes volver a descargar tu paquete cuando quieras.</p>
   </div>
   {% endif %}
 

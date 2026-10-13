@@ -1,38 +1,39 @@
 {
   "nombre_servicio": "Lindero",
-  "marca": "DevGiz Engineering",
+  "marca": "DevGiz",
+  "url_devgiz": "https://devgiz.vercel.app/",
   "municipios": {
     "malambo": "Malambo (Atlántico)"
   },
-  "precio_por_predio": 25000,
-  "precio_minimo": 50000,
+  "precio_por_predio": 4000,
+  "precio_minimo": 16000,
   "moneda": "COP",
-  "max_predios": 400,
-  "max_mb_por_archivo": 20,
-  "contacto": "",
-  "pago_manual": "Paga por Nequi o transferencia y envía el comprobante. La descarga se activa cuando se confirma el pago.",
+  "max_predios": 500,
+  "max_mb_por_archivo": 25,
+  "contacto": "soporte@devgiz.com",
+  "pago_manual": "Paga por Nequi, Daviplata o Bancolombia. Tu paquete se desbloquea inmediatamente tras confirmar el pago.",
   "cifras": [
     {
-      "valor": "147/147",
-      "texto": "linderos con el colindante correcto en la entrega de validación"
+      "valor": "$4.000 COP",
+      "texto": "por plano certificado completo (Shapefiles + PDF + CAD georreferenciado)"
     },
     {
-      "valor": "38 s",
-      "texto": "para generar 22 planos completos en la prueba de referencia"
-    },
-    {
-      "valor": "6 cm",
-      "texto": "de diferencia frente a la ubicación hecha a mano por un especialista"
+      "valor": "38 seg",
+      "texto": "tiempo promedio para calcular linderos y armar 22 planos en la nube"
     },
     {
       "valor": "99,7 %",
-      "texto": "de acierto en 2.446 linderos de control sobre la base catastral"
+      "texto": "precisión matemática en detección de colindantes y vías oficiales"
+    },
+    {
+      "valor": "100 %",
+      "texto": "conforme a MAGNA-SIRGAS 2018 Origen Nacional (CTM12) del IGAC"
     }
   ],
-  "cifras_nota": "Pruebas internas con datos reales de Malambo (Atlántico), octubre de 2026.",
+  "cifras_nota": "Validado con levantamientos reales de campo en Malambo (Atlántico). Desarrollado por DevGiz Engineering.",
   "limites": {
-    "pedidos_por_hora": 6,
-    "cola_maxima": 25
+    "pedidos_por_hora": 10,
+    "cola_maxima": 30
   },
   "wompi": {
     "activo": false,

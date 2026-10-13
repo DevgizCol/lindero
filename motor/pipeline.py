@@ -248,8 +248,18 @@ def _salida_propia(t, base, cfg, lev, coord, inf, nodos, registrar):
     inf["archivos"]["pdf"] = archivos
     ruta_zip = os.path.join(t.carpeta, f"{t.nombre}.zip")
     with zipfile.ZipFile(ruta_zip, "w", zipfile.ZIP_DEFLATED) as z:
+        # 1. PDFs oficiales en 02.PDF
         for a in archivos:
-            z.write(a, os.path.basename(a))
+            z.write(a, arcname=os.path.join("02.PDF", os.path.basename(a)))
+        # 2. Shapefiles de entrega catastral en 01.SHAPEFILE
+        carp_shp = os.path.join(t.carpeta, "01.SHAPEFILE")
+        if os.path.isdir(carp_shp):
+            for arch in os.listdir(carp_shp):
+                z.write(os.path.join(carp_shp, arch), arcname=os.path.join("01.SHAPEFILE", arch))
+        # 3. Vista general de control
+        vista = os.path.join(t.carpeta, "vista_general.png")
+        if os.path.isfile(vista):
+            z.write(vista, arcname="vista_general.png")
     inf["archivos"]["zip"] = ruta_zip
 
 
@@ -336,7 +346,14 @@ def _atlas(t: Trabajo, cfg, rutas, inf, nodos, registrar):
     ruta_zip = os.path.join(t.carpeta, f"{t.nombre}.zip")
     with zipfile.ZipFile(ruta_zip, "w", zipfile.ZIP_DEFLATED) as z:
         for a in archivos:
-            z.write(a, os.path.basename(a))
+            z.write(a, arcname=os.path.join("02.PDF", os.path.basename(a)))
+        carp_shp = os.path.join(t.carpeta, "01.SHAPEFILE")
+        if os.path.isdir(carp_shp):
+            for arch in os.listdir(carp_shp):
+                z.write(os.path.join(carp_shp, arch), arcname=os.path.join("01.SHAPEFILE", arch))
+        vista = os.path.join(t.carpeta, "vista_general.png")
+        if os.path.isfile(vista):
+            z.write(vista, arcname="vista_general.png")
     inf["archivos"]["zip"] = ruta_zip
 
 
@@ -346,8 +363,13 @@ def _cerrar(t: Trabajo, inf):
         json.dump(inf, f, ensure_ascii=False, indent=1, default=str)
     inf["archivos"]["informe"] = ruta
     try:
-        escribir_informe_excel(inf, os.path.join(t.carpeta, "INFORME_REVISION.xlsx"))
-        inf["archivos"]["informe_excel"] = os.path.join(t.carpeta, "INFORME_REVISION.xlsx")
+        ruta_excel = os.path.join(t.carpeta, "INFORME_REVISION.xlsx")
+        escribir_informe_excel(inf, ruta_excel)
+        inf["archivos"]["informe_excel"] = ruta_excel
+        ruta_zip = inf.get("archivos", {}).get("zip")
+        if ruta_zip and os.path.isfile(ruta_zip) and os.path.isfile(ruta_excel):
+            with zipfile.ZipFile(ruta_zip, "a") as z:
+                z.write(ruta_excel, arcname="INFORME_REVISION.xlsx")
     except Exception as e:      # el informe en Excel es accesorio
         inf["avisos"].append(f"No se pudo escribir INFORME_REVISION.xlsx: {e}")
     return inf

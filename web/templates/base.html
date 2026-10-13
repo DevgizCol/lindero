@@ -3,50 +3,106 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{% block titulo %}{{ CFG.nombre_servicio }} · Planos prediales catastrales en minutos{% endblock %}</title>
-<meta name="description" content="{% block descripcion %}Sube tu Excel y tu plano: {{ CFG.nombre_servicio }} ubica cada predio sobre la base catastral, calcula coordenadas, linderos y colindantes y entrega un certificado en PDF por predio. Vista previa gratis.{% endblock %}">
-<meta name="theme-color" content="#060913">
+<title>{% block titulo %}{{ CFG.nombre_servicio }} · Certificados de Plano Predial y Cartografía SIG{% endblock %}</title>
+<meta name="description" content="{% block descripcion %}Plataforma SIG de DevGiz. Del levantamiento topográfico al plano catastral certificado en segundos. MAGNA-SIRGAS Origen Nacional.{% endblock %}">
+<meta name="theme-color" content="#070a13">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="es_CO">
-<meta property="og:site_name" content="{{ CFG.nombre_servicio }}">
-<meta property="og:title" content="{{ CFG.nombre_servicio }} · Del levantamiento al plano firmado, en minutos">
-<meta property="og:description" content="Certificados de plano predial catastral con coordenadas, linderos y colindantes. Mira el resultado antes de pagar.">
+<meta property="og:site_name" content="{{ CFG.nombre_servicio }} por DevGiz">
+<meta property="og:title" content="{{ CFG.nombre_servicio }} · Planos Prediales y SIG Catastral">
+<meta property="og:description" content="Sube tu levantamiento, visualízalo en ortofoto satelital y descarga certificados, shapefiles y DXF en segundos.">
 {% block robots %}{% endblock %}
 <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
+<!-- Tipografía Google Fonts de Alta Gama -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- Leaflet para Visor Satelital -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css', v=VERSION) }}">
 <script src="{{ url_for('static', filename='app.js', v=VERSION) }}" defer></script>
 {% block cabeza %}{% endblock %}
 </head>
-<body>
+<body class="bg-dark text-slate-100">
 <a class="saltar" href="#contenido">Saltar al contenido</a>
 <svg width="0" height="0" class="solo-lector" aria-hidden="true" focusable="false">
   <defs>
-    <linearGradient id="g-marca" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3ba4ff"/><stop offset="1" stop-color="#9066ff"/></linearGradient>
+    <linearGradient id="g-marca" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00f0ff"/><stop offset="1" stop-color="#0066ff"/></linearGradient>
     <symbol id="i-ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
     <symbol id="i-flecha" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
     <symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11.5A7 7 0 005 9.500C5 14.800 12 21 12 21z"/><circle cx="12" cy="9.500" r="2.500"/></symbol>
     <symbol id="i-brujula" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.500 8.500l-2 5-5 2 2-5z"/></symbol>
     <symbol id="i-lindero" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7l9-3 7 4-2 10-10 2z"/><path d="M13 4v6M20 8l-7 2M8 20l5-10"/></symbol>
     <symbol id="i-escudo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.500-3.200 7.800-8 9-4.800-1.200-8-4.500-8-9V6z"/><path d="M8.500 12l2.500 2.500 4.500-5"/></symbol>
-    <symbol id="i-regla" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16L16 3l5 5L8 21z"/><path d="M7.500 12.500l1.500 1.500M10.500 9.500l2 2M13.500 6.500l1.500 1.500"/></symbol>
+    <symbol id="i-capas" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></symbol>
     <symbol id="i-candado" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.500" width="14" height="10" rx="2.500"/><path d="M8 10.500V8a4 4 0 018 0v2.500"/></symbol>
   </defs>
 </svg>
 <header class="cab">
   <div class="cont">
     <a class="marca" href="{{ url_for('inicio') }}" aria-label="{{ CFG.nombre_servicio }}, inicio">
-      <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M20 3l14.700 8.500v17L20 37 5.300 28.500v-17z" stroke="url(#g-marca)" stroke-width="2.600" stroke-linejoin="round"/><path d="M14 13v14h12" stroke="#edf2fa" stroke-width="2.800" stroke-linecap="round" stroke-linejoin="round"/><circle cx="26" cy="27" r="2.600" fill="#2de2e6"/></svg>
-      <span><b>{{ CFG.nombre_servicio|upper }}</b><small>por {{ CFG.marca }}</small></span>
+      <div class="marca-icono">
+        <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M20 3l14.700 8.500v17L20 37 5.300 28.500v-17z" stroke="url(#g-marca)" stroke-width="2.600" stroke-linejoin="round"/><path d="M14 13v14h12" stroke="#ffffff" stroke-width="2.800" stroke-linecap="round" stroke-linejoin="round"/><circle cx="26" cy="27" r="2.800" fill="#00f0ff"/></svg>
+      </div>
+      <div class="marca-texto">
+        <span class="marca-titulo">LINDERO <span class="tag-pro">PRO</span></span>
+        <span class="marca-sub">por <a href="{{ CFG.url_devgiz }}" target="_blank" rel="noopener" class="link-devgiz">DevGiz</a></span>
+      </div>
     </a>
+    <div class="cab-centro">
+      <div class="badge-status">
+        <span class="punto-verde"></span>
+        <span>Motor Catastral Malambo (CTM12) Activo</span>
+      </div>
+    </div>
     <nav class="nav" aria-label="Principal">{% block nav %}{% endblock %}</nav>
   </div>
 </header>
 <main id="contenido">{% block cuerpo %}{% endblock %}</main>
-<footer class="pie">
+<footer class="pie-devgiz">
   <div class="cont">
-    <p><b class="tenue">{{ CFG.nombre_servicio }}</b> es un producto de {{ CFG.marca }}. Los certificados llevan la firma del profesional
-      responsable que indica cada cliente. La base catastral es la publicada por el gestor catastral del municipio.</p>
-    <p class="mono">{{ CFG.municipios.values()|join(' · ') }}</p>
+    <div class="pie-grid">
+      <div class="pie-col-marca">
+        <div class="pie-marca">
+          <span class="logo-txt">DEVGIZ // LINDERO</span>
+          <span class="pie-badge">Spatial Engine v2.4</span>
+        </div>
+        <p class="pie-desc">
+          Plataforma de inteligencia espacial y automatización cartográfica. Transforma levantamientos de campo en planos prediales catastrales oficiales bajo normativa IGAC en segundos.
+        </p>
+        <div class="pie-enlace-devgiz">
+          <span>Desarrollado y respaldado por:</span>
+          <a href="{{ CFG.url_devgiz }}" target="_blank" rel="noopener" class="btn-devgiz-oficial">
+            <span>DevGiz Engineering</span>
+            <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M5.22 14.78a.75.75 0 001.06 0l7.22-7.22v5.69a.75.75 0 001.5 0v-7.5a.75.75 0 00-.75-.75h-7.5a.75.75 0 000 1.5h5.69l-7.22 7.22a.75.75 0 000 1.06z" clip-rule="evenodd"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="pie-col">
+        <h4>ESPECIFICACIONES</h4>
+        <ul>
+          <li><span class="check-dot"></span> MAGNA-SIRGAS Origen Nacional (EPSG:9377)</li>
+          <li><span class="check-dot"></span> Esquema LEVANTAMIENTO_01 (25 campos)</li>
+          <li><span class="check-dot"></span> Salidas COTAS y COORDENADAS WGS84/CTM12</li>
+          <li><span class="check-dot"></span> Formatos SHP, PDF Vectorial y DXF 2018</li>
+        </ul>
+      </div>
+      <div class="pie-col">
+        <h4>SEGURIDAD Y HABEAS DATA</h4>
+        <p class="pie-mini">
+          Cumplimiento Ley 1581 de 2012 de Protección de Datos Personales. Los datos catastrales alfanuméricos procesados son de uso exclusivo del titular del levantamiento y se eliminan del servidor tras la descarga.
+        </p>
+        <div class="tarifa-tag">
+          <small>TARIFA OFICIAL</small>
+          <strong>${{ "{:,}".format(CFG.precio_por_predio).replace(',', '.') }} COP / predio</strong>
+        </div>
+      </div>
+    </div>
+    <div class="pie-inferior">
+      <p>&copy; 2026 DevGiz Engineering. Todos los derechos reservados. <a href="{{ CFG.url_devgiz }}" target="_blank" rel="noopener">devgiz.vercel.app</a></p>
+      <p class="pie-mono">Municipio activo: {{ CFG.municipios.values()|join(' · ') }}</p>
+    </div>
   </div>
 </footer>
 </body>

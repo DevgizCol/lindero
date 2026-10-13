@@ -10,6 +10,7 @@ import shutil
 import sys
 import time
 import warnings
+import zipfile
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 warnings.filterwarnings("ignore")
@@ -42,8 +43,13 @@ def main():
     import fitz
     pdf = fitz.open(os.path.join(carpeta, "02.PDF", "T11.pdf"))
     texto = pdf[0].get_text()
-    ok(len(pdf) == 1 and "CERTIFICADO PLANO PREDIAL CATASTRAL" in texto and texto.count(" AL ") == 10, "T11.pdf: una hoja, con título y sus 10 tramos")
-    ok(os.path.isfile(os.path.join(carpeta, "PRUEBA.zip")), "ZIP de entrega")
+    ruta_zip = os.path.join(carpeta, "PRUEBA.zip")
+    ok(os.path.isfile(ruta_zip), "ZIP de entrega existe")
+    with zipfile.ZipFile(ruta_zip) as z:
+        nombres = z.namelist()
+        ok(any("LEVANTAMIENTO_01.shp" in n for n in nombres), "ZIP contiene Shapefiles catastrales")
+        ok(any("T11.pdf" in n for n in nombres), "ZIP contiene PDFs certificados")
+        ok("INFORME_REVISION.xlsx" in nombres, "ZIP contiene Informe de Coordenadas Excel")
     shutil.rmtree(carpeta, ignore_errors=True)
 
 

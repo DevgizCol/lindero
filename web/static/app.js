@@ -138,4 +138,83 @@
       }, 3600);
     }
   }
+
+  /* ── Visor Satelital Interactivo (Leaflet + Ortofoto Esri + Predios Malambo) ── */
+  var elMapa = d.getElementById("mapa-hero");
+  if (elMapa && typeof L !== "undefined") {
+    try {
+      var mapaHero = L.map("mapa-hero", {
+        center: [10.8584, -74.7738],
+        zoom: 18,
+        zoomControl: true,
+        scrollWheelZoom: false,
+        attributionControl: false
+      });
+
+      L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+        maxZoom: 19
+      }).addTo(mapaHero);
+
+      var predios = [
+        {
+          nodo: "T1",
+          area: "201.64 m²",
+          coords: [[10.85868, -74.77395], [10.85874, -74.77372], [10.85818, -74.77360], [10.85812, -74.77383]],
+          colindantes: "Norte: Predio 0019 · Sur: Calle 12 · Oriente: Predio 0044"
+        },
+        {
+          nodo: "T2",
+          area: "198.50 m²",
+          coords: [[10.85874, -74.77372], [10.85880, -74.77349], [10.85824, -74.77337], [10.85818, -74.77360]],
+          colindantes: "Norte: Predio 0020 · Sur: Calle 12 · Poniente: T1"
+        },
+        {
+          nodo: "T3",
+          area: "215.10 m²",
+          coords: [[10.85880, -74.77349], [10.85886, -74.77326], [10.85830, -74.77314], [10.85824, -74.77337]],
+          colindantes: "Norte: Predio 0021 · Sur: Calle 12 · Poniente: T2"
+        },
+        {
+          nodo: "T4",
+          area: "206.80 m²",
+          coords: [[10.85886, -74.77326], [10.85892, -74.77303], [10.85836, -74.77291], [10.85830, -74.77314]],
+          colindantes: "Norte: Predio 0022 · Sur: Calle 12 · Poniente: T3"
+        }
+      ];
+
+      var grupo = L.featureGroup();
+      predios.forEach(function (p) {
+        var pol = L.polygon(p.coords, {
+          color: "#00f0ff",
+          weight: 2.5,
+          fillColor: "#0066ff",
+          fillOpacity: 0.35,
+          dashArray: "3, 3"
+        });
+
+        pol.bindPopup(
+          "<div style='font-family:sans-serif;color:#0b0f19;padding:6px 2px;min-width:180px;'>" +
+            "<div style='font-size:11px;font-weight:700;color:#0066ff;letter-spacing:1px;'>PREDIO CATASTRAL</div>" +
+            "<div style='font-size:18px;font-weight:800;color:#0f172a;'>NODO " + p.nodo + "</div>" +
+            "<div style='font-size:13px;margin:4px 0 6px;'><b>Área:</b> " + p.area + " · <b>Sistema:</b> CTM12</div>" +
+            "<div style='font-size:11px;color:#64748b;border-top:1px solid #e2e8f0;padding-top:4px;'>" + p.colindantes + "</div>" +
+          "</div>"
+        );
+
+        pol.on("mouseover", function () {
+          this.setStyle({ fillOpacity: 0.65, color: "#ffffff", weight: 3 });
+        });
+        pol.on("mouseout", function () {
+          this.setStyle({ fillOpacity: 0.35, color: "#00f0ff", weight: 2.5 });
+        });
+
+        grupo.addLayer(pol);
+      });
+
+      grupo.addTo(mapaHero);
+      mapaHero.fitBounds(grupo.getBounds(), { padding: [35, 35] });
+    } catch (err) {
+      console.warn("Leaflet mapa-hero:", err);
+    }
+  }
 })();

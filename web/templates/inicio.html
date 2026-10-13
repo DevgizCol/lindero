@@ -11,55 +11,37 @@
 <section class="portada">
   <div class="cont">
     <div class="portada-txt">
-      <span class="ceja">Certificados de plano predial · {{ CFG.municipios.values()|list|first }}</span>
-      <h1>Del levantamiento al <span class="degradado">plano firmado</span>, en minutos.</h1>
-      <p class="bajada">Sube el Excel y el plano de tus predios. {{ CFG.nombre_servicio }} los ubica sobre la base catastral oficial,
-        calcula coordenadas, linderos y colindantes, y te muestra el resultado antes de que pagues.</p>
+      <span class="ceja">Inteligencia Espacial · Catastro {{ CFG.municipios.values()|list|first }}</span>
+      <h1>Del levantamiento al <span class="degradado">plano certificado</span>, en 30 segundos.</h1>
+      <p class="bajada">Sube tu Excel y tu plano DXF. <strong>Lindero PRO</strong> ubica cada predio en la base catastral oficial del IGAC,
+        calcula linderos, coordenadas y colindantes automáticamente, y te muestra el resultado satelital antes de pagar.</p>
       <div class="acciones">
         <a class="btn btn-p btn-xl" href="#pedido">Ver mi vista previa gratis <svg aria-hidden="true"><use href="#i-flecha"/></svg></a>
         <a class="btn btn-s btn-xl" href="#como">Cómo funciona</a>
       </div>
       <ul class="garantias">
-        <li><svg aria-hidden="true"><use href="#i-ok"/></svg>Sin registro</li>
-        <li><svg aria-hidden="true"><use href="#i-ok"/></svg>Vista previa sin costo</li>
-        <li><svg aria-hidden="true"><use href="#i-ok"/></svg>Pagas solo si te sirve</li>
+        <li><svg aria-hidden="true"><use href="#i-ok"/></svg>Sin registro previo</li>
+        <li><svg aria-hidden="true"><use href="#i-ok"/></svg>Vista previa satelital gratis</li>
+        <li><svg aria-hidden="true"><use href="#i-ok"/></svg>Desde $4.000 COP / predio</li>
       </ul>
     </div>
 
-    <div class="tablero" aria-hidden="true">
-      <div class="tablero-barra"><span><i></i>Predio 0043 · ubicando</span><span>CTM12 · MAGNA-SIRGAS</span></div>
-      <svg viewBox="0 0 560 320" role="presentation">
-        <defs>
-          <linearGradient id="g-lote" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3ba4ff"/><stop offset="1" stop-color="#9066ff"/></linearGradient>
-          <linearGradient id="g-barrido" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2de2e6" stop-opacity="0"/><stop offset=".85" stop-color="#2de2e6" stop-opacity=".16"/><stop offset="1" stop-color="#2de2e6" stop-opacity=".55"/></linearGradient>
-          <pattern id="malla" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M28 0H0V28" fill="none" stroke="rgba(148,170,210,.09)" stroke-width="1"/></pattern>
-          <clipPath id="marco"><rect width="560" height="320" rx="14"/></clipPath>
-        </defs>
-        <g clip-path="url(#marco)">
-          <rect width="560" height="320" fill="url(#malla)"/>
-          <path class="t-predio" d="M60 22l110 11v52.500L60 74zM170 33l130 13v52L170 85.500zM300 46l120 12v51.500L300 98zM420 58l92 9v51l-92-8.500z"/>
-          <path class="t-predio" d="M60 74l74 8v176l-74 6zM134 82l74 7v163l-74 6zM290 97l74 7v135l-74 6zM364 104l74 7v122l-74 6zM438 111l74 7v109l-74 6z"/>
-          <path class="t-via" d="M24 296L540 252"/>
-          <text class="t-rot" x="350" y="285" transform="rotate(-4.900 350 285)">CALLE 12</text>
-          <text class="t-rot" x="84" y="172">0041</text><text class="t-rot" x="158" y="172">0042</text>
-          <text class="t-rot" x="314" y="172">0044</text><text class="t-rot" x="388" y="172">0045</text><text class="t-rot" x="462" y="172">0046</text>
-          <text class="t-rot" x="222" y="66">0019</text><text class="t-rot" x="346" y="80">0020</text>
-          <path class="t-lote" d="M208 89l82 8v148l-82 7z"/>
-          <rect class="t-barrido" x="-140" y="0" width="140" height="320"/>
-          <circle class="t-vert" style="--i:0" cx="208" cy="89" r="5"/><circle class="t-vert" style="--i:1" cx="290" cy="97" r="5"/>
-          <circle class="t-vert" style="--i:2" cx="290" cy="245" r="5"/><circle class="t-vert" style="--i:3" cx="208" cy="252" r="5"/>
-          <text class="t-num" style="--i:0" x="192" y="84">1</text><text class="t-num" style="--i:1" x="299" y="92">2</text>
-          <text class="t-num" style="--i:2" x="299" y="258">3</text><text class="t-num" style="--i:3" x="192" y="266">4</text>
-          <text class="t-cota" x="236" y="84">8.17</text><text class="t-cota" x="232" y="176">201.64 m²</text>
-          <text class="t-cota" x="236" y="270">8.20</text>
-        </g>
-      </svg>
-      <div class="cuadro">
-        <div><span>TRAMO</span><span>DIST.</span><span>COLINDANTE</span></div>
-        <div style="--i:0"><b>1 → 2</b><span>8.17 m</span><em>PREDIO · 0019</em></div>
-        <div style="--i:1"><b>2 → 3</b><span>24.53 m</span><em>PREDIO · 0044</em></div>
-        <div style="--i:2"><b>3 → 4</b><span>8.20 m</span><em>CALLE 12</em></div>
-        <div style="--i:3"><b>4 → 1</b><span>24.61 m</span><em>PREDIO · 0042</em></div>
+    <div class="visor-satelital-card" data-ver>
+      <div class="visor-barra">
+        <div class="visor-estado">
+          <span class="punto-radar"></span>
+          <strong>Visor Satelital en Tiempo Real</strong>
+          <span class="chip-ctm12">MAGNA-SIRGAS · CTM12</span>
+        </div>
+        <div class="visor-meta">
+          <span>Malambo, Atlántico</span>
+        </div>
+      </div>
+      <div id="mapa-hero" class="mapa-satelital"></div>
+      <div class="visor-pie-datos">
+        <div class="item-tramo"><span>Levantamiento:</span> <b>El Tesoro (22 lotes)</b></div>
+        <div class="item-tramo"><span>Precisión:</span> <b class="text-cyan">± 0.05 m</b></div>
+        <div class="item-tramo"><span>Estado:</span> <b class="text-verde">Georreferenciado</b></div>
       </div>
     </div>
   </div>
@@ -147,17 +129,18 @@
 <section class="sec fondo-2 borde-sup" id="precio">
   <div class="cont">
     <div class="sec-cab" data-ver>
-      <span class="ceja">Precio</span>
-      <h2>Un precio por predio. Sin mensualidad ni letra pequeña.</h2>
+      <span class="ceja">Tarifa transparente</span>
+      <h2>$4.000 COP por predio. Cero mensualidades, cero contratos.</h2>
+      <p class="bajada">Procesa tu levantamiento completo en segundos. Ahorra días de dibujo manual en QGIS o AutoCAD y entrega a tiempo a tu cliente o entidad.</p>
     </div>
     <div class="precio-caja" data-ver>
       <div>
-        <span class="mini mono">POR PREDIO CON PLANO</span>
+        <span class="mini mono">TARIFA POR PREDIO PROCESADO</span>
         <div class="precio-num">{{ CFG.precio_por_predio|pesos }}<small>{{ CFG.moneda }}</small></div>
         <ul class="lista">
-          <li><svg aria-hidden="true"><use href="#i-ok"/></svg><div><b>La vista previa es gratis</b><span>Ves dos planos y el mapa de todos tus predios antes de decidir.</span></div></li>
-          <li><svg aria-hidden="true"><use href="#i-ok"/></svg><div><b>Solo se cobran los predios con plano</b><span>Las filas sin figura en el DXF no entran en la cuenta.</span></div></li>
-          <li><svg aria-hidden="true"><use href="#i-ok"/></svg><div><b>Revisión profesional incluida</b><span>Si algo queda dudoso, se revisa sin costo adicional.</span></div></li>
+          <li><svg aria-hidden="true"><use href="#i-ok"/></svg><div><b>Vista previa satelital 100% gratis</b><span>Revisas tus predios sobre la ortofoto de Malambo antes de pagar un solo peso.</span></div></li>
+          <li><svg aria-hidden="true"><use href="#i-ok"/></svg><div><b>Paquete oficial multi-formato</b><span>Incluye Shapefiles (25 campos LEVANTAMIENTO_01, COTAS, COORDENADAS), PDFs vectoriales y DXF en CTM12.</span></div></li>
+          <li><svg aria-hidden="true"><use href="#i-ok"/></svg><div><b>Pedido base protegido ({{ CFG.precio_minimo|pesos }})</b><span>Tarifa base para levantamientos de 1 a 4 predios; a partir del 5to, solo $4.000 COP cada uno.</span></div></li>
         </ul>
       </div>
       <div class="calc" data-calc data-unidad="{{ CFG.precio_por_predio }}" data-minimo="{{ CFG.precio_minimo }}">

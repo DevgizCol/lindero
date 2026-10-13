@@ -87,9 +87,9 @@ def extraer(ruta_dxf, nodos_esperados=(), ruta_puntos=None, area_min=8.0, area_m
         d.avisos.append("El DXF no tiene líneas de dibujo fuera de la grilla y el rótulo.")
         return d
     # se cierra con la rejilla más fina que sirva: 1 mm conserva el área al centímetro cuadrado;
-    # solo si quedan líneas sin cerrar se prueba a juntar extremos separados hasta 1 cm y 5 cm
+    # si quedan líneas sin cerrar, prueba snapping de 1 cm, 5 cm y hasta 10 cm para reparar planos sucios
     mejor = None
-    for rej in sorted({0.001, rejilla, 0.05}):
+    for rej in sorted({0.001, rejilla, 0.05, 0.10}):
         geoms = shapely.set_precision(lineas.geometry.values, rej)
         red_r = unary_union([g for g in geoms if g is not None and not g.is_empty])
         polys_r = [p for p in polygonize(red_r) if area_min <= p.area <= area_max]
@@ -123,17 +123,38 @@ def extraer(ruta_dxf, nodos_esperados=(), ruta_puntos=None, area_min=8.0, area_m
         arbol = STRtree(d.poligonos)
         # 1) texto dentro del polígono
         votos = defaultdict(list)
-        for t, x, y in d.textos:
+        textos_usados = set()
+        for idx_t, (t, x, y) in enumerate(d.textos):
             k = norm_nodo(t)
             if esperados and k not in esperados:
                 continue
             if not esperados and not re.fullmatch(r"[A-Z]{0,3}\d{1,5}[A-Z]?", k):
                 continue
-            for i in arbol.query(Point(x, y), predicate="within"):
-                votos[int(i)].append(esperados.get(k, t))
+            matches = arbol.query(Point(x, y), predicate="within")
+            if len(matches):
+                for i in matches:
+                    votos[int(i)].append(esperados.get(k, t))
+                textos_usados.add(idx_t)
         for i, v in votos.items():
             if len(set(v)) == 1:
                 d.nodos[i], d.origen[i] = v[0], "TEXTO"
+
+        # 1.1) rescate: textos en el borde o ligeramente afuera (tolerancia de 50 cm)
+        for i in range(len(d.poligonos)):
+            if not d.nodos[i]:
+                poli = d.poligonos[i]
+                candidatos = []
+                for idx_t, (t, x, y) in enumerate(d.textos):
+                    if idx_t in textos_usados:
+                        continue
+                    k = norm_nodo(t)
+                    if esperados and k not in esperados:
+                        continue
+                    if poli.distance(Point(x, y)) <= 0.5:
+                        candidatos.append((esperados.get(k, t), poli.distance(Point(x, y))))
+                if candidatos:
+                    candidatos.sort(key=lambda c: c[1])
+                    d.nodos[i], d.origen[i] = candidatos[0][0], "TEXTO_BORDE"
         # 2) códigos de la cartera en los vértices
         if ruta_puntos and os.path.isfile(ruta_puntos):
             pts = leer_puntos(ruta_puntos)
