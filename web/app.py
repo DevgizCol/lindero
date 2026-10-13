@@ -646,7 +646,15 @@ def admin():
         except Exception:
             continue
     pedidos.sort(key=lambda p: p.get("creado", ""), reverse=True)
-    return render_template("admin.html", pedidos=pedidos)
+    recaudado = sum(int(p.get("precio", 0)) for p in pedidos if p.get("pagado"))
+    stats = {
+        "total": len(pedidos),
+        "recaudado": recaudado,
+        "en_revision": sum(1 for p in pedidos if p.get("estado") == "EN_REVISION"),
+        "esperando_pago": sum(1 for p in pedidos if p.get("estado") == "PREVIA_LISTA" and not p.get("pagado")),
+        "listos": sum(1 for p in pedidos if p.get("estado") == "LISTO"),
+    }
+    return render_template("admin.html", pedidos=pedidos, stats=stats)
 
 
 @app.post("/admin/pedidos/<pid>/<accion>")

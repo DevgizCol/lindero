@@ -1,22 +1,48 @@
 {% extends "base.html" %}
-{% block titulo %}Entrar · {{ CFG.nombre_servicio }}{% endblock %}
+{% block titulo %}Acceso Administrativo · {{ CFG.nombre_servicio }}{% endblock %}
 {% block robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
 {% block cuerpo %}
-<div class="cont pag" style="max-width:520px">
-  <span class="ceja">Operación</span>
-  <h1 style="margin:16px 0 28px;font-size:clamp(2rem,1.2rem + 3vw,3rem)">Panel de pedidos</h1>
-  {% if deshabilitado %}
-    <div class="aviso ojo">El panel está deshabilitado. Define la variable de entorno <code>PLANOS_ADMIN_CLAVE</code> y reinicia el servidor.</div>
-  {% else %}
-    {% if error %}<div class="aviso mal" role="alert" style="margin-bottom:20px">{{ error }}</div>{% endif %}
-    <form class="panel" method="post">
-      <input type="hidden" name="csrf" value="{{ csrf() }}">
-      <div class="campo" style="margin-top:0">
-        <label for="clave">Clave</label>
-        <input id="clave" type="password" name="clave" required autocomplete="current-password">
+<div class="cont pag adm-login-cont">
+  <div class="adm-login-card">
+    <div class="adm-login-header">
+      <div class="adm-badge-corp">DevGiz Engineering · Operación Segura</div>
+      <div class="adm-icon-shield" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="M9 12l2 2 4-4"/>
+        </svg>
       </div>
-      <div class="pie-form"><span></span><button class="btn btn-p" type="submit">Entrar</button></div>
-    </form>
-  {% endif %}
+      <h1>Consola de Control</h1>
+      <p class="tenue">Ingreso restringido para ingenieros y operadores autorizados de Lindero.</p>
+    </div>
+
+    {% if deshabilitado %}
+      <div class="aviso ojo">El panel está deshabilitado. Define la variable de entorno <code>PLANOS_ADMIN_CLAVE</code> en tu servidor.</div>
+    {% else %}
+      {% if error %}<div class="aviso mal" role="alert" style="margin-bottom:16px">{{ error }}</div>{% endif %}
+      <form class="panel adm-login-form" method="post">
+        <input type="hidden" name="csrf" value="{{ csrf() }}">
+        <div class="campo" style="margin-top:0">
+          <label for="clave">Clave de Operación</label>
+          <div class="input-pass-wrap">
+            <input id="clave" type="password" name="clave" placeholder="Ingresa la clave maestra" required autocomplete="current-password" autofocus>
+            <button type="button" class="btn-toggle-pass" aria-label="Mostrar u ocultar clave" onclick="togglePass()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="pie-form" style="margin-top:24px;display:flex;justify-content:space-between;align-items:center;gap:12px">
+          <a href="{{ url_for('inicio') }}" class="btn btn-s btn-ch">← Inicio</a>
+          <button class="btn btn-p" type="submit">Autenticar y Entrar</button>
+        </div>
+      </form>
+    {% endif %}
+  </div>
 </div>
+<script>
+function togglePass() {
+  var inp = document.getElementById('clave');
+  if (inp) { inp.type = inp.type === 'password' ? 'text' : 'password'; }
+}
+</script>
 {% endblock %}

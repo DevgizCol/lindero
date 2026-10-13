@@ -1234,3 +1234,288 @@ h3 { font-size: 1.05rem; }
 }
 .logro svg { width: 44px; height: 44px; color: var(--verde); }
 code { font-family: var(--f-mono); background: rgba(255, 255, 255, 0.08); padding: 3px 8px; border-radius: 6px; font-size: 0.9em; }
+
+/* ── Consola de Operación y Administración (DevGiz Executive) ── */
+.adm-dashboard { max-width: 1240px; margin: 0 auto; padding-top: 18px; }
+.adm-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.adm-titular h1 { margin: 6px 0 4px; font-size: clamp(1.8rem, 1.2rem + 2vw, 2.6rem); }
+.adm-badge-corp {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--cian);
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+.adm-status-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.84rem;
+  color: var(--txt-2);
+  background: var(--sup);
+  border: 1px solid var(--linea-2);
+  padding: 6px 14px;
+  border-radius: 999px;
+}
+
+/* KPIs Grid */
+.adm-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.kpi-card {
+  background: var(--sup);
+  border: 1px solid var(--linea-2);
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 14px;
+  align-items: center;
+  transition: transform .2s ease, border-color .2s ease;
+}
+.kpi-card:hover { transform: translateY(-2px); border-color: rgba(255, 255, 255, 0.2); }
+.kpi-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  display: grid;
+  place-items: center;
+  font-size: 1.25rem;
+}
+.kpi-datos { display: grid; gap: 2px; }
+.kpi-label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--txt-2); }
+.kpi-valor { font-size: 1.5rem; font-family: var(--f-mono); color: #fff; line-height: 1.1; }
+.kpi-sub { font-size: 0.74rem; color: var(--txt-3); }
+.kpi-recaudo .kpi-valor { color: var(--verde); text-shadow: 0 0 12px rgba(16, 185, 129, 0.25); }
+.kpi-alerta .kpi-valor { color: #f59e0b; }
+.kpi-exito .kpi-valor { color: var(--cian); }
+
+/* Toolbar & Filtros */
+.adm-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.adm-busqueda-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 280px;
+  max-width: 460px;
+}
+.adm-busqueda-wrap input {
+  width: 100%;
+  padding-left: 38px;
+  border-radius: 10px;
+  height: 42px;
+  background: var(--sup);
+  border: 1px solid var(--linea-2);
+  color: #fff;
+  font-size: 0.9rem;
+}
+.adm-busqueda-wrap input:focus { border-color: var(--cian); outline: none; }
+.ico-lupa {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  color: var(--txt-3);
+  pointer-events: none;
+}
+.adm-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.filtro-btn {
+  background: var(--sup);
+  border: 1px solid var(--linea-2);
+  color: var(--txt-2);
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 0.84rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.filtro-btn:hover { color: #fff; border-color: rgba(255, 255, 255, 0.2); }
+.filtro-btn.activo {
+  background: rgba(0, 240, 255, 0.12);
+  border-color: var(--cian);
+  color: #fff;
+}
+.filtro-btn.alerta.activo {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: #f59e0b;
+  color: #fbbf24;
+}
+
+/* Pedido Card Re-diseñado */
+.adm-lista-pedidos { display: grid; gap: 16px; }
+.ped-card {
+  padding: 20px 22px;
+  display: grid;
+  gap: 14px;
+  border-left: 4px solid var(--linea-2);
+  transition: border-color .2s ease;
+}
+.ped-card[data-estado="EN_REVISION"] { border-left-color: #f59e0b; }
+.ped-card[data-estado="LISTO"] { border-left-color: var(--verde); }
+.ped-card[data-estado="PREVIA_LISTA"] { border-left-color: var(--cian); }
+
+.ped-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  border-bottom: 1px solid var(--linea-2);
+  padding-bottom: 12px;
+}
+.ped-id-wrap { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.ped-ref { font-size: 1.15rem; color: #fff; display: inline-flex; align-items: center; gap: 6px; }
+.btn-copiar {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--txt-3);
+  padding: 4px;
+  display: grid;
+  place-items: center;
+  border-radius: 4px;
+}
+.btn-copiar:hover { color: var(--cian); background: rgba(255, 255, 255, 0.05); }
+.btn-copiar svg { width: 15px; height: 15px; }
+.ped-fecha { font-size: 0.8rem; color: var(--txt-3); }
+
+.ped-badges { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.chip-pago { font-family: var(--f-mono); font-size: 0.78rem; }
+.chip-precio { font-size: 0.92rem; color: #fff; }
+
+.ped-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  background: rgba(0, 0, 0, 0.18);
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--linea);
+}
+.meta-rotulo { display: block; font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--txt-3); margin-bottom: 2px; }
+.ped-tecnico {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 0.84rem;
+  color: var(--txt-2);
+}
+
+.ped-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding-top: 4px;
+}
+.btn-aprobar {
+  background: linear-gradient(135deg, #059669, #10b981) !important;
+  color: #fff !important;
+  border: 1px solid rgba(16, 185, 129, 0.5) !important;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.3);
+  font-weight: 700;
+}
+.btn-aprobar:hover {
+  background: linear-gradient(135deg, #10b981, #34d399) !important;
+  transform: translateY(-1px);
+}
+.btn-zip { border-color: rgba(0, 240, 255, 0.35) !important; color: var(--cian) !important; }
+.form-pago-inline {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+.form-pago-inline input {
+  height: 34px;
+  padding: 4px 10px;
+  font-size: 0.82rem;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--linea-2);
+  color: #fff;
+  width: 170px;
+}
+
+/* Pantalla Login Admin */
+.adm-login-cont {
+  min-height: 70vh;
+  display: grid;
+  place-items: center;
+  padding: 40px 16px;
+}
+.adm-login-card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--sup);
+  border: 1px solid var(--linea-2);
+  border-radius: 20px;
+  padding: 36px 32px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 240, 255, 0.05);
+}
+.adm-login-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+.adm-icon-shield {
+  width: 64px;
+  height: 64px;
+  margin: 16px auto 12px;
+  border-radius: 50%;
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  display: grid;
+  place-items: center;
+}
+.adm-icon-shield svg { width: 32px; height: 32px; color: var(--cian); }
+.adm-login-header h1 { margin: 8px 0 4px; font-size: 1.6rem; color: #fff; }
+.input-pass-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.input-pass-wrap input {
+  width: 100%;
+  padding-right: 44px;
+}
+.btn-toggle-pass {
+  position: absolute;
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: var(--txt-3);
+  cursor: pointer;
+  padding: 6px;
+  display: grid;
+  place-items: center;
+}
+.btn-toggle-pass:hover { color: var(--cian); }
+.btn-toggle-pass svg { width: 20px; height: 20px; }

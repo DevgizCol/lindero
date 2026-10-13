@@ -1,59 +1,290 @@
 {% extends "base.html" %}
-{% block titulo %}Operación · {{ CFG.nombre_servicio }}{% endblock %}
+{% block titulo %}Consola de Operaciones · {{ CFG.nombre_servicio }}{% endblock %}
 {% block robots %}<meta name="robots" content="noindex, nofollow">{% endblock %}
-{% block nav %}<form method="post" action="{{ url_for('admin_salir') }}"><input type="hidden" name="csrf" value="{{ csrf() }}">
-  <button class="btn btn-s btn-ch" type="submit">Salir</button></form>{% endblock %}
+{% block nav %}
+<a class="btn btn-s btn-ch" href="{{ url_for('inicio') }}">Ir a la Web</a>
+<form method="post" action="{{ url_for('admin_salir') }}" style="display:inline">
+  <input type="hidden" name="csrf" value="{{ csrf() }}">
+  <button class="btn btn-s btn-ch" type="submit">Cerrar Sesión</button>
+</form>
+{% endblock %}
 {% block cuerpo %}
-<div class="cont pag">
-  <div class="adm-cab">
-    <div><span class="ceja">Operación</span><h1 style="margin-top:16px;font-size:clamp(2rem,1.2rem + 3vw,3.2rem)">Pedidos</h1></div>
-    <div class="chips">
-      <span class="chip">{{ pedidos|length }} en total</span>
-      <span class="chip pend">{{ pedidos|selectattr('estado', 'equalto', 'EN_REVISION')|list|length }} por revisar</span>
-      <span class="chip pend">{{ pedidos|selectattr('estado', 'equalto', 'PREVIA_LISTA')|rejectattr('pagado')|list|length }} esperando pago</span>
+<div class="cont pag adm-dashboard">
+  <!-- Cabecera principal -->
+  <header class="adm-header">
+    <div class="adm-titular">
+      <div class="adm-badge-corp">DevGiz Engineering · Centro de Control</div>
+      <h1>Consola de Despacho Catastral</h1>
+      <p class="tenue">Supervisión en vivo de validaciones MAGNA-SIRGAS CTM12, recaudo y autorizaciones.</p>
+    </div>
+    <div class="adm-status-live">
+      <span class="punto-radar"></span>
+      <span>Servidor Activo · Render Nube</span>
+    </div>
+  </header>
+
+  <!-- Métricas KPI -->
+  <section class="adm-kpis" aria-label="Métricas de operación">
+    <div class="kpi-card kpi-recaudo">
+      <div class="kpi-icon">💰</div>
+      <div class="kpi-datos">
+        <span class="kpi-label">Recaudo Confirmado</span>
+        <strong class="kpi-valor">{{ stats.recaudado|pesos }}</strong>
+        <span class="kpi-sub">Pasarela Wompi y manual</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">📦</div>
+      <div class="kpi-datos">
+        <span class="kpi-label">Total Pedidos</span>
+        <strong class="kpi-valor">{{ stats.total }}</strong>
+        <span class="kpi-sub">Histórico del sistema</span>
+      </div>
+    </div>
+    <div class="kpi-card kpi-alerta">
+      <div class="kpi-icon">⚠️</div>
+      <div class="kpi-datos">
+        <span class="kpi-label">Por Revisar</span>
+        <strong class="kpi-valor">{{ stats.en_revision }}</strong>
+        <span class="kpi-sub">Requieren visto bueno</span>
+      </div>
+    </div>
+    <div class="kpi-card kpi-exito">
+      <div class="kpi-icon">✅</div>
+      <div class="kpi-datos">
+        <span class="kpi-label">Entregados / Listos</span>
+        <strong class="kpi-valor">{{ stats.listos }}</strong>
+        <span class="kpi-sub">Descarga liberada</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">⏳</div>
+      <div class="kpi-datos">
+        <span class="kpi-label">En Espera de Pago</span>
+        <strong class="kpi-valor">{{ stats.esperando_pago }}</strong>
+        <span class="kpi-sub">Vista previa generada</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Barra de Búsqueda y Filtros -->
+  <div class="adm-toolbar">
+    <div class="adm-busqueda-wrap">
+      <svg class="ico-lupa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+      </svg>
+      <input id="filtro-texto" type="search" placeholder="Buscar por referencia, correo, cédula o municipio..." oninput="filtrarPedidos()">
+    </div>
+    <div class="adm-filtros" role="tablist">
+      <button class="filtro-btn activo" data-filtro="todos" onclick="cambiarFiltro('todos')">Todos ({{ stats.total }})</button>
+      <button class="filtro-btn alerta" data-filtro="revision" onclick="cambiarFiltro('revision')">⚠️ Por Revisar ({{ stats.en_revision }})</button>
+      <button class="filtro-btn" data-filtro="pagados" onclick="cambiarFiltro('pagados')">💳 Pagados</button>
+      <button class="filtro-btn exito" data-filtro="listos" onclick="cambiarFiltro('listos')">✅ Listos ({{ stats.listos }})</button>
+      <button class="filtro-btn" data-filtro="espera" onclick="cambiarFiltro('espera')">⏳ Sin Pagar ({{ stats.esperando_pago }})</button>
     </div>
   </div>
-  {% if not pedidos %}<div class="tarjeta centrado"><h2>Aún no hay pedidos</h2><p class="tenue">Aparecerán aquí en cuanto alguien suba sus archivos.</p></div>{% endif %}
-  {% for p in pedidos %}
-  {% set r = p.get('resumen', {}) %}
-  <article class="tarjeta ped">
-    <div class="ped-top">
-      <div>
-        <h2 style="margin:0" class="mono">{{ p.id[:8] }}</h2>
-        <p class="mini">{{ p.creado.replace('T', ' ') }} · {{ p.correo }}</p>
-        <p class="mini">{{ p.firmante.replace('\n', ' · ') }}</p>
+
+  <!-- Lista de pedidos -->
+  <div class="adm-lista-pedidos" id="contenedor-pedidos">
+    {% if not pedidos %}
+      <div class="tarjeta centrado">
+        <h2>Aún no hay pedidos registrados</h2>
+        <p class="tenue">Aparecerán aquí automáticamente en cuanto un cliente cargue sus archivos.</p>
       </div>
-      <div class="chips">
-        <span class="chip {{ 'ok' if p.estado == 'LISTO' else ('err' if p.estado in ('ERROR', 'ERROR_ENTRADA') else ('pend' if p.estado == 'EN_REVISION' else '')) }}">{{ ESTADOS.get(p.estado, p.estado) }}</span>
-        <span class="chip {{ 'ok' if p.pagado else 'pend' }}">{{ 'Pagado' if p.pagado else 'Sin pagar' }}</span>
-        {% if p.get('precio') %}<span class="chip">{{ p.precio|pesos }}</span>{% endif %}
-      </div>
-    </div>
-    {% if r %}
-    <p class="tenue">{{ r.predios }} predios · ubicación {{ r.ubicacion.get('metodo', '-')|replace('_', ' ')|lower }}
-      ({{ r.ubicacion.get('crs_plano', '-') }}, <span class="mono">dx {{ r.ubicacion.get('dx', 0) }} m · dy {{ r.ubicacion.get('dy', 0) }} m</span>)</p>
-    {% if r.por_revisar %}<div class="aviso ojo"><b>Por revisar: {{ r.por_revisar|join(', ') }}</b><span>El detalle de cada lindero está en el informe de revisión.</span></div>{% endif %}
-    {% if r.avisos %}<details class="obs"><summary>Avisos del motor ({{ r.avisos|length }})</summary><ul>{% for a in r.avisos %}<li>{{ a }}</li>{% endfor %}</ul></details>{% endif %}
     {% endif %}
-    {% if p.get('error') %}<div class="aviso mal">{{ p.error }}</div>{% endif %}
-    <div class="acc">
-      <a class="btn btn-s btn-ch" href="{{ url_for('ver_pedido', pid=p.id) }}">Ver como cliente</a>
-      {% if r %}<a class="btn btn-s btn-ch" href="{{ url_for('admin_archivo', pid=p.id, nombre='vista_previa.png') }}" target="_blank" rel="noopener">Mapa de ubicación</a>
-      <a class="btn btn-s btn-ch" href="{{ url_for('admin_archivo', pid=p.id, nombre='informe_final.xlsx' if p.estado in ('LISTO', 'EN_REVISION') else 'informe_previa.xlsx') }}">Informe de revisión</a>{% endif %}
-      {% if p.estado in ('LISTO', 'EN_REVISION') %}<a class="btn btn-s btn-ch" href="{{ url_for('admin_archivo', pid=p.id, nombre='entrega.zip') }}">ZIP</a>{% endif %}
-      {% if not p.pagado and p.estado == 'PREVIA_LISTA' %}
-        <form method="post" action="{{ url_for('admin_accion', pid=p.id, accion='pagado') }}">
-          <input type="hidden" name="csrf" value="{{ csrf() }}">
-          <input type="text" name="referencia" placeholder="N.º de comprobante" aria-label="Número del comprobante de pago">
-          <button class="btn btn-p btn-ch" type="submit">Confirmar pago</button></form>{% endif %}
-      {% if p.estado == 'EN_REVISION' and p.pagado %}
-        <form method="post" action="{{ url_for('admin_accion', pid=p.id, accion='aprobar') }}">
-          <input type="hidden" name="csrf" value="{{ csrf() }}"><button class="btn btn-p btn-ch" type="submit">Aprobar y liberar la descarga</button></form>{% endif %}
-      {% if p.pagado %}
-        <form method="post" action="{{ url_for('admin_accion', pid=p.id, accion='regenerar') }}">
-          <input type="hidden" name="csrf" value="{{ csrf() }}"><button class="btn btn-s btn-ch" type="submit">Volver a generar</button></form>{% endif %}
-    </div>
-  </article>
-  {% endfor %}
+
+    {% for p in pedidos %}
+    {% set r = p.get('resumen', {}) %}
+    {% set pago = p.get('pago', {}) %}
+    <article class="tarjeta ped-card"
+             data-id="{{ p.id }}"
+             data-estado="{{ p.estado }}"
+             data-pagado="{{ '1' if p.pagado else '0' }}"
+             data-busqueda="{{ p.id }} {{ p.correo }} {{ p.firmante }} {{ p.municipio }} {{ pago.get('referencia', '') }}">
+
+      <!-- Header del pedido -->
+      <div class="ped-card-head">
+        <div class="ped-id-wrap">
+          <span class="ped-ref mono">
+            Pedido <strong>{{ p.id[:8] }}</strong>
+            <button type="button" class="btn-copiar" title="Copiar ID completo" onclick="copiarTexto('{{ p.id }}', this)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+          </span>
+          <span class="ped-fecha">{{ p.creado.replace('T', ' · ')[:19] }}</span>
+        </div>
+
+        <div class="ped-badges">
+          <!-- Badge de Estado -->
+          {% if p.estado == 'LISTO' %}
+            <span class="chip ok">✅ Listo para Entrega</span>
+          {% elif p.estado == 'EN_REVISION' %}
+            <span class="chip pend">⚠️ En Revisión Técnica</span>
+          {% elif p.estado == 'PREVIA_LISTA' %}
+            <span class="chip">👁️ Vista Previa Lista</span>
+          {% elif p.estado in ('ERROR', 'ERROR_ENTRADA') %}
+            <span class="chip err">❌ Error en Archivos</span>
+          {% else %}
+            <span class="chip">{{ ESTADOS.get(p.estado, p.estado) }}</span>
+          {% endif %}
+
+          <!-- Badge de Pago -->
+          {% if p.pagado %}
+            {% if pago.get('origen') == 'wompi' %}
+              <span class="chip ok chip-pago" title="ID Wompi: {{ pago.get('referencia') }}">
+                💳 Wompi #{{ pago.get('referencia')[:14] }}
+              </span>
+            {% else %}
+              <span class="chip ok chip-pago">✓ Pago Manual #{{ pago.get('referencia', '-') }}</span>
+            {% endif %}
+          {% else %}
+            <span class="chip pend">⏳ Pendiente de Pago</span>
+          {% endif %}
+
+          <!-- Precio -->
+          {% if p.get('precio') %}
+            <span class="chip chip-precio"><strong>{{ p.precio|pesos }}</strong></span>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Datos del cliente y municipio -->
+      <div class="ped-meta-grid">
+        <div>
+          <span class="meta-rotulo">Cliente / Correo</span>
+          <strong><a href="mailto:{{ p.correo }}" style="color:var(--txt)">{{ p.correo or 'Sin correo' }}</a></strong>
+        </div>
+        <div>
+          <span class="meta-rotulo">Municipio</span>
+          <span>{{ CFG.municipios.get(p.municipio, p.municipio)|capitalize }}</span>
+        </div>
+        <div>
+          <span class="meta-rotulo">Profesional Responsable</span>
+          <span>{{ (p.firmante or 'No especificado').replace('\n', ' · ') }}</span>
+        </div>
+        <div>
+          <span class="meta-rotulo">Cálculo Cartográfico</span>
+          <span><b>{{ r.predios or 0 }} predios</b> · {{ r.poligonos or 0 }} figuras · {{ r.filas_excel or 0 }} registros</span>
+        </div>
+      </div>
+
+      <!-- Detalles técnicos -->
+      {% if r %}
+        <div class="ped-tecnico">
+          <span>Ubicación: <code>{{ r.ubicacion.get('metodo', '-')|replace('_', ' ')|lower }}</code></span>
+          <span>Ajuste CTM12: <code class="mono">dx {{ r.ubicacion.get('dx', 0) }} m · dy {{ r.ubicacion.get('dy', 0) }} m · giro {{ r.ubicacion.get('giro', 0) }}°</code></span>
+        </div>
+
+        {% if r.por_revisar %}
+          <div class="aviso ojo" style="margin:10px 0 0">
+            <b>Predios que requieren verificación:</b> {{ r.por_revisar|join(', ') }}.
+            <span class="mini">Verifica los colindantes en el informe de revisión antes de autorizar.</span>
+          </div>
+        {% endif %}
+
+        {% if r.avisos %}
+          <details class="obs" style="margin-top:10px">
+            <summary>Observaciones del motor técnico ({{ r.avisos|length }})</summary>
+            <ul>{% for a in r.avisos %}<li>{{ a }}</li>{% endfor %}</ul>
+          </details>
+        {% endif %}
+      {% endif %}
+
+      {% if p.get('error') %}
+        <div class="aviso mal" style="margin-top:10px"><b>Fallo reportado:</b> {{ p.error }}</div>
+      {% endif %}
+
+      <!-- Barra de Acciones -->
+      <div class="ped-acciones">
+        <!-- Acción prioritaria: APROBAR si está pagado y en revisión -->
+        {% if p.estado == 'EN_REVISION' and p.pagado %}
+          <form method="post" action="{{ url_for('admin_accion', pid=p.id, accion='aprobar') }}" style="display:inline">
+            <input type="hidden" name="csrf" value="{{ csrf() }}">
+            <button class="btn btn-p btn-ch btn-aprobar" type="submit">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;display:inline-block;vertical-align:text-top"><polyline points="20 6 9 17 4 12"/></svg>
+              Aprobar y Liberar Descarga
+            </button>
+          </form>
+        {% endif %}
+
+        <!-- Acción: Confirmar Pago Manual si aún no está pagado -->
+        {% if not p.pagado and p.estado == 'PREVIA_LISTA' %}
+          <form class="form-pago-inline" method="post" action="{{ url_for('admin_accion', pid=p.id, accion='pagado') }}">
+            <input type="hidden" name="csrf" value="{{ csrf() }}">
+            <input type="text" name="referencia" placeholder="N.º comprobante Nequi" aria-label="Número del comprobante de pago" required>
+            <button class="btn btn-p btn-ch" type="submit">Confirmar Pago</button>
+          </form>
+        {% endif %}
+
+        <!-- Recursos y Enlaces -->
+        <a class="btn btn-s btn-ch" href="{{ url_for('ver_pedido', pid=p.id) }}" target="_blank" rel="noopener">
+          👁️ Ver como Cliente
+        </a>
+
+        {% if r %}
+          <a class="btn btn-s btn-ch" href="{{ url_for('admin_archivo', pid=p.id, nombre='vista_previa.png') }}" target="_blank" rel="noopener">
+            🗺️ Mapa Ubicación
+          </a>
+          <a class="btn btn-s btn-ch" href="{{ url_for('admin_archivo', pid=p.id, nombre='informe_final.xlsx' if p.estado in ('LISTO', 'EN_REVISION') else 'informe_previa.xlsx') }}">
+            📊 Informe Excel
+          </a>
+        {% endif %}
+
+        {% if p.estado in ('LISTO', 'EN_REVISION') %}
+          <a class="btn btn-s btn-ch btn-zip" href="{{ url_for('admin_archivo', pid=p.id, nombre='entrega.zip') }}">
+            📦 Descargar ZIP
+          </a>
+        {% endif %}
+
+        {% if p.pagado %}
+          <form method="post" action="{{ url_for('admin_accion', pid=p.id, accion='regenerar') }}" style="display:inline">
+            <input type="hidden" name="csrf" value="{{ csrf() }}">
+            <button class="btn btn-s btn-ch" type="submit" title="Recompilar planos y shapefiles">🔄 Regenerar</button>
+          </form>
+        {% endif %}
+      </div>
+    </article>
+    {% endfor %}
+  </div>
 </div>
+
+<script>
+var filtroActual = 'todos';
+
+function cambiarFiltro(tipo) {
+  filtroActual = tipo;
+  document.querySelectorAll('.filtro-btn').forEach(function(b) {
+    b.classList.toggle('activo', b.dataset.filtro === tipo);
+  });
+  filtrarPedidos();
+}
+
+function filtrarPedidos() {
+  var texto = (document.getElementById('filtro-texto').value || '').toLowerCase().trim();
+  var tarjetas = document.querySelectorAll('.ped-card');
+  
+  tarjetas.forEach(function(card) {
+    var estado = card.dataset.estado;
+    var pagado = card.dataset.pagado === '1';
+    var datos = (card.dataset.busqueda || '').toLowerCase();
+    
+    var pasaFiltro = true;
+    if (filtroActual === 'revision') pasaFiltro = (estado === 'EN_REVISION');
+    else if (filtroActual === 'pagados') pasaFiltro = pagado;
+    else if (filtroActual === 'listos') pasaFiltro = (estado === 'LISTO');
+    else if (filtroActual === 'espera') pasaFiltro = (estado === 'PREVIA_LISTA' && !pagado);
+
+    var pasaTexto = !texto || datos.indexOf(texto) !== -1;
+    card.style.display = (pasaFiltro && pasaTexto) ? '' : 'none';
+  });
+}
+
+function copiarTexto(texto, btn) {
+  navigator.clipboard.writeText(texto).then(function() {
+    var svg = btn.innerHTML;
+    btn.innerHTML = '✓';
+    setTimeout(function() { btn.innerHTML = svg; }, 1600);
+  });
+}
+</script>
 {% endblock %}
