@@ -183,7 +183,13 @@ def ejecutar(t: Trabajo, registrar=print) -> dict:
         inf["requiere_revision"] = True
         return _cerrar(t, inf)
     if ub.metodo != "COORDENADAS_DEL_PLANO":
-        inf["requiere_revision"] = True
+        # Autonomía inteligente: si los códigos prediales ubican los lotes con alta certeza
+        # (calce >= 80%, fuera <= 15% y sin predios en conflicto), se auto-aprueba sin intervención humana
+        calce_minimo = min(ub.calce) if ub.calce else 0.0
+        calce_optimo = calce_minimo >= 0.80 and ub.fuera_despues <= 0.15
+        conflictos = any("distinto al código" in a for a in ub.avisos)
+        if not calce_optimo or conflictos:
+            inf["requiere_revision"] = True
 
     # código definitivo de cada lote: el del cliente/dirección si es confiable; si no, el predio que queda debajo
     lotes_info = []
@@ -192,7 +198,7 @@ def ejecutar(t: Trabajo, registrar=print) -> dict:
         cod, origen, conf = f.get("_cod", ""), f.get("_cod_origen", ""), f.get("_cod_conf", "")
         nota = ""
         if conf != "ALTA":
-            if debajo and calce >= 0.6 and ub.metodo == "COORDENADAS_DEL_PLANO":
+            if debajo and calce >= 0.6:
                 coincide = cod and geo.terreno_de(cod) == debajo
                 if not coincide:
                     cod = debajo

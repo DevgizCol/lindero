@@ -538,7 +538,8 @@ def descargar(pid):
         abort(403)
     ruta = os.path.join(_dir(pid), "final", "PLANOS_" + pid[:8] + ".zip")
     if not os.path.isfile(ruta):
-        abort(404)
+        encolar(pid, "final")
+        return redirect(url_for("ver_pedido", pid=pid), code=303)
     return send_file(ruta, as_attachment=True, download_name=f"planos_{pid[:8]}.zip")
 
 
@@ -666,7 +667,11 @@ def admin_accion(pid, accion):
     if accion == "pagado":
         marcar_pagado(pid, "manual", request.form.get("referencia", "")[:80])
     elif accion == "aprobar" and p["estado"] == "EN_REVISION" and p.get("pagado"):
-        actualizar(pid, estado="LISTO", mensaje="")
+        ruta_zip = os.path.join(_dir(pid), "final", "PLANOS_" + pid[:8] + ".zip")
+        if not os.path.isfile(ruta_zip):
+            encolar(pid, "final")
+        else:
+            actualizar(pid, estado="LISTO", mensaje="")
     elif accion == "regenerar" and p.get("pagado"):
         encolar(pid, "final")
     elif accion == "previa":
@@ -679,7 +684,7 @@ def admin_accion(pid, accion):
 @app.get("/admin/pedidos/<pid>/archivo/<nombre>")
 def admin_archivo(pid, nombre):
     if not _es_admin():
-        abort(403)
+        return redirect(url_for("admin_entrar"))
     permitidos = {
         "informe_previa.xlsx": ("previa", "INFORME_REVISION.xlsx"), "informe_final.xlsx": ("final", "INFORME_REVISION.xlsx"),
         "vista_previa.png": ("previa", "vista_general.png"), "vista_final.png": ("final", "vista_general.png"),
