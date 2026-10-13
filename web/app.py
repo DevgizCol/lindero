@@ -467,6 +467,11 @@ def inicio():
     return render_template("inicio.html", errores=[], datos={})
 
 
+@app.get("/privacidad")
+def privacidad():
+    return render_template("privacidad.html")
+
+
 @app.post("/pedidos")
 def crear_pedido():
     _exigir_csrf()

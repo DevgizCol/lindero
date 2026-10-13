@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block titulo %}Política de Privacidad y Tratamiento de Datos · {{ CFG.nombre_servicio }}{% endblock %}
+{% block nav %}
+<a href="{{ url_for('inicio') }}">Inicio</a>
+<a class="btn btn-p btn-ch" href="{{ url_for('inicio') }}#pedido">Empezar gratis</a>
+{% endblock %}
+{% block cuerpo %}
+<section class="sec">
+  <div class="cont" style="max-width:860px">
+    <div class="sec-cab" style="margin-bottom:32px">
+      <span class="ceja">Seguridad y Marco Legal</span>
+      <h1>Política de Privacidad y Protección de Datos</h1>
+      <p class="bajada">Cumplimiento riguroso de la Ley Estatutaria 1581 de 2012 y el Decreto 1377 de 2013 de la República de Colombia (Habeas Data).</p>
+    </div>
+
+    <div style="background:var(--sup);border:1px solid var(--linea);border-radius:var(--r);padding:32px;line-height:1.7;color:#cbd5e1;display:flex;flex-direction:column;gap:20px">
+      <div>
+        <h3 style="color:#fff;margin-bottom:8px">1. Responsable del Tratamiento</h3>
+        <p><strong>DevGiz Engineering</strong> opera la plataforma <strong>Lindero PRO</strong> (sitio web: <a href="https://lindero.onrender.com">lindero.onrender.com</a>) como una herramienta de inteligencia y automatización cartográfica para ingenieros, topógrafos y profesionales del territorio. Contacto de privacidad: <code>agaviria2109@gmail.com</code>.</p>
+      </div>
+
+      <div>
+        <h3 style="color:#fff;margin-bottom:8px">2. Datos Recolectados y Finalidad</h3>
+        <p>La plataforma recopila únicamente los datos necesarios para la prestación del servicio técnico contratado:</p>
+        <ul style="padding-left:20px;display:flex;flex-direction:column;gap:6px">
+          <li><strong>Datos de contacto:</strong> Correo electrónico y número de teléfono (para envío seguro de enlaces de descarga y comprobantes de facturación).</li>
+          <li><strong>Información técnica del levantamiento:</strong> Archivos DXF, carteras de coordenadas (TXT/CSV) y tablas Excel con linderos para proyectar en el sistema MAGNA-SIRGAS Origen Nacional (CTM12).</li>
+          <li><strong>Datos de firma profesional:</strong> Nombre y matrícula profesional CPNT aportados voluntariamente para rotular los cajetines de entrega oficial.</li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 style="color:#fff;margin-bottom:8px">3. Reserva y Confidencialidad de la Información</h3>
+        <p>Los archivos y coordenadas subidos son de uso estrictamente confidencial. No se comparten, venden ni publican a terceros. Cada pedido cuenta con un identificador criptográfico único e intransferible al que solo tiene acceso el titular que solicitó el procesamiento.</p>
+      </div>
+
+      <div>
+        <h3 style="color:#fff;margin-bottom:8px">4. Pasarelas de Pago Seguras</h3>
+        <p>Las transacciones financieras son procesadas mediante canales cifrados por proveedores certificados (Wompi Colombia). Lindero PRO no almacena números de tarjetas de crédito ni claves bancarias.</p>
+      </div>
+
+      <div>
+        <h3 style="color:#fff;margin-bottom:8px">5. Derechos del Titular (Habeas Data)</h3>
+        <p>Usted tiene derecho a conocer, actualizar, rectificar o solicitar la supresión de sus datos personales de nuestros registros en cualquier momento escribiendo a <code>agaviria2109@gmail.com</code>.</p>
+      </div>
+    </div>
+
+    <div style="margin-top:24px;text-align:center">
+      <a class="btn btn-s" href="{{ url_for('inicio') }}">← Volver al Inicio</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
