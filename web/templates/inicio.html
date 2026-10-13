@@ -537,37 +537,62 @@
 
 <!-- ── PREGUNTAS FRECUENTES (FAQ) SIN REDUNDANCIAS ── -->
 <section class="sec fondo-2 borde-sup" id="preguntas">
-  <div class="cont dos" style="align-items:start">
-    <div class="sec-cab" data-ver style="margin:0">
+  <div class="cont">
+    <div class="sec-cab text-center" data-ver>
       <span class="ceja">Resolución de Dudas</span>
       <h2>Todo claro antes de subir tu primer archivo.</h2>
       <p class="bajada">Respuestas directas sin tecnicismos confusos para que trabajes con total confianza.</p>
     </div>
-    <div class="preguntas" data-ver>
-      <details open>
-        <summary>¿Puedo revisar el resultado antes de pagar?</summary>
-        <p>Sí, 100% garantizado. Al subir tus archivos, el sistema genera inmediatamente el mapa interactivo con todos tus predios georreferenciados sobre la ortofoto satelital y te muestra dos certificados de plano completos con marca de agua. Si algo no te convence, no pagas un solo peso.</p>
-      </details>
-      <details>
-        <summary>¿Qué pasa si mi plano no tiene coordenadas reales o viene en Bogotá Este?</summary>
-        <p>Si el Excel contiene la dirección o el código predial, el motor cruza las placas domiciliarias y ubica los lotes en su posición oficial en CTM12. Si el plano viene en coordenadas antiguas (Bogotá Este), el sistema realiza la conversión automática al nuevo marco MAGNA-SIRGAS 2018 Origen Nacional.</p>
-      </details>
-      <details>
-        <summary>¿Y si no tengo el código predial de los lotes?</summary>
-        <p>No te preocupes: el motor busca automáticamente por la dirección y cruza las bases catastrales municipales. Además, corrobora la posición con el predio oficial que queda exactamente debajo de cada polígono en el levantamiento.</p>
-      </details>
-      <details>
-        <summary>¿Quién firma y responde por los planos emitidos?</summary>
-        <p>El profesional que tú indiques. Lindero PRO es una herramienta de automatización para topógrafos e ingenieros; el plano predial sale con el nombre, matrícula y firma de tu profesional responsable bajo normativa CPNT.</p>
-      </details>
-      <details>
-        <summary>¿Qué archivos descargo una vez confirmado el pago?</summary>
-        <p>Descargas un archivo ZIP con 3 carpetas organizadas: <b>01.SHAPEFILE/</b> (con los 25 atributos LEVANTAMIENTO_01, cotas y vértices), <b>02.PDF/</b> (un PDF por predio con cuadro oficial de linderos y colindantes listo para radicar), y un archivo <b>INFORME_REVISION.xlsx</b> con el resumen de áreas.</p>
-      </details>
-      <details>
-        <summary>¿Qué métodos de pago aceptan?</summary>
-        <p>{% if wompi %}Aceptamos PSE, Nequi, Daviplata y tarjetas a través de Wompi. La descarga se libera inmediatamente tras la confirmación.{% else %}{{ CFG.pago_manual }}{% endif %}</p>
-      </details>
+    <div class="preguntas-grid" data-ver>
+      <div class="preguntas-col">
+        <details open>
+          <summary>¿Puedo revisar el resultado antes de pagar?</summary>
+          <p>Sí, 100% garantizado. Al subir tus archivos, el sistema genera inmediatamente el mapa interactivo con todos tus predios georreferenciados sobre la ortofoto satelital y te muestra certificados de plano completos con marca de agua. Si algo no te convence, no pagas un solo peso.</p>
+        </details>
+        <details>
+          <summary>¿Qué pasa si mi plano no tiene coordenadas reales o viene en Bogotá Este?</summary>
+          <p>Si el Excel contiene la dirección o el código predial, el motor cruza las placas domiciliarias y ubica los lotes en su posición oficial en CTM12. Si el plano viene en coordenadas antiguas (Bogotá Este), el sistema realiza la conversión automática al nuevo marco MAGNA-SIRGAS 2018 Origen Nacional.</p>
+        </details>
+        <details>
+          <summary>¿Y si no tengo el código predial de los lotes?</summary>
+          <p>No te preocupes: el motor busca automáticamente por la dirección y cruza las bases catastrales municipales. Además, corrobora la posición con el predio oficial que queda exactamente debajo de cada polígono en el levantamiento.</p>
+        </details>
+      </div>
+      <div class="preguntas-col">
+        <details>
+          <summary>¿Quién firma y responde por los planos emitidos?</summary>
+          <p>El profesional que tú indiques. Lindero PRO es una herramienta de automatización para topógrafos e ingenieros; el plano predial sale con el nombre, matrícula y firma de tu profesional responsable bajo normativa CPNT.</p>
+        </details>
+        <details>
+          <summary>¿Qué archivos descargo una vez confirmado el pago?</summary>
+          <p>Descargas un archivo ZIP con 3 carpetas organizadas: <b>01.SHAPEFILE/</b> (con los 25 atributos LEVANTAMIENTO_01, cotas y vértices), <b>02.PDF/</b> (un PDF por predio con cuadro oficial de linderos y colindantes listo para radicar), y un archivo <b>INFORME_REVISION.xlsx</b> con el resumen de áreas.</p>
+        </details>
+        <details>
+          <summary>¿Qué métodos de pago aceptan?</summary>
+          <p>{% if wompi %}Aceptamos PSE, Nequi, Daviplata y tarjetas débito/crédito a través de Wompi. La descarga permanente y el comprobante digital se envían inmediatamente.{% else %}{{ CFG.pago_manual }}{% endif %}</p>
+        </details>
+      </div>
+    </div>
+
+    <!-- Soporte y Asistencia Directa de Ingeniería -->
+    <div class="faq-soporte-banner" data-ver>
+      <div class="faq-soporte-info">
+        <div class="faq-soporte-icono">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;color:var(--cian);"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        </div>
+        <div>
+          <h3 class="faq-soporte-tit">¿Tienes un caso particular o dudas con tu levantamiento?</h3>
+          <p class="faq-soporte-desc">Revisamos tu archivo DXF o coordenadas sin costo antes de que hagas el pedido. Asesoría directa de ingenieros.</p>
+        </div>
+      </div>
+      <div class="faq-soporte-acciones">
+        <a class="btn btn-s btn-sm" href="https://wa.me/573106514707?text=Hola%20Lindero%20PRO,%20tengo%20una%20consulta%20t%C3%A9cnica%20sobre%20un%20plano" target="_blank" rel="noopener">
+          💬 WhatsApp Directo
+        </a>
+        <a class="btn btn-t btn-sm" href="mailto:soporte@devgiz.com?subject=Consulta%20T%C3%A9cnica%20Lindero%20PRO">
+          soporte@devgiz.com
+        </a>
+      </div>
     </div>
   </div>
 </section>

@@ -146,7 +146,13 @@ def enviar_correo_entrega(datos: dict) -> bool:
     resend_key = os.environ.get("RESEND_API_KEY", "").strip()
     if resend_key:
         try:
-            remitente_resend = os.environ.get("RESEND_FROM", "onboarding@resend.dev") if "devgiz.com" in remitente and not os.environ.get("RESEND_DOMAIN_VERIFIED") else remitente
+            remitente_resend = os.environ.get("RESEND_FROM", "").strip()
+            if not remitente_resend:
+                if os.environ.get("RESEND_DOMAIN_VERIFIED") == "1":
+                    remitente_resend = remitente
+                else:
+                    remitente_resend = "Lindero PRO <onboarding@resend.dev>"
+
             payload = json.dumps({
                 "from": remitente_resend,
                 "to": [destinatario],
@@ -166,6 +172,9 @@ def enviar_correo_entrega(datos: dict) -> bool:
                 if resp.status in (200, 201):
                     logger.info("Correo enviado exitosamente vía Resend a %s", destinatario)
                     return True
+        except urllib.error.HTTPError as he:
+            cuerpo_err = he.read().decode("utf-8", errors="replace")
+            logger.warning("Resend devolvió HTTP %s: %s", he.code, cuerpo_err)
         except Exception as e:
             logger.error("Error enviando por Resend: %s", e)
 

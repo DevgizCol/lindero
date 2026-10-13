@@ -940,19 +940,47 @@ h3 { font-size: 1.05rem; }
 }
 .pie-dato-mini svg { width: 14px; height: 14px; color: var(--cian); flex-shrink: 0; }
 
-/* ── Preguntas Frecuentes (FAQ) Acordeón ── */
-.preguntas { display: grid; gap: 8px; }
+/* ── Preguntas Frecuentes (FAQ) Acordeón Equilibrado ── */
+.preguntas-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+@media (max-width: 860px) {
+  .preguntas-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+.preguntas-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.preguntas-col details,
 .preguntas details {
   background: var(--sup);
   border: 1px solid var(--linea);
   border-radius: var(--r-s);
-  padding: 12px 16px;
-  transition: border-color .2s;
+  padding: 13px 18px;
+  transition: all 0.25s ease;
 }
-.preguntas details[open] { border-color: var(--linea-2); background: var(--sup-2); }
+.preguntas-col details:hover,
+.preguntas details:hover {
+  border-color: rgba(0, 240, 255, 0.28);
+  background: rgba(255, 255, 255, 0.02);
+}
+.preguntas-col details[open],
+.preguntas details[open] {
+  border-color: rgba(0, 240, 255, 0.5);
+  background: #0b1328;
+  box-shadow: 0 4px 20px rgba(0, 240, 255, 0.06);
+}
+.preguntas-col summary,
 .preguntas summary {
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   color: #fff;
   cursor: pointer;
   outline: none;
@@ -960,17 +988,78 @@ h3 { font-size: 1.05rem; }
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
+  user-select: none;
 }
+.preguntas-col summary::-webkit-details-marker,
 .preguntas summary::-webkit-details-marker { display: none; }
+.preguntas-col summary::after,
 .preguntas summary::after {
   content: "+";
   font-family: var(--f-mono);
   font-size: 1.15rem;
   color: var(--cian);
   transition: transform .2s;
+  flex-shrink: 0;
 }
+.preguntas-col details[open] summary::after,
 .preguntas details[open] summary::after { content: "−"; }
-.preguntas p { margin: 8px 0 0; color: var(--txt-2); font-size: 0.85rem; line-height: 1.5; }
+.preguntas-col p,
+.preguntas p {
+  margin: 10px 0 2px;
+  color: var(--txt-2);
+  font-size: 0.84rem;
+  line-height: 1.55;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 8px;
+}
+
+/* Banner de Asistencia Directa de Ingeniería */
+.faq-soporte-banner {
+  background: linear-gradient(135deg, rgba(11, 19, 41, 0.95) 0%, rgba(6, 11, 25, 0.98) 100%);
+  border: 1px solid rgba(0, 240, 255, 0.22);
+  border-radius: var(--r-m);
+  padding: 16px 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+  margin-top: 8px;
+}
+.faq-soporte-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.faq-soporte-icono {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(0, 240, 255, 0.1);
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.faq-soporte-tit {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #fff;
+}
+.faq-soporte-desc {
+  margin: 3px 0 0;
+  font-size: 0.78rem;
+  color: var(--txt-2);
+}
+.faq-soporte-acciones {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
 
 /* ── Footer DevGiz Oficial ── */
 .pie-devgiz {
