@@ -1,32 +1,32 @@
-# Lindero: plataforma web + motor, sin QGIS.
-# Las ruedas de pyogrio, shapely y pyproj ya traen GDAL, GEOS y PROJ: no hace falta instalar nada del sistema.
-#
-#   python -m motor.empacar_base malambo        (una vez, en el equipo que tiene la geodatabase)
-#   docker build -t lindero .
-#   docker run -p 8080:8080 -v lindero_datos:/datos -e PLANOS_ADMIN_CLAVE=... -e PLANOS_SECRETO=... lindero
+# Lindero: plataforma web + motor cartografico y planimetria predial.
+# Compatible con Hugging Face Spaces (0$ / 16GB RAM), Render, y contenedores Docker.
 FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     MPLBACKEND=Agg \
     MPLCONFIGDIR=/tmp/matplotlib \
-    PLANOS_DATOS=/datos
+    PLANOS_DATOS=/datos \
+    PORT=7860 \
+    PLANOS_MODO=peticion
 
 WORKDIR /app
+
+# Instalar dependencias
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copiar modulos del proyecto
 COPY motor ./motor
 COPY web ./web
 COPY config ./config
 COPY base ./base
 
-# Sin usuario propio: el bucket montado en /datos pertenece a root y un usuario distinto no podría escribir en él.
-RUN mkdir -p /datos
-VOLUME /datos
-EXPOSE 8080
+# Permisos para el almacenamiento de pedidos y cache
+RUN mkdir -p /datos /tmp/matplotlib && chmod -R 777 /datos /tmp/matplotlib
 
-# Un solo proceso. El pedido se procesa dentro de la petición que lanza su página (PLANOS_MODO=peticion),
-# que es lo que necesitan Cloud Run y similares; el tiempo de espera cubre el trabajo más largo.
-ENV PLANOS_MODO=peticion
-CMD exec gunicorn --bind 0.0.0.0:${PORT:-8080} --workers 1 --threads 8 --timeout 900 web.app:app
+VOLUME /datos
+EXPOSE 7860
+
+# Iniciar servidor Gunicorn en el puerto asignado (7860 por defecto en Hugging Face Spaces)
+CMD exec gunicorn --bind 0.0.0.0:${PORT:-7860} --workers 1 --threads 8 --timeout 900 web.app:app

@@ -75,23 +75,36 @@ def _secreto():
         return f.read().strip()
 
 
+from werkzeug.middleware.proxy_fix import ProxyFix
+
 app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 app.secret_key = _secreto()
 app.config.update(
     MAX_CONTENT_LENGTH=int(CFG.get("max_mb_pedido", CFG["max_mb_por_archivo"] * 5)) * 1024 * 1024,
     SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE="Lax",
-    SESSION_COOKIE_SECURE=os.environ.get("PLANOS_HTTPS") == "1",
+    SESSION_COOKIE_SECURE=os.environ.get("PLANOS_HTTPS") == "1" or bool(os.environ.get("SPACE_ID")),
 )
 
 
 @app.after_request
 def _cabeceras(resp):
     resp.headers.setdefault("X-Content-Type-Options", "nosniff")
-    resp.headers.setdefault("X-Frame-Options", "DENY")
     resp.headers.setdefault("Referrer-Policy", "same-origin")
-    resp.headers.setdefault("Content-Security-Policy",
-                            "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; "
-                            "form-action 'self' https://checkout.wompi.co; frame-ancestors 'none'")
+    
+    # Hugging Face Spaces o modo embebido
+    if os.environ.get("SPACE_ID") or os.environ.get("PERMITIR_IFRAME") == "1":
+        resp.headers["Content-Security-Policy"] = (
+            "default-src 'self' 'unsafe-inline' https://huggingface.co https://*.hf.space; "
+            "style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; "
+            "form-action 'self' https://checkout.wompi.co; "
+            "frame-ancestors 'self' https://huggingface.co https://*.hf.space"
+        )
+    else:
+        resp.headers.setdefault("X-Frame-Options", "DENY")
+        resp.headers.setdefault("Content-Security-Policy",
+                                "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; "
+                                "form-action 'self' https://checkout.wompi.co; frame-ancestors 'none'")
     if request.path.startswith(("/pedidos/", "/admin")):
         resp.headers["Cache-Control"] = "no-store"
     return resp

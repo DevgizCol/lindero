@@ -1,3 +1,13 @@
+---
+title: Lindero - Planos Prediales y SIG Catastral
+emoji: 🗺️
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # Lindero
 
 Certificados de plano predial catastral en minutos. A partir del Excel de los predios y el plano del
