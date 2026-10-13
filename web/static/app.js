@@ -99,22 +99,82 @@
 
   /* zonas para soltar archivos */
   var legible = function (b) { return b > 1048576 ? (b / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(b / 1024)) + " KB"; };
+  
+  // Evita que soltar un archivo por fuera de la caja abra el archivo en una pestaña y borre el formulario
+  window.addEventListener("dragover", function (e) { e.preventDefault(); }, false);
+  window.addEventListener("drop", function (e) { e.preventDefault(); }, false);
+
   d.querySelectorAll(".soltar").forEach(function (zona) {
     var entrada = zona.querySelector("input[type=file]"), titulo = zona.querySelector("b"), detalle = zona.querySelector("small"),
-      accion = zona.querySelector(".accion"), t0 = titulo.textContent, d0 = detalle.textContent;
+      accion = zona.querySelector(".accion"), t0 = titulo ? titulo.textContent : "", d0 = detalle ? detalle.textContent : "";
+    
     var pintar = function () {
+      if (!entrada) return;
       var fs = entrada.files;
-      if (!fs || !fs.length) { zona.classList.remove("lleno"); titulo.textContent = t0; detalle.textContent = d0; accion.textContent = "Elegir"; return; }
+      if (!fs || !fs.length) {
+        zona.classList.remove("lleno");
+        if (titulo) titulo.textContent = t0;
+        if (detalle) detalle.textContent = d0;
+        if (accion) accion.textContent = "Elegir";
+        return;
+      }
       var peso = 0;
       for (var i = 0; i < fs.length; i++) peso += fs[i].size;
       zona.classList.add("lleno");
-      titulo.textContent = fs.length === 1 ? fs[0].name : fs.length + " archivos";
-      detalle.textContent = legible(peso) + " · listo";
-      accion.textContent = "Cambiar";
+      zona.classList.remove("error-falta");
+      if (titulo) titulo.textContent = fs.length === 1 ? fs[0].name : fs.length + " archivos seleccionados";
+      if (detalle) detalle.textContent = legible(peso) + " · Listo para procesar";
+      if (accion) accion.textContent = "Cambiar";
     };
-    entrada.addEventListener("change", pintar);
-    ["dragenter", "dragover"].forEach(function (ev) { zona.addEventListener(ev, function () { zona.classList.add("sobre"); }); });
-    ["dragleave", "drop"].forEach(function (ev) { zona.addEventListener(ev, function () { zona.classList.remove("sobre"); }); });
+
+    if (entrada) {
+      entrada.addEventListener("change", pintar);
+    }
+
+    // Accesibilidad por teclado: Enter o Espacio abre selector de archivos
+    zona.setAttribute("tabindex", "0");
+    zona.addEventListener("keydown", function (e) {
+      if ((e.key === "Enter" || e.key === " ") && entrada) {
+        e.preventDefault();
+        entrada.click();
+      }
+    });
+    
+    // Soporte Drag and Drop completo con prevención de apertura de pestaña
+    ["dragenter", "dragover"].forEach(function (ev) {
+      zona.addEventListener(ev, function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        zona.classList.add("sobre");
+      });
+    });
+    ["dragleave"].forEach(function (ev) {
+      zona.addEventListener(ev, function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!zona.contains(e.relatedTarget)) {
+          zona.classList.remove("sobre");
+        }
+      });
+    });
+    zona.addEventListener("drop", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      zona.classList.remove("sobre");
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length && entrada) {
+        try {
+          entrada.files = e.dataTransfer.files;
+        } catch (err) {
+          try {
+            var dt = new DataTransfer();
+            for (var fi = 0; fi < e.dataTransfer.files.length; fi++) dt.items.add(e.dataTransfer.files[fi]);
+            entrada.files = dt.files;
+          } catch (e2) {}
+        }
+        pintar();
+        try { entrada.dispatchEvent(new Event("change", { bubbles: true })); } catch (e3) {}
+      }
+    });
     pintar();
   });
 
@@ -139,7 +199,17 @@
     var valido = function (i) {
       var campos = pasos[i].querySelectorAll("input, select, textarea");
       for (var k = 0; k < campos.length; k++) {
-        if (!campos[k].checkValidity()) { campos[k].reportValidity(); return false; }
+        var c = campos[k];
+        if (!c.checkValidity()) {
+          var z = c.closest(".soltar");
+          if (z) {
+            z.classList.add("error-falta");
+            z.scrollIntoView({ behavior: "smooth", block: "center" });
+            setTimeout(function () { z.classList.remove("error-falta"); }, 2800);
+          }
+          try { c.reportValidity(); } catch (e) {}
+          return false;
+        }
       }
       return true;
     };
@@ -189,7 +259,11 @@
         frases[turno].hidden = true;
         turno = (turno + 1) % frases.length;
         frases[turno].hidden = false;
-      }, 3  /* ── Visor Satelital Interactivo Real (Leaflet + Ortofoto Esri + Predios El Tesoro, Malambo) ── */
+      }, 3600);
+    }
+  }
+
+  /* ── Visor Satelital Interactivo Real (Leaflet + Ortofoto Esri + Predios El Tesoro, Malambo) ── */
   var elMapa = d.getElementById("mapa-hero");
   if (elMapa && typeof L !== "undefined") {
     try {
