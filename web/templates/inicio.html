@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% block nav %}
-  <a href="#como">Cómo funciona</a>
-  <a href="#entrega">Qué recibes</a>
-  <a href="#por-dentro">Garantía técnica</a>
-  <a href="#precio">Precios</a>
-  <a href="#preguntas">Preguntas</a>
-  <a class="btn btn-p btn-ch" href="#pedido">Empezar gratis</a>
+<a href="#como">Cómo funciona</a>
+<a href="#entrega">Qué recibes</a>
+<a href="#por-dentro">Garantía técnica</a>
+<a href="#precio">Precios</a>
+<a href="#preguntas">Preguntas</a>
+<a class="btn btn-p btn-ch" href="#pedido">Empezar gratis</a>
 {% endblock %}
 {% block cuerpo %}
 
@@ -15,15 +15,25 @@
     <div class="portada-txt">
       <span class="ceja">Automatización Cartográfica · {{ CFG.municipios.values()|list|first }}</span>
       <h1>Del levantamiento al <span class="degradado">plano certificado</span>, en 38 segundos.</h1>
-      <p class="bajada">Sube tu Excel y tu archivo DXF. <strong>Lindero PRO</strong> proyecta cada predio sobre la base catastral oficial del IGAC en CTM12, calcula linderos y colindantes automáticamente, y te muestra la <strong>vista previa satelital gratis</strong> antes de pagar un solo peso.</p>
+      <p class="bajada">Sube tu Excel y tu archivo DXF. <strong>Lindero PRO</strong> proyecta cada predio sobre la base
+        catastral oficial del IGAC en CTM12, calcula linderos y colindantes automáticamente, y te muestra la
+        <strong>vista previa satelital gratis</strong> antes de pagar un solo peso.</p>
       <div class="acciones">
-        <a class="btn btn-p btn-xl" href="#pedido">Ver mi vista previa gratis <svg aria-hidden="true"><use href="#i-flecha"/></svg></a>
+        <a class="btn btn-p btn-xl" href="#pedido">Ver mi vista previa gratis <svg aria-hidden="true">
+            <use href="#i-flecha" />
+          </svg></a>
         <a class="btn btn-s btn-xl" href="#como">Cómo funciona</a>
       </div>
       <ul class="garantias">
-        <li><svg aria-hidden="true"><use href="#i-ok"/></svg>Sin registro ni tarjeta previa</li>
-        <li><svg aria-hidden="true"><use href="#i-ok"/></svg>Vista previa satelital 100% gratis</li>
-        <li><svg aria-hidden="true"><use href="#i-ok"/></svg>Solo $4.000 COP / predio</li>
+        <li><svg aria-hidden="true">
+            <use href="#i-ok" />
+          </svg>Sin registro ni tarjeta previa</li>
+        <li><svg aria-hidden="true">
+            <use href="#i-ok" />
+          </svg>Vista previa satelital 100% gratis</li>
+        <li><svg aria-hidden="true">
+            <use href="#i-ok" />
+          </svg>Solo $4.000 COP / predio</li>
       </ul>
     </div>
 
@@ -36,21 +46,28 @@
           <span class="chip-ctm12">MAGNA-SIRGAS · CTM12</span>
         </div>
         <div class="visor-controles-topografo">
-          <button type="button" class="btn-visor-modo activo" id="btn-enfocar-lotes" title="Enfocar directamente en los Lotes Continuos T1 y T2">🎯 Enfocar Lotes T1-T2</button>
-          <button type="button" class="btn-visor-modo" id="btn-enfocar-manzana" title="Ver la Manzana Catastral 231 completa con sus vías y linderos">📐 Manzana 231</button>
+          <button type="button" class="btn-visor-modo activo" id="btn-enfocar-lotes"
+            title="Enfocar directamente en los Lotes Continuos T1 y T2">🎯 Enfocar Lotes T1-T2</button>
+          <button type="button" class="btn-visor-modo" id="btn-enfocar-manzana"
+            title="Ver la Manzana Catastral 231 completa con sus vías y linderos">📐 Manzana 231</button>
         </div>
       </div>
 
       <!-- Barra de conmutación de capas topográficas y base catastral -->
       <div class="visor-capas-subbar">
         <div class="visor-capas-toggles">
-          <label class="toggle-capa"><input type="checkbox" id="chk-capa-satelite" checked> <span>🛰️ Ortofoto HD</span></label>
-          <label class="toggle-capa"><input type="checkbox" id="chk-capa-terrenos" checked> <span>🏠 Lotes Catastrales</span></label>
+          <label class="toggle-capa"><input type="checkbox" id="chk-capa-satelite" checked> <span>🛰️ Ortofoto
+              HD</span></label>
+          <label class="toggle-capa"><input type="checkbox" id="chk-capa-terrenos" checked> <span>🏠 Lotes
+              Catastrales</span></label>
           <label class="toggle-capa"><input type="checkbox" id="chk-capa-vias" checked> <span>🛣️ Vías</span></label>
-          <label class="toggle-capa"><input type="checkbox" id="chk-capa-placas" checked> <span>🏷️ Placas</span></label>
+          <label class="toggle-capa"><input type="checkbox" id="chk-capa-placas" checked> <span>🏷️
+              Placas</span></label>
           <label class="toggle-capa"><input type="checkbox" id="chk-capa-cotas" checked> <span>📏 Cotas</span></label>
-          <label class="toggle-capa"><input type="checkbox" id="chk-capa-vertices" checked> <span>📍 Vértices</span></label>
-          <label class="toggle-capa"><input type="checkbox" id="chk-capa-deslinde" checked> <span>📐 Deslinde</span></label>
+          <label class="toggle-capa"><input type="checkbox" id="chk-capa-vertices" checked> <span>📍
+              Vértices</span></label>
+          <label class="toggle-capa"><input type="checkbox" id="chk-capa-deslinde" checked> <span>📐
+              Deslinde</span></label>
         </div>
         <div class="visor-meta-municipio">Mz 231 · Malambo (Atlántico)</div>
       </div>
@@ -83,7 +100,8 @@
       </details>
 
       <div class="visor-pie-datos">
-        <div class="item-tramo"><span>Levantamiento:</span> <b id="pie-levantamiento-txt">Lotes Continuos T1 + T2 (561.70 m²) · Mz 231</b></div>
+        <div class="item-tramo"><span>Levantamiento:</span> <b id="pie-levantamiento-txt">Lotes Continuos T1 + T2
+            (561.70 m²) · Mz 231</b></div>
         <div class="item-tramo"><span>Precisión:</span> <b class="text-cyan">± 0.05 m (CTM12)</b></div>
         <div class="item-tramo"><span>Base Oficial:</span> <b class="text-verde">IGAC Catastro Malambo</b></div>
       </div>
@@ -125,28 +143,32 @@
     <div class="sec-cab" data-ver>
       <span class="ceja">Flujo Transparente</span>
       <h2>Tres pasos simples. Cero riesgo: revisas antes de pagar.</h2>
-      <p class="bajada">Diseñado para topógrafos e ingenieros que necesitan entregar rápido y sin contratiempos legales.</p>
+      <p class="bajada">Diseñado para topógrafos e ingenieros que necesitan entregar rápido y sin contratiempos legales.
+      </p>
     </div>
     <ol class="pasos">
       <li data-ver>
         <div class="paso-num">01</div>
         <small>2 minutos · Sin registro</small>
         <h3>Sube tus archivos de campo</h3>
-        <p>Carga tu archivo Excel con las columnas NODO y dirección, y tu plano en AutoCAD guardado como DXF 2018. El sistema valida la geometría al instante.</p>
+        <p>Carga tu archivo Excel con las columnas NODO y dirección, y tu plano en AutoCAD guardado como DXF 2018. El
+          sistema valida la geometría al instante.</p>
         <span class="paso-check">✓ Validación geométrica inmediata</span>
       </li>
       <li data-ver style="--d:120ms">
         <div class="paso-num">02</div>
         <small>100% Gratis · Cero riesgo</small>
         <h3>Inspecciona tu vista previa</h3>
-        <p>Observa todos tus predios georreferenciados en el visor satelital interactivo y abre dos planos prediales de muestra completos para verificar colindantes y coordenadas.</p>
+        <p>Observa todos tus predios georreferenciados en el visor satelital interactivo y abre dos planos prediales de
+          muestra completos para verificar colindantes y coordenadas.</p>
         <span class="paso-check">✓ Muestras completas con marca de agua</span>
       </li>
       <li data-ver style="--d:240ms">
         <div class="paso-num">03</div>
         <small>Descarga Inmediata</small>
         <h3>Descarga tu paquete certificado</h3>
-        <p>Realiza el pago protegido y desbloquea de inmediato tu archivo ZIP oficial con carpetas ordenadas: PDFs listos para radicar, Shapefiles con 25 atributos IGAC y DXF en CTM12.</p>
+        <p>Realiza el pago protegido y desbloquea de inmediato tu archivo ZIP oficial con carpetas ordenadas: PDFs
+          listos para radicar, Shapefiles con 25 atributos IGAC y DXF en CTM12.</p>
         <span class="paso-check">✓ Entrega oficial lista para Curaduría</span>
       </li>
     </ol>
@@ -163,92 +185,134 @@
       </div>
       <div class="hoja" aria-hidden="true">
         <svg viewBox="0 0 700 495" role="presentation" font-family="Arial, sans-serif">
-          <rect width="700" height="495" fill="#fff"/>
-          <rect x="5" y="5" width="690" height="485" fill="none" stroke="#111" stroke-width="1.200"/>
-          <text x="350" y="19" text-anchor="middle" font-family="Times New Roman, serif" font-weight="700" font-size="11.500" fill="#111">CERTIFICADO PLANO PREDIAL CATASTRAL</text>
+          <rect width="700" height="495" fill="#fff" />
+          <rect x="5" y="5" width="690" height="485" fill="none" stroke="#111" stroke-width="1.200" />
+          <text x="350" y="19" text-anchor="middle" font-family="Times New Roman, serif" font-weight="700"
+            font-size="11.500" fill="#111">CERTIFICADO PLANO PREDIAL CATASTRAL</text>
           <g fill="none" stroke="#111" stroke-width=".800">
-            <rect x="9" y="29" width="394" height="86"/><path d="M9 46h394M9 64h394M9 81h280M9 98h280M67 29v86M289 46v69M333 46v69"/>
-            <rect x="416" y="29" width="272" height="86"/><path d="M416 44h272"/>
-            <rect x="9" y="127" width="679" height="268"/><rect x="16" y="134" width="662" height="254"/>
+            <rect x="9" y="29" width="394" height="86" />
+            <path d="M9 46h394M9 64h394M9 81h280M9 98h280M67 29v86M289 46v69M333 46v69" />
+            <rect x="416" y="29" width="272" height="86" />
+            <path d="M416 44h272" />
+            <rect x="9" y="127" width="679" height="268" />
+            <rect x="16" y="134" width="662" height="254" />
           </g>
           <g fill="#c9ced6">
-            <rect x="74" y="34" width="90" height="6"/><rect x="74" y="52" width="170" height="6"/><rect x="74" y="69" width="120" height="6"/><rect x="74" y="86" width="150" height="6"/><rect x="74" y="103" width="60" height="6"/>
-            <rect x="340" y="52" width="46" height="6"/><rect x="340" y="69" width="40" height="6"/><rect x="340" y="94" width="50" height="6"/>
-            <rect x="470" y="54" width="164" height="4"/><rect x="486" y="64" width="132" height="4"/><rect x="500" y="74" width="104" height="4"/><rect x="478" y="84" width="148" height="4"/><rect x="494" y="94" width="116" height="4"/>
+            <rect x="74" y="34" width="90" height="6" />
+            <rect x="74" y="52" width="170" height="6" />
+            <rect x="74" y="69" width="120" height="6" />
+            <rect x="74" y="86" width="150" height="6" />
+            <rect x="74" y="103" width="60" height="6" />
+            <rect x="340" y="52" width="46" height="6" />
+            <rect x="340" y="69" width="40" height="6" />
+            <rect x="340" y="94" width="50" height="6" />
+            <rect x="470" y="54" width="164" height="4" />
+            <rect x="486" y="64" width="132" height="4" />
+            <rect x="500" y="74" width="104" height="4" />
+            <rect x="478" y="84" width="148" height="4" />
+            <rect x="494" y="94" width="116" height="4" />
           </g>
           <g fill="#7b8491" font-size="6.500">
-            <text x="14" y="40">Departamento:</text><text x="14" y="58">N° Predial:</text><text x="14" y="75">Dirección:</text><text x="14" y="92">Ocupante:</text><text x="14" y="109">Fecha:</text>
+            <text x="14" y="40">Departamento:</text><text x="14" y="58">N° Predial:</text><text x="14"
+              y="75">Dirección:</text><text x="14" y="92">Ocupante:</text><text x="14" y="109">Fecha:</text>
             <text x="293" y="58">Área:</text><text x="293" y="75">Barrio:</text><text x="293" y="100">Zona:</text>
             <text x="552" y="39" text-anchor="middle" fill="#111">Sistema de Referencia (CTM12)</text>
           </g>
           <g fill="none" stroke="#9aa3ae" stroke-width=".700">
-            <path d="M16 190l190 44M16 162l300 70 362 82M206 234l60-100M316 232l56-98M420 256l52-122M524 280l44-146M620 302l36-168M110 388l40-178M230 388l34-150M420 388l-30-140M560 388l-24-108"/>
+            <path
+              d="M16 190l190 44M16 162l300 70 362 82M206 234l60-100M316 232l56-98M420 256l52-122M524 280l44-146M620 302l36-168M110 388l40-178M230 388l34-150M420 388l-30-140M560 388l-24-108" />
           </g>
-          <path d="M16 330L678 372" stroke="#e0457b" stroke-width=".900" fill="none"/>
-          <text x="300" y="344" font-size="8" fill="#555" transform="rotate(3.600 300 344)">CALLE 12 (VÍA PÚBLICA)</text>
-          <path d="M264 238l126 10-30 100-110-14z" fill="none" stroke="#111" stroke-width="2"/>
+          <path d="M16 330L678 372" stroke="#e0457b" stroke-width=".900" fill="none" />
+          <text x="300" y="344" font-size="8" fill="#555" transform="rotate(3.600 300 344)">CALLE 12 (VÍA
+            PÚBLICA)</text>
+          <path d="M264 238l126 10-30 100-110-14z" fill="none" stroke="#111" stroke-width="2" />
           <g stroke="#e11" stroke-width="1.300">
-            <path d="M260 234l8 8m0-8l-8 8M386 244l8 8m0-8l-8 8M356 344l8 8m0-8l-8 8M246 330l8 8m0-8l-8 8"/>
+            <path d="M260 234l8 8m0-8l-8 8M386 244l8 8m0-8l-8 8M356 344l8 8m0-8l-8 8M246 330l8 8m0-8l-8 8" />
           </g>
           <text x="318" y="300" text-anchor="middle" font-weight="700" font-size="9" fill="#e11">Área: 201.64 m²</text>
           <g fill="none" stroke="#111" stroke-width=".800">
-            <rect x="9" y="402" width="292" height="86"/><path d="M9 414h292"/>
-            <rect x="312" y="402" width="200" height="40"/><rect x="312" y="448" width="96" height="40"/><rect x="416" y="448" width="96" height="40"/>
-            <rect x="524" y="402" width="164" height="86"/><path d="M524 414h164"/>
+            <rect x="9" y="402" width="292" height="86" />
+            <path d="M9 414h292" />
+            <rect x="312" y="402" width="200" height="40" />
+            <rect x="312" y="448" width="96" height="40" />
+            <rect x="416" y="448" width="96" height="40" />
+            <rect x="524" y="402" width="164" height="86" />
+            <path d="M524 414h164" />
           </g>
-          <rect x="16" y="420" width="270" height="9" fill="#a8f0d4" stroke="#111" stroke-width=".500"/>
-          <g fill="#e3e6ea"><rect x="16" y="438" width="270" height="8"/><rect x="16" y="456" width="270" height="8"/></g>
+          <rect x="16" y="420" width="270" height="9" fill="#a8f0d4" stroke="#111" stroke-width=".500" />
+          <g fill="#e3e6ea">
+            <rect x="16" y="438" width="270" height="8" />
+            <rect x="16" y="456" width="270" height="8" />
+          </g>
           <g font-size="6.500" fill="#111" text-anchor="middle">
             <text x="155" y="411">Cuadro Oficial de Coordenadas y Linderos</text>
             <text x="412" y="411">Convenciones Catastrales</text>
             <text x="606" y="411">Firma Autorizada Topógrafo</text>
             <text x="360" y="458" fill="#7b8491">Manzana</text><text x="464" y="458" fill="#7b8491">Plano N°</text>
           </g>
-          <g font-size="12" fill="#111" text-anchor="middle"><text x="360" y="478">0231</text><text x="464" y="478">N-12</text></g>
-          <path d="M566 462c8-16 12 10 20-8s8 18 16-4 10 14 22-6" fill="none" stroke="#333" stroke-width="1.100"/>
-          <path d="M560 474h92" stroke="#111" stroke-width=".600"/>
-          <rect x="574" y="424" width="64" height="4" fill="#c9ced6"/><rect x="582" y="432" width="48" height="4" fill="#c9ced6"/>
+          <g font-size="12" fill="#111" text-anchor="middle"><text x="360" y="478">0231</text><text x="464"
+              y="478">N-12</text></g>
+          <path d="M566 462c8-16 12 10 20-8s8 18 16-4 10 14 22-6" fill="none" stroke="#333" stroke-width="1.100" />
+          <path d="M560 474h92" stroke="#111" stroke-width=".600" />
+          <rect x="574" y="424" width="64" height="4" fill="#c9ced6" />
+          <rect x="582" y="432" width="48" height="4" fill="#c9ced6" />
         </svg>
       </div>
       <!-- Hotspots explicativos con neuropsicología de certidumbre -->
       <div class="hoja-hotspots">
-        <div class="hotspot-item"><span>🎯 <b>Linderos Elipsoidales:</b> Rumbos y distancias cerradas al milímetro</span></div>
-        <div class="hotspot-item"><span>🏛️ <b>Colindantes Oficiales:</b> Predio vecino, vía o lote del mismo plano</span></div>
-        <div class="hotspot-item"><span>✍️ <b>Matrícula Profesional:</b> Listo para la firma de tu topógrafo</span></div>
+        <div class="hotspot-item"><span>🎯 <b>Linderos Elipsoidales:</b> Rumbos y distancias cerradas al
+            milímetro</span></div>
+        <div class="hotspot-item"><span>🏛️ <b>Colindantes Oficiales:</b> Predio vecino, vía o lote del mismo
+            plano</span></div>
+        <div class="hotspot-item"><span>✍️ <b>Matrícula Profesional:</b> Listo para la firma de tu topógrafo</span>
+        </div>
       </div>
     </div>
 
     <div data-ver style="--d:120ms">
       <span class="ceja">Entregables Certificados</span>
       <h2 style="margin-top:14px">Todo lo que tu cliente y la entidad necesitan para radicar.</h2>
-      <p class="bajada" style="margin-bottom:24px">Sin reprocesos en AutoCAD ni horas cuadrando cuadros de rumbos a mano.</p>
+      <p class="bajada" style="margin-bottom:24px">Sin reprocesos en AutoCAD ni horas cuadrando cuadros de rumbos a
+        mano.</p>
       <ul class="lista-entregables">
         <li>
-          <div class="ico-pack"><svg aria-hidden="true"><use href="#i-ok"/></svg></div>
+          <div class="ico-pack"><svg aria-hidden="true">
+              <use href="#i-ok" />
+            </svg></div>
           <div>
             <b>PDF Individual Vectorial por Predio</b>
-            <span>Nombrado exactamente con su NODO (ej. <code>T1_PLANO.pdf</code>), formateado con cuadro de coordenadas CTM12, colindantes, manzana y espacio de firma.</span>
+            <span>Nombrado exactamente con su NODO (ej. <code>T1_PLANO.pdf</code>), formateado con cuadro de coordenadas
+              CTM12, colindantes, manzana y espacio de firma.</span>
           </div>
         </li>
         <li>
-          <div class="ico-pack"><svg aria-hidden="true"><use href="#i-ok"/></svg></div>
+          <div class="ico-pack"><svg aria-hidden="true">
+              <use href="#i-ok" />
+            </svg></div>
           <div>
             <b>Shapefiles Completos (Esquema LEVANTAMIENTO_01)</b>
-            <span>25 campos alfanuméricos estandarizados, capas de predios, cotas y vértices, listos para cargar en QGIS, ArcGIS o el visor del gestor catastral.</span>
+            <span>25 campos alfanuméricos estandarizados, capas de predios, cotas y vértices, listos para cargar en
+              QGIS, ArcGIS o el visor del gestor catastral.</span>
           </div>
         </li>
         <li>
-          <div class="ico-pack"><svg aria-hidden="true"><use href="#i-ok"/></svg></div>
+          <div class="ico-pack"><svg aria-hidden="true">
+              <use href="#i-ok" />
+            </svg></div>
           <div>
             <b>Plano CAD Georreferenciado (.DXF)</b>
-            <span>Proyectado en MAGNA-SIRGAS Origen Nacional (EPSG:9377) para abrir directamente en AutoCAD sin desplazamiento.</span>
+            <span>Proyectado en MAGNA-SIRGAS Origen Nacional (EPSG:9377) para abrir directamente en AutoCAD sin
+              desplazamiento.</span>
           </div>
         </li>
         <li>
-          <div class="ico-pack"><svg aria-hidden="true"><use href="#i-ok"/></svg></div>
+          <div class="ico-pack"><svg aria-hidden="true">
+              <use href="#i-ok" />
+            </svg></div>
           <div>
             <b>Informe de Revisión (.XLSX)</b>
-            <span>Resumen técnico con área de campo, área catastral, porcentaje de variación y código predial oficial verificado.</span>
+            <span>Resumen técnico con área de campo, área catastral, porcentaje de variación y código predial oficial
+              verificado.</span>
           </div>
         </li>
       </ul>
@@ -266,34 +330,52 @@
     </div>
     <div class="razones" data-ver>
       <article>
-        <div class="razon-ico"><svg aria-hidden="true"><use href="#i-escudo"/></svg></div>
+        <div class="razon-ico"><svg aria-hidden="true">
+            <use href="#i-escudo" />
+          </svg></div>
         <h3>Cero devoluciones en Curaduría y Catastro</h3>
-        <p>Cada distancia y área se calcula sobre el elipsoide GRS80 con el mismo rigor matemático de QGIS. Tus planos cumplen las especificaciones de entrega a la primera.</p>
+        <p>Cada distancia y área se calcula sobre el elipsoide GRS80 con el mismo rigor matemático de QGIS. Tus planos
+          cumplen las especificaciones de entrega a la primera.</p>
       </article>
       <article>
-        <div class="razon-ico"><svg aria-hidden="true"><use href="#i-pin"/></svg></div>
+        <div class="razon-ico"><svg aria-hidden="true">
+            <use href="#i-pin" />
+          </svg></div>
         <h3>Identificación automática de vecinos oficiales</h3>
-        <p>No pierdas días buscando predio por predio en geopartales caídos. El motor identifica automáticamente quién colinda a cada lado (vía, predio oficial o lote vecino).</p>
+        <p>No pierdas días buscando predio por predio en geopartales caídos. El motor identifica automáticamente quién
+          colinda a cada lado (vía, predio oficial o lote vecino).</p>
       </article>
       <article>
-        <div class="razon-ico"><svg aria-hidden="true"><use href="#i-brujula"/></svg></div>
+        <div class="razon-ico"><svg aria-hidden="true">
+            <use href="#i-brujula" />
+          </svg></div>
         <h3>Transformación automática a CTM12</h3>
-        <p>¿Tu levantamiento viene en coordenadas antiguas (Bogotá Este) o locales? El sistema lo proyecta con precisión en el nuevo estándar oficial nacional sin errores humanos.</p>
+        <p>¿Tu levantamiento viene en coordenadas antiguas (Bogotá Este) o locales? El sistema lo proyecta con precisión
+          en el nuevo estándar oficial nacional sin errores humanos.</p>
       </article>
       <article>
-        <div class="razon-ico"><svg aria-hidden="true"><use href="#i-lindero"/></svg></div>
+        <div class="razon-ico"><svg aria-hidden="true">
+            <use href="#i-lindero" />
+          </svg></div>
         <h3>Doble filtro y control de calidad</h3>
-        <p>Si algún predio presenta inconsistencias geométricas o dudas de nomenclatura, el sistema te lo advierte con total transparencia antes de que pagues.</p>
+        <p>Si algún predio presenta inconsistencias geométricas o dudas de nomenclatura, el sistema te lo advierte con
+          total transparencia antes de que pagues.</p>
       </article>
       <article>
-        <div class="razon-ico"><svg aria-hidden="true"><use href="#i-capas"/></svg></div>
+        <div class="razon-ico"><svg aria-hidden="true">
+            <use href="#i-capas" />
+          </svg></div>
         <h3>De días de trasnocho a 38 segundos</h3>
-        <p>Automatiza los cuadros de coordenadas y cajetines repetitivos. Lo que antes le tomaba horas o días a un cadista, lo resuelves en un café mientras el cliente espera.</p>
+        <p>Automatiza los cuadros de coordenadas y cajetines repetitivos. Lo que antes le tomaba horas o días a un
+          cadista, lo resuelves en un café mientras el cliente espera.</p>
       </article>
       <article>
-        <div class="razon-ico"><svg aria-hidden="true"><use href="#i-candado"/></svg></div>
+        <div class="razon-ico"><svg aria-hidden="true">
+            <use href="#i-candado" />
+          </svg></div>
         <h3>Privacidad bancaria y enlace seguro</h3>
-        <p>Tus levantamientos viven en un enlace privado único e intransferible. Cumplimiento riguroso de Habeas Data (Ley 1581) para la total reserva de tu cliente.</p>
+        <p>Tus levantamientos viven en un enlace privado único e intransferible. Cumplimiento riguroso de Habeas Data
+          (Ley 1581) para la total reserva de tu cliente.</p>
       </article>
     </div>
   </div>
@@ -305,7 +387,8 @@
     <div class="sec-cab" data-ver>
       <span class="ceja">Inversión Transparente</span>
       <h2>$4.000 COP por predio. Menos que una gaseosa, cero suscripciones.</h2>
-      <p class="bajada">Un cadista cobra entre $45.000 y $80.000 COP por plano y tarda 2 días. Con Lindero PRO pagas solo $4.000 COP y lo tienes en 38 segundos.</p>
+      <p class="bajada">Un cadista cobra entre $45.000 y $80.000 COP por plano y tarda 2 días. Con Lindero PRO pagas
+        solo $4.000 COP y lo tienes en 38 segundos.</p>
     </div>
     <div class="precio-caja" data-ver>
       <div class="precio-info">
@@ -313,9 +396,18 @@
         <div class="precio-num">$ 4.000<small>COP / predio</small></div>
         <p class="precio-desc-sub">Sin contratos, sin mensualidades. Pagas únicamente por los predios que procesas.</p>
         <ul class="lista-precios">
-          <li><svg aria-hidden="true"><use href="#i-ok"/></svg><span><b>Vista previa satelital 100% gratis:</b> Inspeccionas el mapa y muestras completas antes de desembolsar un peso.</span></li>
-          <li><svg aria-hidden="true"><use href="#i-ok"/></svg><span><b>Paquete oficial completo:</b> PDFs vectoriales con cuadros CTM12, Shapefiles (25 campos) y DXF georreferenciado.</span></li>
-          <li><svg aria-hidden="true"><use href="#i-ok"/></svg><span><b>Pedido base protegido ($16.000 COP):</b> Tarifa base para 1 a 4 predios; a partir del 5to predio, exactamente $4.000 COP cada uno.</span></li>
+          <li><svg aria-hidden="true">
+              <use href="#i-ok" />
+            </svg><span><b>Vista previa satelital 100% gratis:</b> Inspeccionas el mapa y muestras completas antes de
+              desembolsar un peso.</span></li>
+          <li><svg aria-hidden="true">
+              <use href="#i-ok" />
+            </svg><span><b>Paquete oficial completo:</b> PDFs vectoriales con cuadros CTM12, Shapefiles (25 campos) y
+              DXF georreferenciado.</span></li>
+          <li><svg aria-hidden="true">
+              <use href="#i-ok" />
+            </svg><span><b>Pedido base protegido ($16.000 COP):</b> Tarifa base para 1 a 4 predios; a partir del 5to
+              predio, exactamente $4.000 COP cada uno.</span></li>
         </ul>
       </div>
       <div class="calc" data-calc data-unidad="{{ CFG.precio_por_predio }}" data-minimo="{{ CFG.precio_minimo }}">
@@ -323,7 +415,8 @@
           <span class="mini mono">CALCULA TU INVERSIÓN Y AHORRO</span>
           <span class="calc-tag">Ahorro Inmediato</span>
         </div>
-        <label for="rango"><span>Cantidad de predios a procesar:</span><output for="rango" data-cuantos>20</output></label>
+        <label for="rango"><span>Cantidad de predios a procesar:</span><output for="rango"
+            data-cuantos>20</output></label>
         <input id="rango" type="range" min="1" max="200" value="20" step="1" aria-label="Cantidad de predios">
         <div class="calc-total">
           <span class="tenue">Total con Lindero PRO:</span>
@@ -347,25 +440,33 @@
       <h2>Empieza tu pedido. Tu vista previa satelital estará lista en 2 minutos.</h2>
       <p class="bajada">Sube tus archivos de campo. Validamos la información antes de cobrar cualquier tarifa.</p>
     </div>
-    
-    {% if errores %}<div class="aviso mal" role="alert" style="margin-bottom:24px"><b>Falta corregir esto para continuar:</b><ul>{% for e in errores %}<li>{{ e }}</li>{% endfor %}</ul></div>{% endif %}
+
+    {% if errores %}<div class="aviso mal" role="alert" style="margin-bottom:24px"><b>Falta corregir esto para
+        continuar:</b>
+      <ul>{% for e in errores %}<li>{{ e }}</li>{% endfor %}</ul>
+    </div>{% endif %}
 
     <div class="pedido-layout">
       <!-- Columna Principal: Formulario Wizard por Pasos -->
-      <form class="panel-pedido" method="post" action="{{ url_for('crear_pedido') }}" enctype="multipart/form-data" data-pasos>
+      <form class="panel-pedido" method="post" action="{{ url_for('crear_pedido') }}" enctype="multipart/form-data"
+        data-pasos>
         <input type="hidden" name="csrf" value="{{ csrf() }}">
         <ol class="etapas solo-js" aria-label="Pasos del pedido">
-          <li class="actual">1 · Archivos</li><li>2 · Firma</li><li>3 · Contacto</li>
+          <li class="actual">1 · Archivos</li>
+          <li>2 · Firma</li>
+          <li>3 · Contacto</li>
         </ol>
 
         <!-- PASO 1: ARCHIVOS -->
         <fieldset class="paso-form activo">
           <legend>Archivos del levantamiento topográfico</legend>
-          <p class="tenue">Se validan automáticamente en la nube. Si falta algún dato, te indicamos exactamente qué ajustar.</p>
-          
+          <p class="tenue">Se validan automáticamente en la nube. Si falta algún dato, te indicamos exactamente qué
+            ajustar.</p>
+
           <div class="campo">
             <label for="municipio">Municipio activo:</label>
-            <select id="municipio" name="municipio" required data-tooltip="Base catastral activa y georreferenciada con la ortofoto municipal">
+            <select id="municipio" name="municipio" required
+              data-tooltip="Base catastral activa y georreferenciada con la ortofoto municipal">
               {% for k, v in CFG.municipios.items() %}<option value="{{ k }}">{{ v }}</option>{% endfor %}
             </select>
           </div>
@@ -376,14 +477,16 @@
               <span class="et" id="et-excel">Excel con predios y direcciones</span>
               <span class="badge-req">Requerido</span>
             </div>
-            <label class="soltar" data-tooltip="Debe contener columnas NODO (ej. T1, T2) y DIRECCIÓN o CÓDIGO PREDIAL. Acepta .xlsx o .xlsm">
+            <label class="soltar"
+              data-tooltip="Debe contener columnas NODO (ej. T1, T2) y DIRECCIÓN o CÓDIGO PREDIAL. Acepta .xlsx o .xlsm">
               <span class="ico ico-excel">XLSX</span>
               <span class="soltar-texto">
                 <b>Arrastra tu Excel o haz clic para seleccionarlo</b>
                 <small>Con columnas NODO y dirección. Puedes subir uno o varios archivos.</small>
               </span>
               <span class="accion">Elegir</span>
-              <input type="file" name="excel" accept=".xlsx,.xlsm,.XLSX,.XLSM" multiple required aria-labelledby="et-excel">
+              <input type="file" name="excel" accept=".xlsx,.xlsm,.XLSX,.XLSM" multiple required
+                aria-labelledby="et-excel">
             </label>
           </div>
 
@@ -393,7 +496,8 @@
               <span class="et" id="et-dxf">Plano topográfico del levantamiento</span>
               <span class="badge-req">Requerido</span>
             </div>
-            <label class="soltar" data-tooltip="Exporta desde AutoCAD como 'AutoCAD 2018 DXF'. Cada lote debe ser una polilínea cerrada con su NODO escrito dentro">
+            <label class="soltar"
+              data-tooltip="Exporta desde AutoCAD como 'AutoCAD 2018 DXF'. Cada lote debe ser una polilínea cerrada con su NODO escrito dentro">
               <span class="ico ico-dxf">DXF</span>
               <span class="soltar-texto">
                 <b>Arrastra tu plano .DXF o haz clic para seleccionarlo</b>
@@ -410,7 +514,8 @@
               <span class="et" id="et-pts">Cartera de coordenadas de campo</span>
               <span class="badge-opc">Opcional</span>
             </div>
-            <label class="soltar" data-tooltip="Opcional: Solo necesario si tu plano DXF no tiene los nombres de los NODO escritos dentro de cada figura">
+            <label class="soltar"
+              data-tooltip="Opcional: Solo necesario si tu plano DXF no tiene los nombres de los NODO escritos dentro de cada figura">
               <span class="ico ico-txt">TXT / CSV</span>
               <span class="soltar-texto">
                 <b>Solo si el plano no trae los NODO escritos dentro</b>
@@ -423,18 +528,23 @@
 
           <div class="pie-form solo-js">
             <span class="mini">Paso 1 de 3 · Validación Gratuita</span>
-            <button class="btn btn-p" type="button" data-ir="sig">Continuar a Firma <svg aria-hidden="true"><use href="#i-flecha"/></svg></button>
+            <button class="btn btn-p" type="button" data-ir="sig">Continuar a Firma <svg aria-hidden="true">
+                <use href="#i-flecha" />
+              </svg></button>
           </div>
         </fieldset>
 
         <!-- PASO 2: FIRMA Y RESPONSABILIDAD TÉCNICA -->
         <fieldset class="paso-form">
           <legend>Datos del profesional responsable</legend>
-          <p class="tenue">{{ CFG.nombre_servicio }} no reemplaza al profesional: el certificado se emite con el nombre y matrícula de quien autoriza y responde por el levantamiento.</p>
-          
+          <p class="tenue">{{ CFG.nombre_servicio }} no reemplaza al profesional: el certificado se emite con el nombre
+            y matrícula de quien autoriza y responde por el levantamiento.</p>
+
           <div class="campo">
             <label for="firmante">Nombre completo y matrícula profesional:</label>
-            <textarea id="firmante" name="firmante" required maxlength="180" placeholder="Top. Alejandro Morales Gómez&#10;T.P. 08-12345 CPNT" data-tooltip="Aparecerá exactamente como lo escribas en el cuadro oficial de 'Firma Autorizada'">{{ datos.get('firmante', '') }}</textarea>
+            <textarea id="firmante" name="firmante" required maxlength="180"
+              placeholder="Top. Alejandro Morales Gómez&#10;T.P. 08-12345 CPNT"
+              data-tooltip="Aparecerá exactamente como lo escribas en el cuadro oficial de 'Firma Autorizada'">{{ datos.get('firmante', '') }}</textarea>
             <span class="ayuda">Sale tal como lo escribas, debajo de «Firma Autorizada» en cada plano.</span>
           </div>
 
@@ -443,7 +553,8 @@
               <span class="et" id="et-firma">Firma escaneada o digital</span>
               <span class="badge-opc">Opcional</span>
             </div>
-            <label class="soltar" data-tooltip="Imagen transparente (PNG o JPG) de la firma. Si no la subes, el plano sale con la línea para firmar a mano">
+            <label class="soltar"
+              data-tooltip="Imagen transparente (PNG o JPG) de la firma. Si no la subes, el plano sale con la línea para firmar a mano">
               <span class="ico ico-img">PNG</span>
               <span class="soltar-texto">
                 <b>Arrastra la firma o haz clic</b>
@@ -456,32 +567,43 @@
 
           <label class="casilla">
             <input type="checkbox" name="declaracion" value="1" required>
-            <span>Declaro contar con la autorización del profesional titular para registrar su nombre, matrícula y firma en estos planos prediales.</span>
+            <span>Declaro contar con la autorización del profesional titular para registrar su nombre, matrícula y firma
+              en estos planos prediales.</span>
           </label>
 
           <div class="pie-form solo-js">
             <button class="btn btn-s" type="button" data-ir="ant">Atrás</button>
-            <button class="btn btn-p" type="button" data-ir="sig">Continuar a Contacto <svg aria-hidden="true"><use href="#i-flecha"/></svg></button>
+            <button class="btn btn-p" type="button" data-ir="sig">Continuar a Contacto <svg aria-hidden="true">
+                <use href="#i-flecha" />
+              </svg></button>
           </div>
         </fieldset>
 
         <!-- PASO 3: CONTACTO Y CONFIRMACIÓN -->
         <fieldset class="paso-form">
           <legend>¿A dónde enviamos el enlace privado?</legend>
-          <p class="tenue">Tu pedido quedará asociado a este correo para que puedas volver a consultarlo o recibir soporte técnico si es necesario.</p>
-          
+          <p class="tenue">Tu pedido quedará asociado a este correo para que puedas volver a consultarlo o recibir
+            soporte técnico si es necesario.</p>
+
           <div class="campo">
             <label for="correo">Correo electrónico del profesional o empresa:</label>
-            <input id="correo" type="email" name="correo" required autocomplete="email" inputmode="email" placeholder="topografo@empresa.com" value="{{ datos.get('correo', '') }}" data-tooltip="Te enviaremos el enlace privado con tu visor y los archivos para descarga">
+            <input id="correo" type="email" name="correo" required autocomplete="email" inputmode="email"
+              placeholder="topografo@empresa.com" value="{{ datos.get('correo', '') }}"
+              data-tooltip="Te enviaremos el enlace privado con tu visor y los archivos para descarga">
           </div>
 
           <div class="pie-form">
             <button class="btn btn-s solo-js" type="button" data-ir="ant">Atrás</button>
-            <button class="btn btn-p btn-xl" type="submit">Generar mi Vista Previa Gratis <svg aria-hidden="true"><use href="#i-flecha"/></svg></button>
+            <button class="btn btn-p btn-xl" type="submit">Generar mi Vista Previa Gratis <svg aria-hidden="true">
+                <use href="#i-flecha" />
+              </svg></button>
           </div>
           <div class="garantia-pago-nota">
-            <svg aria-hidden="true"><use href="#i-ok"/></svg>
-            <span><strong>Cero cobro en este paso.</strong> Visualizarás tus planos sobre la ortofoto y podrás decidir antes de cualquier pago.</span>
+            <svg aria-hidden="true">
+              <use href="#i-ok" />
+            </svg>
+            <span><strong>Cero cobro en este paso.</strong> Visualizarás tus planos sobre la ortofoto y podrás decidir
+              antes de cualquier pago.</span>
           </div>
         </fieldset>
       </form>
@@ -510,7 +632,8 @@
               <strong>2. Plano CAD (.dxf)</strong>
               <span class="check-tag-req">Requerido</span>
             </div>
-            <p>Desde AutoCAD: <em>Guardar como → DXF 2018</em>. Cada predio cerrado como polilínea y con su texto de NODO adentro.</p>
+            <p>Desde AutoCAD: <em>Guardar como → DXF 2018</em>. Cada predio cerrado como polilínea y con su texto de
+              NODO adentro.</p>
           </div>
 
           <div class="check-box">
@@ -525,11 +648,15 @@
 
         <div class="checklist-pie">
           <div class="pie-dato-mini">
-            <svg aria-hidden="true"><use href="#i-candado"/></svg>
+            <svg aria-hidden="true">
+              <use href="#i-candado" />
+            </svg>
             <span>Cifrado SSL 256-bit · Máx. {{ CFG.max_mb_por_archivo }} MB por archivo</span>
           </div>
           <div class="pie-dato-mini">
-            <svg aria-hidden="true"><use href="#i-ok"/></svg>
+            <svg aria-hidden="true">
+              <use href="#i-ok" />
+            </svg>
             <span>Soporte técnico directo ante cualquier inconsistencia</span>
           </div>
         </div>
@@ -550,29 +677,40 @@
       <div class="preguntas-col">
         <details open>
           <summary>¿Puedo revisar el resultado antes de pagar?</summary>
-          <p>Sí, 100% garantizado. Al subir tus archivos, el sistema genera inmediatamente el mapa interactivo con todos tus predios georreferenciados sobre la ortofoto satelital y te muestra certificados de plano completos con marca de agua. Si algo no te convence, no pagas un solo peso.</p>
+          <p>Sí, 100% garantizado. Al subir tus archivos, el sistema genera inmediatamente el mapa interactivo con todos
+            tus predios georreferenciados sobre la ortofoto satelital y te muestra certificados de plano completos con
+            marca de agua. Si algo no te convence, no pagas un solo peso.</p>
         </details>
         <details>
           <summary>¿Qué pasa si mi plano no tiene coordenadas reales o viene en Bogotá Este?</summary>
-          <p>Si el Excel contiene la dirección o el código predial, el motor cruza las placas domiciliarias y ubica los lotes en su posición oficial en CTM12. Si el plano viene en coordenadas antiguas (Bogotá Este), el sistema realiza la conversión automática al nuevo marco MAGNA-SIRGAS 2018 Origen Nacional.</p>
+          <p>Si el Excel contiene la dirección o el código predial, el motor cruza las placas domiciliarias y ubica los
+            lotes en su posición oficial en CTM12. Si el plano viene en coordenadas antiguas (Bogotá Este), el sistema
+            realiza la conversión automática al nuevo marco MAGNA-SIRGAS 2018 Origen Nacional.</p>
         </details>
         <details>
           <summary>¿Y si no tengo el código predial de los lotes?</summary>
-          <p>No te preocupes: el motor busca automáticamente por la dirección y cruza las bases catastrales municipales. Además, corrobora la posición con el predio oficial que queda exactamente debajo de cada polígono en el levantamiento.</p>
+          <p>No te preocupes: el motor busca automáticamente por la dirección y cruza las bases catastrales municipales.
+            Además, corrobora la posición con el predio oficial que queda exactamente debajo de cada polígono en el
+            levantamiento.</p>
         </details>
       </div>
       <div class="preguntas-col">
         <details>
           <summary>¿Quién firma y responde por los planos emitidos?</summary>
-          <p>El profesional que tú indiques. Lindero PRO es una herramienta de automatización para topógrafos e ingenieros; el plano predial sale con el nombre, matrícula y firma de tu profesional responsable bajo normativa CPNT.</p>
+          <p>El profesional que tú indiques. Lindero PRO es una herramienta de automatización para topógrafos e
+            ingenieros; el plano predial sale con el nombre, matrícula y firma de tu profesional responsable bajo
+            normativa CPNT.</p>
         </details>
         <details>
           <summary>¿Qué archivos descargo una vez confirmado el pago?</summary>
-          <p>Descargas un archivo ZIP con 3 carpetas organizadas: <b>01.SHAPEFILE/</b> (con los 25 atributos LEVANTAMIENTO_01, cotas y vértices), <b>02.PDF/</b> (un PDF por predio con cuadro oficial de linderos y colindantes listo para radicar), y un archivo <b>INFORME_REVISION.xlsx</b> con el resumen de áreas.</p>
+          <p>Descargas un archivo ZIP con 3 carpetas organizadas: <b>01.SHAPEFILE/</b> (con los 25 atributos
+            LEVANTAMIENTO_01, cotas y vértices), <b>02.PDF/</b> (un PDF por predio con cuadro oficial de linderos y
+            colindantes listo para radicar), y un archivo <b>INFORME_REVISION.xlsx</b> con el resumen de áreas.</p>
         </details>
         <details>
           <summary>¿Qué métodos de pago aceptan?</summary>
-          <p>{% if wompi %}Aceptamos PSE, Nequi, Daviplata y tarjetas débito/crédito a través de Wompi. La descarga permanente y el comprobante digital se envían inmediatamente.{% else %}{{ CFG.pago_manual }}{% endif %}</p>
+          <p>{% if wompi %}Aceptamos PSE, Nequi, Daviplata y tarjetas débito/crédito a través de Wompi. La descarga
+            permanente y el comprobante digital se envían inmediatamente.{% else %}{{ CFG.pago_manual }}{% endif %}</p>
         </details>
       </div>
     </div>
@@ -581,18 +719,25 @@
     <div class="faq-soporte-banner" data-ver>
       <div class="faq-soporte-info">
         <div class="faq-soporte-icono">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;color:var(--cian);"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" style="width:20px;height:20px;color:var(--cian);">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
         </div>
         <div>
           <h3 class="faq-soporte-tit">¿Tienes un caso particular o dudas con tu levantamiento?</h3>
-          <p class="faq-soporte-desc">Revisamos tu archivo DXF o coordenadas sin costo antes de que hagas el pedido. Asesoría directa de ingenieros.</p>
+          <p class="faq-soporte-desc">Revisamos tu archivo DXF o coordenadas sin costo antes de que hagas el pedido.
+            Asesoría directa de ingenieros.</p>
         </div>
       </div>
       <div class="faq-soporte-acciones">
-        <a class="btn btn-s btn-sm" href="https://wa.me/573106514707?text=Hola%20Lindero%20PRO,%20tengo%20una%20consulta%20t%C3%A9cnica%20sobre%20un%20plano" target="_blank" rel="noopener">
+        <a class="btn btn-s btn-sm"
+          href="https://wa.me/573106514707?text=Hola%20Lindero%20PRO,%20tengo%20una%20consulta%20t%C3%A9cnica%20sobre%20un%20plano"
+          target="_blank" rel="noopener">
           💬 WhatsApp Directo
         </a>
-        <a class="btn btn-t btn-sm" href="mailto:soporte@devgiz.com?subject=Consulta%20T%C3%A9cnica%20Lindero%20PRO">
+        <a class="btn btn-t btn-sm"
+          href="mailto:agaviria2109@gmail.com?subject=Consulta%20T%C3%A9cnica%20Lindero%20PRO">
           soporte@devgiz.com
         </a>
       </div>
@@ -605,8 +750,11 @@
   <div class="cont">
     <div class="cierre" data-ver>
       <h2>Tus planos pueden estar certificados hoy mismo.</h2>
-      <p class="bajada">Sube tus archivos ahora y visualiza el levantamiento en el mapa en menos de dos minutos. Cero riesgo.</p>
-      <a class="btn btn-p btn-xl" href="#pedido">Ver mi vista previa gratis <svg aria-hidden="true"><use href="#i-flecha"/></svg></a>
+      <p class="bajada">Sube tus archivos ahora y visualiza el levantamiento en el mapa en menos de dos minutos. Cero
+        riesgo.</p>
+      <a class="btn btn-p btn-xl" href="#pedido">Ver mi vista previa gratis <svg aria-hidden="true">
+          <use href="#i-flecha" />
+        </svg></a>
     </div>
   </div>
 </section>
