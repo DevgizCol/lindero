@@ -51,9 +51,13 @@ def norm_nodo(t) -> str:
 
 
 def extraer_num_nodo(t) -> str:
-    """Extrae el número entero de un identificador para rescate: 'T-01' -> '1', 'Lote 12' -> '12'."""
-    nums = re.findall(r"\d+", str(t or ""))
-    return str(int(nums[-1])) if nums else ""
+    """Extrae el número entero principal de un lote: 'T-01' -> '1', 'Lote 12' -> '12', 'P-298 casa 1' -> '298'."""
+    s = re.sub(r"\b(CASA|APTO|APT|LOCAL|PISO|INT|INTERIOR)\s*\d+", "", str(t or ""), flags=re.IGNORECASE)
+    nums = re.findall(r"\d+", s)
+    if nums:
+        return str(int(nums[0]))
+    nums_orig = re.findall(r"\d+", str(t or ""))
+    return str(int(nums_orig[-1])) if nums_orig else ""
 
 
 def leer_dxf(ruta) -> gpd.GeoDataFrame:
@@ -106,7 +110,7 @@ def extraer(ruta_dxf, nodos_esperados=(), ruta_puntos=None, area_min=8.0, area_m
     # se cierra con la rejilla más fina que sirva: 1 mm conserva el área al centímetro cuadrado;
     # si quedan líneas sin cerrar, prueba snapping de 1 cm, 5 cm y hasta 10 cm para reparar planos sucios
     mejor = None
-    for rej in sorted({0.001, rejilla, 0.05, 0.10}):
+    for rej in sorted({0.001, rejilla, 0.05, 0.10, 0.15, 0.20}):
         geoms = shapely.set_precision(lineas.geometry.values, rej)
         red_r = unary_union([g for g in geoms if g is not None and not g.is_empty])
         polys_r = [p for p in polygonize(red_r) if area_min <= p.area <= area_max]
@@ -134,29 +138,40 @@ def extraer(ruta_dxf, nodos_esperados=(), ruta_puntos=None, area_min=8.0, area_m
     tx = ent[util & ent.geom_type.eq("Point") & ent["Text"].notna()] if "Text" in ent else ent.iloc[0:0]
     d.textos = [(str(t).strip(), g.x, g.y) for t, g in zip(tx["Text"], tx.geometry)]
     esperados = {norm_nodo(n): str(n) for n in nodos_esperados if norm_nodo(n)}
+    esperados_num = {extraer_num_nodo(n): str(n) for n in nodos_esperados if extraer_num_nodo(n)}
     d.nodos = [""] * len(d.poligonos)
     d.origen = [""] * len(d.poligonos)
+
+    def _resolver(texto):
+        k = norm_nodo(texto)
+        if esperados and k in esperados:
+            return esperados[k]
+        num = extraer_num_nodo(texto)
+        if esperados_num and num in esperados_num:
+            return esperados_num[num]
+        if not esperados and re.fullmatch(r"[A-Z]{0,4}\d{1,5}[A-Z]?", k):
+            return texto
+        return None
+
     if d.poligonos:
         arbol = STRtree(d.poligonos)
         # 1) texto dentro del polígono
         votos = defaultdict(list)
         textos_usados = set()
         for idx_t, (t, x, y) in enumerate(d.textos):
-            k = norm_nodo(t)
-            if esperados and k not in esperados:
-                continue
-            if not esperados and not re.fullmatch(r"[A-Z]{0,3}\d{1,5}[A-Z]?", k):
+            val = _resolver(t)
+            if not val:
                 continue
             matches = arbol.query(Point(x, y), predicate="within")
             if len(matches):
                 for i in matches:
-                    votos[int(i)].append(esperados.get(k, t))
+                    votos[int(i)].append(val)
                 textos_usados.add(idx_t)
         for i, v in votos.items():
             if len(set(v)) == 1:
                 d.nodos[i], d.origen[i] = v[0], "TEXTO"
 
-        # 1.1) rescate: textos en el borde o ligeramente afuera (tolerancia de 50 cm)
+        # 1.1) rescate: textos en el borde o ligeramente afuera (tolerancia de hasta 1.2 m)
         for i in range(len(d.poligonos)):
             if not d.nodos[i]:
                 poli = d.poligonos[i]
@@ -164,11 +179,12 @@ def extraer(ruta_dxf, nodos_esperados=(), ruta_puntos=None, area_min=8.0, area_m
                 for idx_t, (t, x, y) in enumerate(d.textos):
                     if idx_t in textos_usados:
                         continue
-                    k = norm_nodo(t)
-                    if esperados and k not in esperados:
+                    val = _resolver(t)
+                    if not val:
                         continue
-                    if poli.distance(Point(x, y)) <= 0.5:
-                        candidatos.append((esperados.get(k, t), poli.distance(Point(x, y))))
+                    dist = poli.distance(Point(x, y))
+                    if dist <= 1.2:
+                        candidatos.append((val, dist))
                 if candidatos:
                     candidatos.sort(key=lambda c: c[1])
                     d.nodos[i], d.origen[i] = candidatos[0][0], "TEXTO_BORDE"
