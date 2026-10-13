@@ -11,6 +11,8 @@ tests/datos/
 *.xlsx
 *.dxf
 *.dwg
+!tests/fixtures/*.xlsx
+!tests/fixtures/*.dxf
 
 # Secretos y configuración local
 web/.env.local
