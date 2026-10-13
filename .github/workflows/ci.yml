@@ -6,14 +6,15 @@ on:
   pull_request:
     branches: [ main ]
   schedule:
-    # Ping cada 14 minutos para evitar spin-down de 50 segundos en Render Free tier
-    - cron: '*/14 * * * *'
+    # Ping cada 10 minutos (Render duerme a los 15 min; 10 min da 5 min de tolerancia ante retrasos de cola)
+    - cron: '*/10 * * * *'
   workflow_dispatch:
 
 jobs:
   test:
     name: Verificación Cartográfica y Seguridad
     runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
     steps:
       - name: Descargar repositorio
         uses: actions/checkout@v4
@@ -42,6 +43,15 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     steps:
-      - name: Health Ping a Render Producción
+      - name: Health Ping a Render Producción con Reintentos
         run: |
-          curl -s -f https://lindero.onrender.com/salud || echo "Servicio reactivándose..."
+          for i in 1 2 3; do
+            echo "Enviando ping #$i a Render..."
+            if curl -s -f -m 25 https://lindero.onrender.com/salud; then
+              echo "✅ Servidor Lindero PRO activo y respondiendo."
+              exit 0
+            fi
+            echo "Reintentando en 5 segundos..."
+            sleep 5
+          done
+          echo "⚠️ El servidor no respondió tras 3 intentos."
